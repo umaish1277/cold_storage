@@ -1,0 +1,20 @@
+{
+  "doctype": "Report",
+  "report_name": "My Pending Cold Storage Approvals",
+  "name": "My Pending Cold Storage Approvals",
+  "ref_doctype": "Cold Storage Receive Goods",
+  "is_standard": "Yes",
+  "report_type": "Script Report",
+  "module": "Cold Storage",
+  "roles": [
+    {
+      "role": "Cold Storage Supervisor"
+    },
+    {
+      "role": "Cold Storage Manager"
+    },
+    {
+      "role": "System Manager"
+    }
+  ]
+}

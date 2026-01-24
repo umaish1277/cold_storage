@@ -1,0 +1,32 @@
+{
+  "doctype": "DocType",
+  "name": "Cold Storage Chamber",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 0,
+  "is_tree": 0,
+  "is_submittable": 0,
+  "autoname": "field:chamber_name",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "chamber_name",
+      "label": "Chamber Name",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "warehouse",
+      "label": "Warehouse",
+      "fieldtype": "Link",
+      "options": "Warehouse",
+      "reqd": 1,
+      "in_list_view": 1
+    }
+  ],
+  "permissions": []
+}

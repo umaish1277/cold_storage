@@ -1,0 +1,64 @@
+{
+  "doctype": "DocType",
+  "name": "Storage Contract",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 0,
+  "is_tree": 0,
+  "is_submittable": 0,
+  "autoname": "format:CS-CONTRACT-.#####",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "customer",
+      "label": "Customer",
+      "fieldtype": "Link",
+      "options": "Customer",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "season",
+      "label": "Season",
+      "fieldtype": "Link",
+      "options": "Cold Storage Season",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "rate_card",
+      "label": "Rate Card",
+      "fieldtype": "Link",
+      "options": "Cold Storage Rate Card",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "billing_cycle",
+      "label": "Billing Cycle",
+      "fieldtype": "Select",
+      "options": "Seasonal\nMonthly",
+      "default": "Seasonal",
+      "reqd": 1
+    },
+    {
+      "fieldname": "min_monthly_amount",
+      "label": "Minimum Monthly Amount",
+      "fieldtype": "Currency",
+      "default": 0
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Active\nClosed",
+      "default": "Active",
+      "reqd": 1,
+      "in_list_view": 1
+    }
+  ],
+  "permissions": []
+}

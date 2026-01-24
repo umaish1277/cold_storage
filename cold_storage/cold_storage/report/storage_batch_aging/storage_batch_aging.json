@@ -1,0 +1,17 @@
+{
+  "doctype": "Report",
+  "report_name": "Storage Batch Aging",
+  "name": "Storage Batch Aging",
+  "ref_doctype": "Storage Batch",
+  "is_standard": "Yes",
+  "report_type": "Script Report",
+  "module": "Cold Storage",
+  "roles": [
+    {
+      "role": "Stock User"
+    },
+    {
+      "role": "System Manager"
+    }
+  ]
+}

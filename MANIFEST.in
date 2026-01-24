@@ -1,0 +1,2 @@
+include README.md
+recursive-include cold_storage *.json *.js *.py *.md *.txt

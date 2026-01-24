@@ -1,0 +1,10 @@
+{
+  "doctype": "Number Card",
+  "name": "CS - Pending Approvals",
+  "label": "Pending Approvals",
+  "is_standard": 1,
+  "module": "Cold Storage",
+  "type": "Custom",
+  "method": "cold_storage.cold_storage.api.kpi.pending_approvals_count",
+  "is_public": 0
+}

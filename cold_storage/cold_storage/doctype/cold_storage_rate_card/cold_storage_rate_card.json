@@ -1,0 +1,31 @@
+{
+  "doctype": "DocType",
+  "name": "Cold Storage Rate Card",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 0,
+  "is_tree": 0,
+  "is_submittable": 0,
+  "autoname": "field:rate_card_name",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "rate_card_name",
+      "label": "Rate Card Name",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "charge_rules",
+      "label": "Charge Rules",
+      "fieldtype": "Table",
+      "options": "Cold Storage Rate Card Rule",
+      "reqd": 1
+    }
+  ],
+  "permissions": []
+}

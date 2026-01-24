@@ -1,0 +1,19 @@
+{
+  "doctype": "Notification",
+  "name": "CS - Receive Pending Approval (Bell)",
+  "enabled": 1,
+  "is_standard": 1,
+  "module": "Cold Storage",
+  "document_type": "Cold Storage Receive Goods",
+  "event": "Value Change",
+  "value_changed": "workflow_state",
+  "condition": "doc.workflow_state == 'CS Pending Approval'",
+  "subject": "Receive Goods pending approval: {{ doc.name }}",
+  "message": "Receive Goods <b>{{ doc.name }}</b> is pending approval.<br><b>Customer:</b> {{ doc.customer }}<br><b>Date/Time:</b> {{ doc.receiving_datetime or doc.creation }}<br><b>Reference:</b> {{ doc.reference or '' }}",
+  "recipients": [
+    {
+      "receiver_by_role": "Cold Storage Supervisor"
+    }
+  ],
+  "channel": "System Notification"
+}

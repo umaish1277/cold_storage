@@ -1,0 +1,7 @@
+{
+  "doctype": "Workflow State",
+  "workflow_state_name": "CS Approved",
+  "style": "Success",
+  "is_standard": 1,
+  "module": "Cold Storage"
+}

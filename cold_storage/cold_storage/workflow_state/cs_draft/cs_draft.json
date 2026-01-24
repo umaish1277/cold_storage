@@ -1,0 +1,7 @@
+{
+  "doctype": "Workflow State",
+  "workflow_state_name": "CS Draft",
+  "style": "Warning",
+  "is_standard": 1,
+  "module": "Cold Storage"
+}

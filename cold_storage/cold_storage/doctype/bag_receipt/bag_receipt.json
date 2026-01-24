@@ -1,0 +1,59 @@
+{
+  "doctype": "DocType",
+  "name": "Bag Receipt",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 0,
+  "is_tree": 0,
+  "is_submittable": 1,
+  "autoname": "format:CS-BR-.#####",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "customer",
+      "label": "Customer",
+      "fieldtype": "Link",
+      "options": "Customer",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "contract",
+      "label": "Contract",
+      "fieldtype": "Link",
+      "options": "Storage Contract",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "posting_datetime",
+      "label": "Posting Date/Time",
+      "fieldtype": "Datetime",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "reference",
+      "label": "Reference",
+      "fieldtype": "Data",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "storage_batch",
+      "label": "Storage Batch",
+      "fieldtype": "Link",
+      "options": "Storage Batch"
+    },
+    {
+      "fieldname": "bags",
+      "label": "Bags",
+      "fieldtype": "Table",
+      "options": "Bag Movement Line",
+      "reqd": 1
+    }
+  ],
+  "permissions": []
+}

@@ -1,0 +1,15 @@
+{
+  "doctype": "Dashboard Chart",
+  "name": "CS - Monthly Revenue",
+  "chart_name": "CS - Monthly Revenue",
+  "is_standard": 1,
+  "module": "Cold Storage",
+  "chart_type": "Sum",
+  "document_type": "Sales Invoice",
+  "based_on": "posting_date",
+  "value_based_on": "grand_total",
+  "time_interval": "Monthly",
+  "timespan": "Last Year",
+  "filters_json": "[[\"Sales Invoice\", \"docstatus\", \"=\", 1, false], [\"Sales Invoice\", \"cold_storage_contract\", \"!=\", \"\", false]]",
+  "type": "Document Type"
+}

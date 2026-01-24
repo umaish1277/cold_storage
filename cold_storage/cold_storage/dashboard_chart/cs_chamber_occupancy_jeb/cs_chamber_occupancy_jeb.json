@@ -1,0 +1,9 @@
+{
+  "doctype": "Dashboard Chart",
+  "name": "CS - Chamber Occupancy (JEB)",
+  "chart_name": "CS - Chamber Occupancy (JEB)",
+  "is_standard": 1,
+  "module": "Cold Storage",
+  "chart_type": "Custom",
+  "source": "CS Chamber Occupancy JEB"
+}

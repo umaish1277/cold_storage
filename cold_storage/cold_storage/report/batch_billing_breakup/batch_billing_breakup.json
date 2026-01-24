@@ -1,0 +1,20 @@
+{
+  "doctype": "Report",
+  "report_name": "Batch Billing Breakup",
+  "name": "Batch Billing Breakup",
+  "ref_doctype": "Storage Batch",
+  "is_standard": "Yes",
+  "report_type": "Script Report",
+  "module": "Cold Storage",
+  "roles": [
+    {
+      "role": "Accounts User"
+    },
+    {
+      "role": "System Manager"
+    },
+    {
+      "role": "Cold Storage Billing User"
+    }
+  ]
+}

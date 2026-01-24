@@ -1,0 +1,32 @@
+{
+  "doctype": "DocType",
+  "name": "Bag Movement Line",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 1,
+  "editable_grid": 1,
+  "is_tree": 0,
+  "is_submittable": 0,
+  "autoname": "hash",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "bag_type",
+      "label": "Bag Type",
+      "fieldtype": "Select",
+      "options": "Jute\nNet",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "qty",
+      "label": "Qty (Nos)",
+      "fieldtype": "Int",
+      "reqd": 1,
+      "in_list_view": 1
+    }
+  ],
+  "permissions": []
+}

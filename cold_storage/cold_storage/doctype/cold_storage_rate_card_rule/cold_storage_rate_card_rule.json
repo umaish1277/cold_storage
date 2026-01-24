@@ -1,0 +1,40 @@
+{
+  "doctype": "DocType",
+  "name": "Cold Storage Rate Card Rule",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 1,
+  "editable_grid": 1,
+  "is_tree": 0,
+  "is_submittable": 0,
+  "autoname": "hash",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "charge_type",
+      "label": "Charge Type",
+      "fieldtype": "Select",
+      "options": "Storage\nHandling\nOther",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "billing_basis",
+      "label": "Billing Basis",
+      "fieldtype": "Select",
+      "options": "Per Jute Eq Bag\nPer Month\nFlat",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "rate",
+      "label": "Rate",
+      "fieldtype": "Currency",
+      "reqd": 1,
+      "in_list_view": 1
+    }
+  ],
+  "permissions": []
+}

@@ -1,0 +1,71 @@
+{
+  "doctype": "DocType",
+  "name": "Customer Bag Ledger Entry",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 0,
+  "is_tree": 0,
+  "is_submittable": 0,
+  "autoname": "hash",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "posting_datetime",
+      "label": "Posting Date/Time",
+      "fieldtype": "Datetime",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "customer",
+      "label": "Customer",
+      "fieldtype": "Link",
+      "options": "Customer",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "bag_type",
+      "label": "Bag Type",
+      "fieldtype": "Select",
+      "options": "Jute\nNet",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "in_qty",
+      "label": "In Qty",
+      "fieldtype": "Int",
+      "default": 0,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "out_qty",
+      "label": "Out Qty",
+      "fieldtype": "Int",
+      "default": 0,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "voucher_type",
+      "label": "Voucher Type",
+      "fieldtype": "Data",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "voucher_no",
+      "label": "Voucher No",
+      "fieldtype": "Data",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "remarks",
+      "label": "Remarks",
+      "fieldtype": "Small Text"
+    }
+  ],
+  "permissions": []
+}

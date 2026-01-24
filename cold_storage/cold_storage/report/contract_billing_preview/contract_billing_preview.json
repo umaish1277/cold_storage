@@ -1,0 +1,20 @@
+{
+  "doctype": "Report",
+  "report_name": "Contract Billing Preview",
+  "name": "Contract Billing Preview",
+  "ref_doctype": "Storage Contract",
+  "is_standard": "Yes",
+  "report_type": "Script Report",
+  "module": "Cold Storage",
+  "roles": [
+    {
+      "role": "Accounts User"
+    },
+    {
+      "role": "System Manager"
+    },
+    {
+      "role": "Cold Storage Billing User"
+    }
+  ]
+}

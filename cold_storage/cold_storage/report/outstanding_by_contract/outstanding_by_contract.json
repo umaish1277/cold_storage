@@ -1,0 +1,20 @@
+{
+  "doctype": "Report",
+  "report_name": "Outstanding by Contract",
+  "name": "Outstanding by Contract",
+  "ref_doctype": "Sales Invoice",
+  "is_standard": "Yes",
+  "report_type": "Script Report",
+  "module": "Cold Storage",
+  "roles": [
+    {
+      "role": "Accounts User"
+    },
+    {
+      "role": "System Manager"
+    },
+    {
+      "role": "Cold Storage Billing User"
+    }
+  ]
+}

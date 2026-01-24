@@ -1,0 +1,117 @@
+{
+  "doctype": "DocType",
+  "name": "Cold Storage Dispatch Goods",
+  "module": "Cold Storage",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 0,
+  "is_tree": 0,
+  "is_submittable": 1,
+  "autoname": "format:CS-DSP-.#####",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "customer",
+      "label": "Customer",
+      "fieldtype": "Link",
+      "options": "Customer",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "contract",
+      "label": "Contract",
+      "fieldtype": "Link",
+      "options": "Storage Contract",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "dispatch_datetime",
+      "label": "Dispatch Date/Time",
+      "fieldtype": "Datetime",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "reference",
+      "label": "Reference/Vehicle",
+      "fieldtype": "Data",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "section_break_1",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "storage_batch",
+      "label": "Storage Batch",
+      "fieldtype": "Link",
+      "options": "Storage Batch",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "item",
+      "label": "Item",
+      "fieldtype": "Link",
+      "options": "Item",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "qty_dispatch",
+      "label": "Qty Dispatch",
+      "fieldtype": "Float",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "uom",
+      "label": "UOM",
+      "fieldtype": "Link",
+      "options": "UOM",
+      "default": "Nos",
+      "reqd": 1
+    },
+    {
+      "fieldname": "batch",
+      "label": "ERP Batch",
+      "fieldtype": "Link",
+      "options": "Batch"
+    },
+    {
+      "fieldname": "chamber",
+      "label": "Chamber",
+      "fieldtype": "Link",
+      "options": "Cold Storage Chamber"
+    },
+    {
+      "fieldname": "warehouse",
+      "label": "Warehouse",
+      "fieldtype": "Link",
+      "options": "Warehouse",
+      "reqd": 1
+    },
+    {
+      "fieldname": "column_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "bags",
+      "label": "Bags Returned",
+      "fieldtype": "Table",
+      "options": "Bag Movement Line"
+    },
+    {
+      "fieldname": "workflow_state",
+      "label": "Workflow State",
+      "fieldtype": "Link",
+      "options": "Workflow State",
+      "read_only": 1
+    }
+  ],
+  "permissions": []
+}
