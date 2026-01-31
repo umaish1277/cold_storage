@@ -26,7 +26,8 @@
             "fieldtype": "Link",
             "in_list_view": 1,
             "label": "Bag Type",
-            "options": "Item"
+            "options": "Item",
+            "reqd": 1
         },
         {
             "fieldname": "number_of_bags",

@@ -119,6 +119,12 @@
             "fieldtype": "Currency",
             "label": "Grand Total",
             "read_only": 1
+        },
+        {
+            "fieldname": "in_words",
+            "fieldtype": "Small Text",
+            "label": "In Words",
+            "read_only": 1
         }
     ],
     "index_web_pages_for_search": 1,

@@ -1,5 +1,14 @@
 import frappe
 from frappe.model.document import Document
+from frappe.utils import flt
+
+@frappe.whitelist()
+def get_bag_rate(bag_type):
+    settings = frappe.get_single("Cold Storage Settings")
+    for row in settings.bag_type_rates:
+        if row.bag_type == bag_type:
+            return flt(row.rate)
+    return 0.0
 
 class ColdStorageDispatch(Document):
 	def validate(self):
@@ -41,31 +50,44 @@ class ColdStorageDispatch(Document):
         
 	def calculate_billing(self):
 		settings = frappe.get_single("Cold Storage Settings")
-		default_rate = settings.default_handling_charge_per_bag or 0
+		
+		# Create a map of Bag Type -> Rate
+		rate_map = {}
+		if settings.bag_type_rates:
+			for row in settings.bag_type_rates:
+				rate_map[row.bag_type] = flt(row.rate)
 		
 		total_handling = 0
 		
 		for item in self.items:
-			# Set default rate if not set
+			# Enforce rate based on Bag Type (Standard Pricing) only if Rate is not set
+			# This allows manual overrides while providing defaults.
 			if not item.rate:
-				item.rate = default_rate
+				if item.bag_type in rate_map:
+					item.rate = rate_map[item.bag_type]
+				else:
+					item.rate = 0
 				
 			# Calculate item amount
-			item.amount = frappe.utils.flt(item.rate) * frappe.utils.flt(item.number_of_bags)
+			item.amount = flt(item.rate) * flt(item.number_of_bags)
 			total_handling += item.amount
 			
 		self.total_amount = total_handling
 		
 		# Calculate GST
 		if self.gst_applicable:
-			 # If gst_rate is not set, maybe should error? Or assume 0.
-			 rate = frappe.utils.flt(self.gst_rate)
+			 rate = flt(self.gst_rate)
 			 self.total_gst_amount = (total_handling * rate) / 100.0
 		else:
 			 self.total_gst_amount = 0
 			 self.gst_rate = 0
 			 
 		self.grand_total = self.total_amount + self.total_gst_amount
+		
+		# Set In Words
+		from frappe.utils import money_in_words
+		company_currency = frappe.get_cached_value('Company',  self.company,  'default_currency')
+		self.in_words = money_in_words(self.grand_total, company_currency)
 
 	def on_submit(self):
 		# The original on_submit logic for Sales Invoice creation

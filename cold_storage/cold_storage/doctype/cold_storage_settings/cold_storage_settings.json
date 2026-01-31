@@ -4,14 +4,14 @@
     "doctype": "DocType",
     "engine": "InnoDB",
     "field_order": [
-        "default_handling_charge_per_bag"
+        "bag_type_rates"
     ],
     "fields": [
         {
-            "fieldname": "default_handling_charge_per_bag",
-            "fieldtype": "Currency",
-            "label": "Default Handling Charge (Per Bag)",
-            "non_negative": 1
+            "fieldname": "bag_type_rates",
+            "fieldtype": "Table",
+            "label": "Bag Type Rates",
+            "options": "Bag Type Rate"
         }
     ],
     "issingle": 1,
