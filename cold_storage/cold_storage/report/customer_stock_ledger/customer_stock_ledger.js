@@ -21,6 +21,25 @@ frappe.query_reports["Customer Stock Ledger"] = {
             "reqd": 0
         },
         {
+            "fieldname": "warehouse",
+            "label": __("Warehouse"),
+            "fieldtype": "Link",
+            "options": "Warehouse",
+            "reqd": 0
+        },
+        {
+            "fieldname": "bag_type",
+            "label": __("Bag Type"),
+            "fieldtype": "Link",
+            "options": "Item",
+            "get_query": function () {
+                return {
+                    query: "cold_storage.cold_storage.report.customer_stock_ledger.customer_stock_ledger.get_bag_type_filter"
+                };
+            },
+            "reqd": 0
+        },
+        {
             "fieldname": "show_zero_balance",
             "label": __("Show Zero Balance"),
             "fieldtype": "Check",

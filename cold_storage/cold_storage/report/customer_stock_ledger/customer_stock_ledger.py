@@ -22,6 +22,10 @@ def execute(filters=None):
 		conditions += f" AND customer = '{filters.get('customer')}'"
 	if filters.get("batch_no"):
 		conditions += f" AND batch_no LIKE '%{filters.get('batch_no')}%'"
+	if filters.get("warehouse"):
+		conditions += f" AND p.warehouse = '{filters.get('warehouse')}'"
+	if filters.get("bag_type"):
+		conditions += f" AND c.bag_type = '{filters.get('bag_type')}'"
     
 	# Fetch Receipts from Child Table
 	receipts = frappe.db.sql(f"""
@@ -63,3 +67,17 @@ def execute(filters=None):
 		})
 
 	return columns, data
+
+@frappe.whitelist()
+def get_bag_type_filter(doctype, txt, searchfield, start, page_len, filters):
+	return frappe.db.sql(f"""
+		SELECT DISTINCT bag_type 
+		FROM `tabCold Storage Receipt Item`
+		WHERE bag_type LIKE %(txt)s
+		AND docstatus = 1
+		LIMIT %(page_len)s OFFSET %(start)s
+	""", {
+		'txt': f"%{txt}%",
+		'page_len': page_len,
+		'start': start
+	})
