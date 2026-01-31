@@ -93,11 +93,11 @@ def execute(filters=None):
 			"batch_no": frappe.bold(_("Total")),
 			"receipt": "",
 			"receipt_date": "",
-			"days_in_store": "",
+			"days_in_store": None,
 			"in_qty": total_in_qty,
 			"out_qty": total_out_qty,
 			"balance": total_balance,
-			"cumulative_balance": ""
+			"cumulative_balance": None
 		})
 
 	return columns, data

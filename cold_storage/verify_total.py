@@ -24,7 +24,13 @@ def verify_total_row():
         print(f"Total In Qty: {last_row.get('in_qty')}")
         print(f"Total Out Qty: {last_row.get('out_qty')}")
         print(f"Total Balance: {last_row.get('balance')}")
+        print(f"Total Days In Store: '{last_row.get('days_in_store')}'")
         
+        if last_row.get('days_in_store') == "":
+            print("Success: Total Days In Store is empty.")
+        else:
+            print(f"Warning: Total Days In Store is NOT empty: {last_row.get('days_in_store')}")
+
         # Verify sum conceptually (first few rows)
         if len(data) > 1:
              # Sum of previous rows
