@@ -1,6 +1,18 @@
 frappe.query_reports["Customer Stock Ledger"] = {
     "filters": [
         {
+            "fieldname": "from_date",
+            "label": __("From Date"),
+            "fieldtype": "Date",
+            "reqd": 0
+        },
+        {
+            "fieldname": "to_date",
+            "label": __("To Date"),
+            "fieldtype": "Date",
+            "reqd": 0
+        },
+        {
             "fieldname": "customer",
             "label": __("Customer"),
             "fieldtype": "Link",

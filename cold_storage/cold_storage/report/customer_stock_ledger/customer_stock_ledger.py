@@ -29,6 +29,10 @@ def execute(filters=None):
 		conditions += f" AND c.bag_type = '{filters.get('bag_type')}'"
 	if filters.get("item_code"):
 		conditions += f" AND c.goods_item = '{filters.get('item_code')}'"
+	if filters.get("from_date"):
+		conditions += f" AND p.receipt_date >= '{filters.get('from_date')}'"
+	if filters.get("to_date"):
+		conditions += f" AND p.receipt_date <= '{filters.get('to_date')}'"
     
 	# Fetch Receipts from Child Table
 	receipts = frappe.db.sql(f"""
