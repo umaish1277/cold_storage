@@ -13,13 +13,16 @@
         "receipt_date",
         "column_break_jklz",
         "naming_series",
+        "qr_code",
         "warehouse",
         "section_break_details",
         "items",
         "section_break_remarks",
         "remarks",
+        "total_bags",
         "amended_from"
     ],
+    "image_field": "qr_code",
     "fields": [
         {
             "fieldname": "section_break_gkhy",
@@ -94,6 +97,19 @@
             "no_copy": 1,
             "options": "Cold Storage Receipt",
             "read_only": 1
+        },
+        {
+            "fieldname": "total_bags",
+            "fieldtype": "Int",
+            "label": "Total Bags",
+            "read_only": 1
+        },
+        {
+            "fieldname": "qr_code",
+            "fieldtype": "Attach Image",
+            "label": "QR Code",
+            "read_only": 1,
+            "hidden": 0
         }
     ],
     "index_web_pages_for_search": 1,

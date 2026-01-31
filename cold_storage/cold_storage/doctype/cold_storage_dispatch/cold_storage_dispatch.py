@@ -199,6 +199,33 @@ class ColdStorageDispatch(Document):
 		si.save()
 		
 		# Link Invoice to Dispatch
+		# Link Invoice to Dispatch
 		self.db_set("sales_invoice", si.name)
 		
+		# Send Notification
+		self.notify_customer(si.grand_total)
+		
 		frappe.msgprint(f"Sales Invoice <a href='/app/sales-invoice/{si.name}'>{si.name}</a> created.")
+
+	def notify_customer(self, amount):
+		if not self.customer: return
+		
+		contact_email = frappe.db.get_value("Contact", {"link_doctype": "Customer", "link_name": self.customer, "is_primary_contact": 1}, "email_id")
+		if not contact_email:
+				contact_email = frappe.db.get_value("Contact", {"link_doctype": "Customer", "link_name": self.customer}, "email_id")
+
+		if contact_email:
+			subject = f"Goods Dispatched: {self.name}"
+			message = f"""
+				<p>Dear Customer,</p>
+				<p>Your goods have been dispatched.</p>
+				<ul>
+					<li><b>Dispatch No:</b> {self.name}</li>
+					<li><b>Date:</b> {self.dispatch_date}</li>
+					<li><b>Total Amount:</b> {frappe.format(amount, currency=self.currency) if amount else 'N/A'}</li>
+				</ul>
+				<p>The invoice has been generated.</p>
+				<p>Thank you.</p>
+			"""
+			frappe.sendmail(recipients=[contact_email], subject=subject, message=message)
+			frappe.msgprint(f"Notification sent to {contact_email}")
