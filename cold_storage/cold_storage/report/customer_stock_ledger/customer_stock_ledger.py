@@ -38,34 +38,56 @@ def execute(filters=None):
         WHERE p.docstatus = 1 {conditions}
 	""", as_dict=True)
 
+	total_in_qty = 0
+	total_out_qty = 0
+	total_balance = 0
+
 	for r in receipts:
 		# Calculate Out Qty from Dispatches
-        # Dispatch logic might need looking at batch no + receipt combo
+		# Dispatch logic might need looking at batch no + receipt combo
 		out_qty = frappe.db.sql("""
 			SELECT SUM(d_item.number_of_bags) 
-            FROM `tabCold Storage Dispatch` d
-            JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = d.name
-            WHERE d.docstatus = 1 AND d.linked_receipt = %s AND d_item.batch_no = %s
+			FROM `tabCold Storage Dispatch` d
+			JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = d.name
+			WHERE d.docstatus = 1 AND d.linked_receipt = %s AND d_item.batch_no = %s
 		""", (r.receipt, r.batch_no), as_dict=False)[0][0] or 0
-        
+		
 		balance = r.in_qty - out_qty
-        
+		
 		days = frappe.utils.date_diff(frappe.utils.today(), r.receipt_date)
 
 		if balance == 0 and not filters.get("show_zero_balance"):
 			continue
-            
+			
 		data.append({
 			"customer": r.customer,
 			"item": r.item,
-            "bag_type": r.bag_type,
+			"bag_type": r.bag_type,
 			"batch_no": r.batch_no,
 			"receipt": r.receipt,
-            "receipt_date": r.receipt_date,
-            "days_in_store": days,
+			"receipt_date": r.receipt_date,
+			"days_in_store": days,
 			"in_qty": r.in_qty,
 			"out_qty": out_qty,
 			"balance": balance
+		})
+
+		total_in_qty += r.in_qty
+		total_out_qty += out_qty
+		total_balance += balance
+
+	if data:
+		data.append({
+			"customer": frappe.bold(_("Total")),
+			"item": "",
+			"bag_type": "",
+			"batch_no": "",
+			"receipt": "",
+			"receipt_date": "",
+			"days_in_store": "",
+			"in_qty": frappe.bold(total_in_qty),
+			"out_qty": frappe.bold(total_out_qty),
+			"balance": frappe.bold(total_balance)
 		})
 
 	return columns, data
