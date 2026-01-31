@@ -23,7 +23,7 @@
     "time_interval": "Daily",
     "timeseries": 1,
     "timespan": "Last Year",
-    "type": "Line",
+    "type": "Bar",
     "report_name": "Bag Inflow Trends",
     "use_report_chart": 1,
     "value_based_on": "receipt_date",
