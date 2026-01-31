@@ -19,9 +19,9 @@ def execute(filters=None):
 	
 	conditions = ""
 	if filters.get("customer"):
-		conditions += f" AND customer = '{filters.get('customer')}'"
+		conditions += f" AND p.customer = '{filters.get('customer')}'"
 	if filters.get("batch_no"):
-		conditions += f" AND batch_no LIKE '%{filters.get('batch_no')}%'"
+		conditions += f" AND c.batch_no LIKE '%{filters.get('batch_no')}%'"
 	if filters.get("warehouse"):
 		conditions += f" AND p.warehouse = '{filters.get('warehouse')}'"
 	if filters.get("bag_type"):
