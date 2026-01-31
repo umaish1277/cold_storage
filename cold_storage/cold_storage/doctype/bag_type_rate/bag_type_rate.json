@@ -5,10 +5,19 @@
     "editable_grid": 1,
     "engine": "InnoDB",
     "field_order": [
+        "goods_item",
         "bag_type",
         "rate"
     ],
     "fields": [
+        {
+            "fieldname": "goods_item",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Goods Item",
+            "options": "Item",
+            "reqd": 1
+        },
         {
             "fieldname": "bag_type",
             "fieldtype": "Link",
@@ -22,6 +31,15 @@
             "fieldtype": "Currency",
             "in_list_view": 1,
             "label": "Handling Charge (Per Bag)",
+            "non_negative": 1,
+            "reqd": 1
+        },
+        {
+            "default": "0",
+            "fieldname": "loading_rate",
+            "fieldtype": "Currency",
+            "in_list_view": 1,
+            "label": "Loading Charge (Per Bag)",
             "non_negative": 1,
             "reqd": 1
         }

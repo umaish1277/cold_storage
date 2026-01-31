@@ -11,15 +11,15 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "cold_storage",
-# 		"logo": "/assets/cold_storage/logo.png",
-# 		"title": "Cold Storage",
-# 		"route": "/cold_storage",
-# 		"has_permission": "cold_storage.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "cold_storage",
+		"logo": "/assets/cold_storage/logo.png",
+		"title": "Cold Storage",
+		"route": "/app/cold-storage", 
+		"has_permission": "cold_storage.api.permission.has_app_permission"
+	}
+]
 
 # Includes in <head>
 # ------------------

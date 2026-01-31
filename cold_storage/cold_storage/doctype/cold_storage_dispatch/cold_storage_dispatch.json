@@ -90,6 +90,12 @@
             "label": "Billing"
         },
         {
+            "fieldname": "total_loading_amount",
+            "fieldtype": "Currency",
+            "label": "Total Loading Amount",
+            "read_only": 1
+        },
+        {
             "fieldname": "total_amount",
             "fieldtype": "Currency",
             "label": "Total Handling Amount",

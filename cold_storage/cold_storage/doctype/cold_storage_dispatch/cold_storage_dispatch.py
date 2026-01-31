@@ -51,39 +51,52 @@ class ColdStorageDispatch(Document):
 	def calculate_billing(self):
 		settings = frappe.get_single("Cold Storage Settings")
 		
-		# Create a map of Bag Type -> Rate
+		# Create a map of Bag Type -> Rates (Handling + Loading)
 		rate_map = {}
 		if settings.bag_type_rates:
 			for row in settings.bag_type_rates:
-				rate_map[row.bag_type] = flt(row.rate)
+				key = (row.goods_item, row.bag_type)
+				rate_map[key] = {
+					"handling": flt(row.rate),
+					"loading": flt(row.loading_rate)
+				}
 		
 		total_handling = 0
+		total_loading = 0
 		
 		for item in self.items:
-			# Enforce rate based on Bag Type (Standard Pricing) only if Rate is not set
-			# This allows manual overrides while providing defaults.
+			# Fetch Rates
+			found_rates = None
+			if (item.goods_item, item.bag_type) in rate_map:
+				found_rates = rate_map[(item.goods_item, item.bag_type)]
+			
+			# Fallback or Defaults
 			if not item.rate:
-				if item.bag_type in rate_map:
-					item.rate = rate_map[item.bag_type]
-				else:
-					item.rate = 0
-				
-			# Calculate item amount
+				item.rate = found_rates["handling"] if found_rates else 0.0
+			
+			if not item.loading_rate:
+				item.loading_rate = found_rates["loading"] if found_rates else 0.0
+			
+			# Calculate item amounts
 			item.amount = flt(item.rate) * flt(item.number_of_bags)
+			item.loading_amount = flt(item.loading_rate) * flt(item.number_of_bags)
+			
 			total_handling += item.amount
+			total_loading += item.loading_amount
 			
 		self.total_amount = total_handling
+		self.total_loading_amount = total_loading
 		
-		# Calculate GST
+		# GST API
 		if self.gst_applicable:
-			 rate = flt(self.gst_rate)
-			 self.total_gst_amount = (total_handling * rate) / 100.0
+			# GST applies to both? Usually yes on services.
+			taxable_amount = self.total_amount + self.total_loading_amount
+			self.total_gst_amount = taxable_amount * (flt(self.gst_rate) / 100)
 		else:
-			 self.total_gst_amount = 0
-			 self.gst_rate = 0
-			 
-		self.grand_total = self.total_amount + self.total_gst_amount
-		
+			self.total_gst_amount = 0
+			
+		self.grand_total = self.total_amount + self.total_loading_amount + self.total_gst_amount
+
 		# Set In Words
 		from frappe.utils import money_in_words
 		company_currency = frappe.get_cached_value('Company',  self.company,  'default_currency')
@@ -130,13 +143,25 @@ class ColdStorageDispatch(Document):
 		for row in self.items:
 			rate = row.rate or 0.0
 			
-			si.append("items", {
-				"item_code": "Cold Storage Service",
-				"qty": row.number_of_bags * duration,
-				"rate": rate,
-				"description": f"Storage Charges ({billing_type}) for {row.number_of_bags} bags (Batch {row.batch_no}) {description_suffix} @ {rate}/{billing_type[:-2] if billing_type != 'Daily' else 'Day'}",
-				"uom": "Nos"
-			})
+			if rate > 0:
+				si.append("items", {
+					"item_code": "Cold Storage Service",
+					"qty": row.number_of_bags * duration,
+					"rate": rate,
+					"description": f"Storage Charges ({billing_type}) for {row.number_of_bags} bags (Batch {row.batch_no}) {description_suffix} @ {rate}/{billing_type[:-2] if billing_type != 'Daily' else 'Day'}",
+					"uom": "Nos"
+				})
+			
+			# Loading Charge
+			loading_rate = row.loading_rate or 0.0
+			if loading_rate > 0:
+				si.append("items", {
+					"item_code": "Cold Storage Service",
+					"qty": row.number_of_bags, # One time charge
+					"rate": loading_rate,
+					"description": f"Loading/Unloading Charges for {row.number_of_bags} bags (Batch {row.batch_no}) @ {loading_rate}/Bag",
+					"uom": "Nos"
+				})
 		
 		si.set_missing_values() # Fetches taxes from template if any
         

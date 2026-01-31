@@ -56,7 +56,18 @@
         {
             "fieldname": "amount",
             "fieldtype": "Currency",
-            "label": "Amount",
+            "label": "Handling Amount",
+            "read_only": 1
+        },
+        {
+            "fieldname": "loading_rate",
+            "fieldtype": "Currency",
+            "label": "Loading Rate"
+        },
+        {
+            "fieldname": "loading_amount",
+            "fieldtype": "Currency",
+            "label": "Loading Amount",
             "read_only": 1
         }
     ],
