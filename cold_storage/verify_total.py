@@ -30,7 +30,11 @@ def verify_total_row():
              # Sum of previous rows
             calc_in = sum(d['in_qty'] for d in data[:-1])
             print(f"Calculated Sum of In Qty (manual): {calc_in}")
+            
+            if last_row.get('in_qty') == calc_in:
+                print("Success: Total In Qty matches calculated sum.")
+            else:
+                print(f"Warning: Total In Qty {last_row.get('in_qty')} != Calculated {calc_in}")
              # Note: Last row values are also bolded strings now, so equality check needs parsing or visual confirmation
     else:
         print("Error: Last row does not appear to be the Total row.")
-

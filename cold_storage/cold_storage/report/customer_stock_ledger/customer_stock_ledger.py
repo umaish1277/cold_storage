@@ -90,10 +90,10 @@ def execute(filters=None):
 			"receipt": "",
 			"receipt_date": "",
 			"days_in_store": "",
-			"in_qty": frappe.bold(total_in_qty),
-			"out_qty": frappe.bold(total_out_qty),
-			"balance": frappe.bold(total_balance),
-			"cumulative_balance": frappe.bold(cumulative_balance)
+			"in_qty": total_in_qty,
+			"out_qty": total_out_qty,
+			"balance": total_balance,
+			"cumulative_balance": ""
 		})
 
 	return columns, data

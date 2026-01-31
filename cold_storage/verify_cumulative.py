@@ -31,10 +31,8 @@ def verify_cumulative_balance():
         
     last_row = data[-1]
     # Verify Total row also has it
-    if last_row.get('cumulative_balance') == last_row.get('balance'): # In total row, cumulative should equal total balance
-         print(f"Total Row Cumulative matches Total Balance: {last_row.get('cumulative_balance')}")
+    if last_row.get('cumulative_balance') == "": 
+         print(f"Success: Total Row Cumulative is empty as requested.")
     else:
-        # Note: They are bolded strings, so strict equality might fail if not checked carefully, but here we expect them to be generated same way
-        # frappe.bold(cumulative_balance) vs frappe.bold(total_balance). cumulative_balance == total_balance at end.
-        print(f"Warning: Total Row Cumulative {last_row.get('cumulative_balance')} != Total Balance {last_row.get('balance')}")
+        print(f"Warning: Total Row Cumulative is NOT empty: {last_row.get('cumulative_balance')}")
 
