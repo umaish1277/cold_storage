@@ -107,7 +107,7 @@ def execute(filters=None):
             "labels": labels,
             "datasets": datasets
         },
-        "type": "line",
+        "type": "bar",
         "colors": chart_colors
     }
         
