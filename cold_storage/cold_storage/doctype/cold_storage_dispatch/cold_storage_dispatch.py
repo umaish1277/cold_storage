@@ -3,7 +3,39 @@ from frappe.model.document import Document
 
 class ColdStorageDispatch(Document):
 	def validate(self):
-		pass
+		if not self.linked_receipt:
+			frappe.throw("Please select a Linked Receipt")
+
+		for row in self.items:
+			# 1. Check if Batch exists in Receipt
+			receipt_item = frappe.db.get_value("Cold Storage Receipt Item", 
+				filters={"parent": self.linked_receipt, "batch_no": row.batch_no}, 
+				fieldname=["number_of_bags"], 
+				as_dict=True
+			)
+			
+			if not receipt_item:
+				frappe.throw(f"Batch {row.batch_no} not found in Receipt {self.linked_receipt}")
+
+			received_qty = receipt_item.number_of_bags
+			
+			# 2. Calculate already dispatched quantity (Submitted Dispatches only)
+			# We exclude current document using name != self.name, though self.name might be valid if updating draft
+			# But we only care about SUBMITTED docs for accounting.
+			dispatched_qty = frappe.db.sql("""
+				SELECT SUM(d_item.number_of_bags)
+				FROM `tabCold Storage Dispatch` d
+				JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = d.name
+				WHERE d.linked_receipt = %s 
+				  AND d_item.batch_no = %s 
+				  AND d.docstatus = 1
+				  AND d.name != %s
+			""", (self.linked_receipt, row.batch_no, self.name or "New Dispatch"), as_dict=False)[0][0] or 0
+			
+			available_qty = received_qty - dispatched_qty
+			
+			if row.number_of_bags > available_qty:
+				frappe.throw(f"Row {row.idx}: Insufficient balance for Batch {row.batch_no}. Available: {available_qty}, Requested: {row.number_of_bags}")
 
 	def on_submit(self):
 		if not self.items:

@@ -40,7 +40,8 @@
             "fieldname": "batch_no",
             "fieldtype": "Data",
             "in_list_view": 1,
-            "label": "Batch No"
+            "label": "Batch No",
+            "reqd": 1
         },
         {
             "default": "0",

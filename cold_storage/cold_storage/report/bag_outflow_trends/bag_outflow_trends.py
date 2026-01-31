@@ -4,35 +4,26 @@ from frappe import _
 def execute(filters=None):
     if not filters: filters = {}
     
-    # Columns: Date, Jute Bags, Net Bags
-    # We will dynamically find bag types if we want, but user asked specifically for Jute and Net.
-    # To be generic, we can pivot whatever bag types exist.
-    
-    # 1. Fetch all distinct bag types utilized in the filtered period
-    # We need this to define the columns and initialize the pivot
-    
     # Base conditions
     conditions = ""
     if filters.get("from_date"):
-        conditions += f" AND p.receipt_date >= '{filters.get('from_date')}'"
+        conditions += f" AND p.dispatch_date >= '{filters.get('from_date')}'"
     if filters.get("to_date"):
-        conditions += f" AND p.receipt_date <= '{filters.get('to_date')}'"
+        conditions += f" AND p.dispatch_date <= '{filters.get('to_date')}'"
 
-    # Get Distinct Types
+    # Get Distinct Types from Dispatches
     distinct_types = frappe.db.sql(f"""
         SELECT DISTINCT c.bag_type
-        FROM `tabCold Storage Receipt` p
-        JOIN `tabCold Storage Receipt Item` c ON c.parent = p.name
+        FROM `tabCold Storage Dispatch` p
+        JOIN `tabCold Storage Dispatch Item` c ON c.parent = p.name
         WHERE p.docstatus = 1 {conditions}
     """, as_dict=True)
     
     bag_types = sorted([d.bag_type for d in distinct_types if d.bag_type])
     
-    # Always include 'Unspecified' if there are nulls, or if we want to show it.
-    # Let's check if there are nulls.
     check_nulls = frappe.db.sql(f"""
-        SELECT 1 FROM `tabCold Storage Receipt` p
-        JOIN `tabCold Storage Receipt Item` c ON c.parent = p.name
+        SELECT 1 FROM `tabCold Storage Dispatch` p
+        JOIN `tabCold Storage Dispatch Item` c ON c.parent = p.name
         WHERE p.docstatus = 1 AND (c.bag_type IS NULL OR c.bag_type = '') {conditions}
         LIMIT 1
     """)
@@ -53,12 +44,12 @@ def execute(filters=None):
 
     # 2. Aggregate Data
     raw_data = frappe.db.sql(f"""
-        SELECT p.receipt_date, c.bag_type, SUM(c.number_of_bags) as qty
-        FROM `tabCold Storage Receipt` p
-        JOIN `tabCold Storage Receipt Item` c ON c.parent = p.name
+        SELECT p.dispatch_date, c.bag_type, SUM(c.number_of_bags) as qty
+        FROM `tabCold Storage Dispatch` p
+        JOIN `tabCold Storage Dispatch Item` c ON c.parent = p.name
         WHERE p.docstatus = 1 {conditions}
-        GROUP BY p.receipt_date, c.bag_type
-        ORDER BY p.receipt_date ASC
+        GROUP BY p.dispatch_date, c.bag_type
+        ORDER BY p.dispatch_date ASC
     """, as_dict=True)
     
     # Pivot
@@ -71,7 +62,7 @@ def execute(filters=None):
              bt_key = "Unspecified"
         
         if bt_key in bag_types:
-            pivot[str(row.receipt_date)][bt_key] += float(row.qty or 0)
+            pivot[str(row.dispatch_date)][bt_key] += float(row.qty or 0)
             
     data = []
     labels = sorted(pivot.keys())
@@ -96,7 +87,6 @@ def execute(filters=None):
             "name": bt,
             "values": [pivot[d][bt] for d in labels]
         })
-        # Assign color cyclically or mapped
         if bt == "Unspecified":
             chart_colors.append("#808080")
         else:
@@ -112,7 +102,3 @@ def execute(filters=None):
     }
         
     return columns, data, None, chart
-
-
-
-

@@ -1,58 +1,71 @@
 {
-    "charts": [
-        {
-            "chart_name": "Incoming Bags",
-            "label": "Incoming Bags"
-        }
-    ],
-    "content": "[{\"type\":\"header\",\"data\":{\"text\":\"Cold Storage Dashboard\",\"level\":2,\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Active Batches\",\"col\":4}},{\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}}]",
-    "creation": "2024-05-24 12:00:00.000000",
-    "custom_blocks": [],
-    "docstatus": 0,
-    "doctype": "Workspace",
-    "idx": 0,
-    "is_standard": 1,
-    "label": "Cold Storage",
-    "links": [],
-    "modified": "2024-05-24 12:00:00.000000",
-    "modified_by": "Administrator",
-    "module": "Cold Storage",
-    "name": "Cold Storage",
-    "number_cards": [
-        {
-            "label": "Active Batches",
-            "number_card_name": "Active Batches"
-        }
-    ],
-    "owner": "Administrator",
-    "public": 1,
-    "roles": [
-        {
-            "role": "System Manager"
-        },
-        {
-            "role": "Stock Manager"
-        }
-    ],
-    "shortcuts": [
-        {
-            "label": "New Receipt",
-            "link_to": "Cold Storage Receipt",
-            "type": "DocType",
-            "url": "/app/cold-storage-receipt/new"
-        },
-        {
-            "label": "New Dispatch",
-            "link_to": "Cold Storage Dispatch",
-            "type": "DocType",
-            "url": "/app/cold-storage-dispatch/new"
-        },
-        {
-            "label": "Customer Ledger",
-            "link_to": "Customer Stock Ledger",
-            "type": "Report",
-            "url": "/app/query-report/Customer Stock Ledger"
-        }
-    ],
-    "title": "Cold Storage"
+ "app": "cold_storage",
+ "charts": [
+  {
+   "chart_name": "Incoming Bags",
+   "label": "Incoming Bags"
+  },
+  {
+   "chart_name": "Outgoing Bags",
+   "label": "Outgoing Bags"
+  }
+ ],
+ "content": "[{\"type\":\"header\",\"data\":{\"text\":\"Cold Storage Dashboard\",\"level\":2,\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Active Batches\",\"col\":4}},{\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}}]",
+ "creation": "2024-05-24 12:00:00",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Cold Storage",
+ "links": [],
+ "modified": "2026-01-31 13:42:29.846657",
+ "modified_by": "Administrator",
+ "module": "Cold Storage",
+ "name": "Cold Storage",
+ "number_cards": [
+  {
+   "label": "Active Batches",
+   "number_card_name": "Active Batches"
+  }
+ ],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Stock Manager"
+  }
+ ],
+ "sequence_id": 0.0,
+ "shortcuts": [
+  {
+   "doc_view": "",
+   "label": "New Receipt",
+   "link_to": "Cold Storage Receipt",
+   "type": "DocType",
+   "url": "/app/cold-storage-receipt/new"
+  },
+  {
+   "doc_view": "",
+   "label": "New Dispatch",
+   "link_to": "Cold Storage Dispatch",
+   "type": "DocType",
+   "url": "/app/cold-storage-dispatch/new"
+  },
+  {
+   "doc_view": "",
+   "label": "Customer Ledger",
+   "link_to": "Customer Stock Ledger",
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Report",
+   "url": "/app/query-report/Customer Stock Ledger"
+  }
+ ],
+ "title": "Cold Storage",
+ "type": "Workspace"
 }
