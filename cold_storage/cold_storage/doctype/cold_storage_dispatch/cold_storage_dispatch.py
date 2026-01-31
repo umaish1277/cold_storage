@@ -138,6 +138,21 @@ class ColdStorageDispatch(Document):
 				"uom": "Nos"
 			})
 		
-		si.set_missing_values() # Fetches taxes etc
+		si.set_missing_values() # Fetches taxes from template if any
+        
+        # Add GST on Services if applicable
+		if self.gst_applicable:
+			settings = frappe.get_single("Cold Storage Settings")
+			if not settings.gst_on_services_account:
+				frappe.throw("Please configure 'GST on Services Account' in Cold Storage Settings")
+				
+			si.append("taxes", {
+				"charge_type": "On Net Total",
+				"account_head": settings.gst_on_services_account,
+				"rate": self.gst_rate,
+				"description": "GST on Services",
+                "cost_center": si.company # Or fetch default
+			})
+            
 		si.save()
 		frappe.msgprint(f"Sales Invoice <a href='/app/sales-invoice/{si.name}'>{si.name}</a> created.")

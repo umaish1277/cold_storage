@@ -99,19 +99,19 @@
             "default": "0",
             "fieldname": "gst_applicable",
             "fieldtype": "Check",
-            "label": "GST Applicable"
+            "label": "GST on Services Applicable"
         },
         {
             "depends_on": "eval:doc.gst_applicable",
             "fieldname": "gst_rate",
             "fieldtype": "Percent",
-            "label": "GST Rate (%)",
+            "label": "GST on Services Rate (%)",
             "mandatory_depends_on": "eval:doc.gst_applicable"
         },
         {
             "fieldname": "total_gst_amount",
             "fieldtype": "Currency",
-            "label": "Total GST Amount",
+            "label": "Total GST on Services Amount",
             "read_only": 1
         },
         {

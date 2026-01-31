@@ -4,7 +4,8 @@
     "doctype": "DocType",
     "engine": "InnoDB",
     "field_order": [
-        "bag_type_rates"
+        "bag_type_rates",
+        "gst_on_services_account"
     ],
     "fields": [
         {
@@ -12,6 +13,12 @@
             "fieldtype": "Table",
             "label": "Bag Type Rates",
             "options": "Bag Type Rate"
+        },
+        {
+            "fieldname": "gst_on_services_account",
+            "fieldtype": "Link",
+            "label": "GST on Services Account",
+            "options": "Account"
         }
     ],
     "issingle": 1,
