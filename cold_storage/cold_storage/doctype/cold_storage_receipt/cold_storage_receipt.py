@@ -13,7 +13,14 @@ class ColdStorageReceipt(Document):
 			from frappe.utils.file_manager import save_file
 			from io import BytesIO
 			
-			qr = qrcode.make(self.name)
+			# Fetch Customer Name
+			customer_name = frappe.db.get_value("Customer", self.customer, "customer_name") or self.customer
+			
+			# Summarize Items with Batch and Qty
+			items_summary = "; ".join([f"{item.goods_item} ({item.number_of_bags} Bags, Batch: {item.batch_no})" for item in self.items])
+			
+			qr_data = f"Receipt: {self.name}\nCustomer: {customer_name}\nWarehouse: {self.warehouse}\nItems: {items_summary}"
+			qr = qrcode.make(qr_data)
 			buffered = BytesIO()
 			qr.save(buffered, format="PNG")
 			img_str = buffered.getvalue()
