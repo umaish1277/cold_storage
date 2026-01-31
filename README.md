@@ -11,8 +11,8 @@ A comprehensive Cold Storage Management application built on the Frappe Framewor
 ### 2. Automated Billing & Invoicing
 *   **Flexible Billing Types**: Support for **Daily**, **Monthly**, and **Seasonal** billing cycles.
 *   **Smart Rate Fetching**:
-    *   Define Handling and Loading charges per **Bag Type** (e.g., Jute Bag = ₹10).
-    *   Override rates for specific **Item + Bag Type** combinations (e.g., Potato in Jute Bag = ₹15).
+    *   Define Handling and Loading charges per **Bag Type** (e.g., Jute Bag = 10).
+    *   Override rates for specific **Item + Bag Type** combinations (e.g., Potato in Jute Bag = 15).
 *   **Loading/Unloading Charges**: Automatically calculates and adds loading charges to the invoice.
 *   **GST Integration**: Automatically applies GST on storage and service charges based on your configuration.
 *   **Sales Invoice Automation**: Automatically creates and links an ERPNext Sales Invoice upon submission of a Dispatch.
