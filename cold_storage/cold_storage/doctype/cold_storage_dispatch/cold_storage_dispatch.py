@@ -51,11 +51,17 @@ class ColdStorageDispatch(Document):
 	def calculate_billing(self):
 		settings = frappe.get_single("Cold Storage Settings")
 		
-		# Create a map of Bag Type -> Rates (Handling + Loading)
+		# Create a map of Bag Type -> Rates
+		# Keys:
+		# (Item, BagType) -> Specific
+		# (None, BagType) -> Generic
 		rate_map = {}
 		if settings.bag_type_rates:
 			for row in settings.bag_type_rates:
-				key = (row.goods_item, row.bag_type)
+				# Use None for empty goods_item
+				item_key = row.goods_item if row.goods_item else None
+				key = (item_key, row.bag_type)
+				
 				rate_map[key] = {
 					"handling": flt(row.rate),
 					"loading": flt(row.loading_rate)
@@ -65,10 +71,21 @@ class ColdStorageDispatch(Document):
 		total_loading = 0
 		
 		for item in self.items:
-			# Fetch Rates
+			# Fetch Rates Priority:
+			# 1. Specific Match (Item + Bag)
+			# 2. Generic Match (Bag only)
+			
 			found_rates = None
+			
+			# 1. Specific
 			if (item.goods_item, item.bag_type) in rate_map:
 				found_rates = rate_map[(item.goods_item, item.bag_type)]
+			
+			# 2. Generic (if not found specific)
+			if not found_rates and (None, item.bag_type) in rate_map:
+				found_rates = rate_map[(None, item.bag_type)]
+			
+			# Fallback or Defaults
 			
 			# Fallback or Defaults
 			if not item.rate:

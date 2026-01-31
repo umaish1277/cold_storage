@@ -16,7 +16,7 @@
             "in_list_view": 1,
             "label": "Goods Item",
             "options": "Item",
-            "reqd": 1
+            "reqd": 0
         },
         {
             "fieldname": "bag_type",
