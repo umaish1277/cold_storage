@@ -13,6 +13,7 @@ def execute(filters=None):
 		{"label": _("In Qty"), "fieldname": "in_qty", "fieldtype": "Int", "width": 100},
 		{"label": _("Out Qty"), "fieldname": "out_qty", "fieldtype": "Int", "width": 100},
 		{"label": _("Balance"), "fieldname": "balance", "fieldtype": "Int", "width": 100},
+		{"label": _("Cumulative Balance"), "fieldname": "cumulative_balance", "fieldtype": "Int", "width": 140},
 	]
 
 	data = []
@@ -41,6 +42,7 @@ def execute(filters=None):
 	total_in_qty = 0
 	total_out_qty = 0
 	total_balance = 0
+	cumulative_balance = 0
 
 	for r in receipts:
 		# Calculate Out Qty from Dispatches
@@ -58,6 +60,8 @@ def execute(filters=None):
 
 		if balance == 0 and not filters.get("show_zero_balance"):
 			continue
+
+		cumulative_balance += balance
 			
 		data.append({
 			"customer": r.customer,
@@ -69,7 +73,8 @@ def execute(filters=None):
 			"days_in_store": days,
 			"in_qty": r.in_qty,
 			"out_qty": out_qty,
-			"balance": balance
+			"balance": balance,
+			"cumulative_balance": cumulative_balance
 		})
 
 		total_in_qty += r.in_qty
@@ -78,16 +83,17 @@ def execute(filters=None):
 
 	if data:
 		data.append({
-			"customer": frappe.bold(_("Total")),
+			"customer": "",
 			"item": "",
 			"bag_type": "",
-			"batch_no": "",
+			"batch_no": frappe.bold(_("Total")),
 			"receipt": "",
 			"receipt_date": "",
 			"days_in_store": "",
 			"in_qty": frappe.bold(total_in_qty),
 			"out_qty": frappe.bold(total_out_qty),
-			"balance": frappe.bold(total_balance)
+			"balance": frappe.bold(total_balance),
+			"cumulative_balance": frappe.bold(cumulative_balance)
 		})
 
 	return columns, data

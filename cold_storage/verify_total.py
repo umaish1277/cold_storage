@@ -17,9 +17,9 @@ def verify_total_row():
     # Check if last row is indeed the total row
     # We used frappe.bold("Total") for customer, but raw string check might vary if bold adds HTML
     # It adds <b>Total</b>.
-    print(f"Last Row Customer Field: {last_row.get('customer')}")
+    print(f"Last Row Batch No Field: {last_row.get('batch_no')}")
     
-    if "Total" in str(last_row.get('customer')):
+    if "Total" in str(last_row.get('batch_no')):
         print("Confirmed: Last row is a Total row.")
         print(f"Total In Qty: {last_row.get('in_qty')}")
         print(f"Total Out Qty: {last_row.get('out_qty')}")
