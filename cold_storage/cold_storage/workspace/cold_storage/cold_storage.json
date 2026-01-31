@@ -3,9 +3,13 @@
         {
             "chart_name": "Incoming Bags",
             "label": "Incoming Bags"
+        },
+        {
+            "chart_name": "Outgoing Bags",
+            "label": "Outgoing Bags"
         }
     ],
-    "content": "[{\"type\":\"header\",\"data\":{\"text\":\"Cold Storage Dashboard\",\"level\":2,\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Active Batches\",\"col\":4}},{\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}}]",
+    "content": "[{\"type\":\"header\",\"data\":{\"text\":\"Cold Storage Dashboard\",\"level\":2,\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Active Batches\",\"col\":4}},{\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}}]",
     "creation": "2024-05-24 12:00:00.000000",
     "custom_blocks": [],
     "docstatus": 0,
