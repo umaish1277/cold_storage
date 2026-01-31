@@ -7,10 +7,7 @@
     "field_order": [
         "goods_item",
         "bag_type",
-        "number_of_bags",
-        "batch_no",
-        "rate",
-        "description"
+        "rate"
     ],
     "fields": [
         {
@@ -19,7 +16,7 @@
             "in_list_view": 1,
             "label": "Goods Item",
             "options": "Item",
-            "reqd": 1
+            "reqd": 0
         },
         {
             "fieldname": "bag_type",
@@ -30,45 +27,21 @@
             "reqd": 1
         },
         {
-            "fieldname": "number_of_bags",
-            "fieldtype": "Int",
-            "in_list_view": 1,
-            "label": "Number of Bags",
-            "reqd": 1
-        },
-        {
-            "fieldname": "batch_no",
-            "fieldtype": "Data",
-            "in_list_view": 1,
-            "label": "Batch No",
-            "reqd": 1
-        },
-        {
             "fieldname": "rate",
             "fieldtype": "Currency",
-            "label": "Rate"
+            "in_list_view": 1,
+            "label": "Handling Charge (Per Bag)",
+            "non_negative": 1,
+            "reqd": 1
         },
         {
-            "fieldname": "description",
-            "fieldtype": "Small Text",
-            "label": "Description"
-        },
-        {
-            "fieldname": "amount",
-            "fieldtype": "Currency",
-            "label": "Handling Amount",
-            "read_only": 1
-        },
-        {
+            "default": "0",
             "fieldname": "loading_rate",
             "fieldtype": "Currency",
-            "label": "Loading Rate"
-        },
-        {
-            "fieldname": "loading_amount",
-            "fieldtype": "Currency",
-            "label": "Loading Amount",
-            "read_only": 1
+            "in_list_view": 1,
+            "label": "Loading Charge (Per Bag)",
+            "non_negative": 1,
+            "reqd": 1
         }
     ],
     "istable": 1,
@@ -76,7 +49,7 @@
     "modified": "2024-05-24 12:00:00.000000",
     "modified_by": "Administrator",
     "module": "Cold Storage",
-    "name": "Cold Storage Dispatch Item",
+    "name": "Bag Type Rate",
     "owner": "Administrator",
     "permissions": [],
     "sort_field": "modified",

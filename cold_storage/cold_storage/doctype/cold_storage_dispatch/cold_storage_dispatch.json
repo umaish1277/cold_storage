@@ -90,9 +90,53 @@
             "label": "Billing"
         },
         {
+            "fieldname": "sales_invoice",
+            "fieldtype": "Link",
+            "label": "Sales Invoice",
+            "options": "Sales Invoice",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_loading_amount",
+            "fieldtype": "Currency",
+            "label": "Total Loading Amount",
+            "read_only": 1
+        },
+        {
             "fieldname": "total_amount",
             "fieldtype": "Currency",
-            "label": "Total Amount",
+            "label": "Total Handling Amount",
+            "read_only": 1
+        },
+        {
+            "default": "0",
+            "fieldname": "gst_applicable",
+            "fieldtype": "Check",
+            "label": "GST on Services Applicable"
+        },
+        {
+            "depends_on": "eval:doc.gst_applicable",
+            "fieldname": "gst_rate",
+            "fieldtype": "Percent",
+            "label": "GST on Services Rate (%)",
+            "mandatory_depends_on": "eval:doc.gst_applicable"
+        },
+        {
+            "fieldname": "total_gst_amount",
+            "fieldtype": "Currency",
+            "label": "Total GST on Services Amount",
+            "read_only": 1
+        },
+        {
+            "fieldname": "grand_total",
+            "fieldtype": "Currency",
+            "label": "Grand Total",
+            "read_only": 1
+        },
+        {
+            "fieldname": "in_words",
+            "fieldtype": "Small Text",
+            "label": "In Words",
             "read_only": 1
         }
     ],
@@ -117,6 +161,38 @@
             "share": 1,
             "submit": 1,
             "write": 1
+        },
+        {
+            "amend": 1,
+            "cancel": 1,
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage Manager",
+            "share": 1,
+            "submit": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage Accountant",
+            "write": 1
+        },
+        {
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage User",
+            "if_owner": 1
         }
     ],
     "sort_field": "modified",
