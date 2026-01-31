@@ -26,6 +26,8 @@ def execute(filters=None):
 		conditions += f" AND p.warehouse = '{filters.get('warehouse')}'"
 	if filters.get("bag_type"):
 		conditions += f" AND c.bag_type = '{filters.get('bag_type')}'"
+	if filters.get("item_code"):
+		conditions += f" AND c.goods_item = '{filters.get('item_code')}'"
     
 	# Fetch Receipts from Child Table
 	receipts = frappe.db.sql(f"""
