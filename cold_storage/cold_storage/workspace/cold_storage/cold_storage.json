@@ -8,13 +8,9 @@
   {
    "chart_name": "Outgoing Bags",
    "label": "Outgoing Bags"
-  },
-  {
-   "chart_name": "Bag Movement",
-   "label": "Bag Activity Trends"
   }
  ],
- "content": "[{\"id\": \"WLUDg2RSL9\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\", \"col\": 12}}, {\"id\": \"ntYjhsr-oV\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Customers\", \"col\": 3}}, {\"id\": \"Y6aY40UH8S\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Batches\", \"col\": 3}}, {\"id\": \"Ajh0eM2rh-\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Warehouses\", \"col\": 3}}, {\"id\": \"JnNccy9PlQ\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Incoming Payment\", \"col\": 3}}, {\"type\": \"chart\", \"data\": {\"chart_name\": \"Bag Movement\", \"col\": 12}, \"id\": \"e29bb77dd2\"}, {\"id\": \"FQwbpNL8ju\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Incoming Bags\", \"col\": 12}}, {\"id\": \"Tf4y5B8w9l\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Outgoing Bags\", \"col\": 12}}, {\"id\": \"fVs1y9G4py\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Receipt\", \"col\": 4}}, {\"id\": \"nJ1yl0Rcdr\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Dispatch\", \"col\": 4}}, {\"id\": \"bA4G7qFC89\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Customer Ledger\", \"col\": 4}}]",
+ "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"ntYjhsr-oV\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"Y6aY40UH8S\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"Ajh0eM2rh-\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"Xji9XmjLTN\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"FQwbpNL8ju\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"id\":\"Tf4y5B8w9l\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":12}},{\"id\":\"fVs1y9G4py\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"id\":\"nJ1yl0Rcdr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"id\":\"bA4G7qFC89\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}}]",
  "creation": "2024-05-24 12:00:00",
  "custom_blocks": [],
  "docstatus": 0,
@@ -26,7 +22,7 @@
  "is_hidden": 0,
  "label": "Cold Storage",
  "links": [],
- "modified": "2026-01-31 23:55:19.444234",
+ "modified": "2026-02-01 00:25:12.251986",
  "modified_by": "Administrator",
  "module": "Cold Storage",
  "name": "Cold Storage",
@@ -36,12 +32,12 @@
    "number_card_name": "Active Customers"
   },
   {
-   "label": "Active Batches",
-   "number_card_name": "Active Batches"
+   "label": "Total Outgoing Bills",
+   "number_card_name": "Total Outgoing Bills"
   },
   {
-   "label": "Total Incoming Payment",
-   "number_card_name": "Total Incoming Payment"
+   "label": "Active Batches",
+   "number_card_name": "Active Batches"
   },
   {
    "label": "Total Warehouses",

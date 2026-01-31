@@ -11,6 +11,12 @@
         },
         {
             "role": "System Manager"
+        },
+        {
+            "role": "Cold Storage User"
+        },
+        {
+            "role": "Cold Storage Accountant"
         }
     ],
     "type": "Bar",
