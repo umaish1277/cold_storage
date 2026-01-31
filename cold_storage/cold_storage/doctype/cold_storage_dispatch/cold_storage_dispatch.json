@@ -90,6 +90,13 @@
             "label": "Billing"
         },
         {
+            "fieldname": "sales_invoice",
+            "fieldtype": "Link",
+            "label": "Sales Invoice",
+            "options": "Sales Invoice",
+            "read_only": 1
+        },
+        {
             "fieldname": "total_loading_amount",
             "fieldtype": "Currency",
             "label": "Total Loading Amount",

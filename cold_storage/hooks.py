@@ -14,9 +14,9 @@ app_license = "mit"
 add_to_apps_screen = [
 	{
 		"name": "cold_storage",
-		"logo": "/assets/cold_storage/logo.png",
+		"logo": "/assets/cold_storage/images/logo.svg",
 		"title": "Cold Storage",
-		"route": "/app/cold-storage", 
+		"route": "/app/cold-storage",
 		"has_permission": "cold_storage.api.permission.has_app_permission"
 	}
 ]
@@ -249,4 +249,3 @@ add_to_apps_screen = [
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-

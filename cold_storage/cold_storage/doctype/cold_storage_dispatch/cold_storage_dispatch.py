@@ -197,4 +197,8 @@ class ColdStorageDispatch(Document):
 			})
             
 		si.save()
+		
+		# Link Invoice to Dispatch
+		self.db_set("sales_invoice", si.name)
+		
 		frappe.msgprint(f"Sales Invoice <a href='/app/sales-invoice/{si.name}'>{si.name}</a> created.")
