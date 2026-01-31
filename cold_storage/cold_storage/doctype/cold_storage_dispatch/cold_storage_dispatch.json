@@ -1,0 +1,125 @@
+{
+    "actions": [],
+    "autoname": "format:CSD-{MM}-{YY}-{####}",
+    "creation": "2024-05-24 12:00:00.000000",
+    "default_view": "List",
+    "doctype": "DocType",
+    "document_type": "Document",
+    "engine": "InnoDB",
+    "field_order": [
+        "section_break_gkhy",
+        "company",
+        "customer",
+        "dispatch_date",
+        "billing_type",
+        "linked_receipt",
+        "column_break_jklz",
+        "naming_series",
+        "section_break_details",
+        "items",
+        "section_break_billing",
+        "total_amount"
+    ],
+    "fields": [
+        {
+            "fieldname": "section_break_gkhy",
+            "fieldtype": "Section Break"
+        },
+        {
+            "fieldname": "company",
+            "fieldtype": "Link",
+            "label": "Company",
+            "options": "Company",
+            "reqd": 1
+        },
+        {
+            "fieldname": "customer",
+            "fieldtype": "Link",
+            "label": "Customer",
+            "options": "Customer",
+            "reqd": 1
+        },
+        {
+            "default": "Today",
+            "fieldname": "dispatch_date",
+            "fieldtype": "Date",
+            "label": "Dispatch Date",
+            "reqd": 1
+        },
+        {
+            "default": "Daily",
+            "fieldname": "billing_type",
+            "fieldtype": "Select",
+            "label": "Billing Type",
+            "options": "Daily\nMonthly\nSeasonal",
+            "reqd": 1
+        },
+        {
+            "fieldname": "linked_receipt",
+            "fieldtype": "Link",
+            "label": "Linked Receipt",
+            "options": "Cold Storage Receipt",
+            "description": "Receipt being dispatched"
+        },
+        {
+            "fieldname": "column_break_jklz",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "CSD-.MM.-.YY.-",
+            "fieldname": "naming_series",
+            "fieldtype": "Select",
+            "label": "Series",
+            "options": "CSD-.MM.-.YY.-",
+            "read_only": 1
+        },
+        {
+            "fieldname": "section_break_details",
+            "fieldtype": "Section Break",
+            "label": "Items"
+        },
+        {
+            "fieldname": "items",
+            "fieldtype": "Table",
+            "label": "Items",
+            "options": "Cold Storage Dispatch Item"
+        },
+        {
+            "fieldname": "section_break_billing",
+            "fieldtype": "Section Break",
+            "label": "Billing"
+        },
+        {
+            "fieldname": "total_amount",
+            "fieldtype": "Currency",
+            "label": "Total Amount",
+            "read_only": 1
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "is_submittable": 1,
+    "links": [],
+    "modified": "2024-05-24 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Cold Storage Dispatch",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "submit": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}
