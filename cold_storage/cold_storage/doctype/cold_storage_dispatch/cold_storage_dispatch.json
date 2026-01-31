@@ -92,7 +92,32 @@
         {
             "fieldname": "total_amount",
             "fieldtype": "Currency",
-            "label": "Total Amount",
+            "label": "Total Handling Amount",
+            "read_only": 1
+        },
+        {
+            "default": "0",
+            "fieldname": "gst_applicable",
+            "fieldtype": "Check",
+            "label": "GST Applicable"
+        },
+        {
+            "depends_on": "eval:doc.gst_applicable",
+            "fieldname": "gst_rate",
+            "fieldtype": "Percent",
+            "label": "GST Rate (%)",
+            "mandatory_depends_on": "eval:doc.gst_applicable"
+        },
+        {
+            "fieldname": "total_gst_amount",
+            "fieldtype": "Currency",
+            "label": "Total GST Amount",
+            "read_only": 1
+        },
+        {
+            "fieldname": "grand_total",
+            "fieldtype": "Currency",
+            "label": "Grand Total",
             "read_only": 1
         }
     ],

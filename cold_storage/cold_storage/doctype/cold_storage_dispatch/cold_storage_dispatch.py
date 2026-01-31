@@ -36,8 +36,39 @@ class ColdStorageDispatch(Document):
 			
 			if row.number_of_bags > available_qty:
 				frappe.throw(f"Row {row.idx}: Insufficient balance for Batch {row.batch_no}. Available: {available_qty}, Requested: {row.number_of_bags}")
+		
+		self.calculate_billing()
+        
+	def calculate_billing(self):
+		settings = frappe.get_single("Cold Storage Settings")
+		default_rate = settings.default_handling_charge_per_bag or 0
+		
+		total_handling = 0
+		
+		for item in self.items:
+			# Set default rate if not set
+			if not item.rate:
+				item.rate = default_rate
+				
+			# Calculate item amount
+			item.amount = frappe.utils.flt(item.rate) * frappe.utils.flt(item.number_of_bags)
+			total_handling += item.amount
+			
+		self.total_amount = total_handling
+		
+		# Calculate GST
+		if self.gst_applicable:
+			 # If gst_rate is not set, maybe should error? Or assume 0.
+			 rate = frappe.utils.flt(self.gst_rate)
+			 self.total_gst_amount = (total_handling * rate) / 100.0
+		else:
+			 self.total_gst_amount = 0
+			 self.gst_rate = 0
+			 
+		self.grand_total = self.total_amount + self.total_gst_amount
 
 	def on_submit(self):
+		# The original on_submit logic for Sales Invoice creation
 		if not self.items:
 			return
 
