@@ -57,9 +57,10 @@
         },
         {
             "fieldname": "batch_no",
-            "fieldtype": "Data",
+            "fieldtype": "Link",
             "in_list_view": 1,
             "label": "Batch No",
+            "options": "Batch",
             "reqd": 1
         },
         {
