@@ -176,9 +176,28 @@ def get_total_warehouses_count(filters=None):
 	default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 	if not default_company:
 		return 0
-	
 	return frappe.db.count("Warehouse", {
 		"company": default_company,
 		"disabled": 0,
 		"is_group": 0
 	})
+@frappe.whitelist()
+def get_total_outgoing_bills(filters=None):
+	default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+	if not default_company:
+		return 0
+	
+	from frappe.utils import getdate, nowdate
+	today = getdate(nowdate())
+	year_start = f"{today.year}-01-01"
+	year_end = f"{today.year}-12-31"
+
+	result = frappe.db.sql("""
+		SELECT SUM(base_net_total)
+		FROM `tabSales Invoice`
+		WHERE company = %s
+		  AND docstatus = 1
+		  AND posting_date BETWEEN %s AND %s
+	""", (default_company, year_start, year_end))
+	
+	return flt(result[0][0]) if result else 0.0
