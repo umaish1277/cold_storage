@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ lang }}">
 
 <head>
     <meta charset="utf-8">
     <title>Stock Statement - {{ customer }}</title>
+    <!-- Google Fonts - Noto Nastaliq Urdu for Urdu language -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
@@ -11,6 +16,32 @@
             color: #333;
             line-height: 1.5;
         }
+
+        /* Urdu/RTL specific styling */
+        body[dir="rtl"] {
+            font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Nafees Nastaleeq', serif;
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        body[dir="rtl"] h1,
+        body[dir="rtl"] h3 {
+            font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        }
+
+        body[dir="rtl"] th,
+        body[dir="rtl"] td {
+            text-align: right;
+        }
+
+        body[dir="rtl"] .text-right {
+            text-align: left;
+        }
+
+        body[dir="rtl"] .text-center {
+            text-align: center;
+        }
+
 
         .header {
             border-bottom: 2px solid #2ecc71;
@@ -155,47 +186,109 @@
     </style>
 </head>
 
-<body>
+<body dir="{{ t.direction }}">
     <div class="header">
-        <h1>📦 Stock Statement</h1>
-        <div class="subtitle">Cold Storage Inventory Report</div>
+        <h1>📦 {{ t.title }}</h1>
+        <div class="subtitle">{{ t.subtitle }}</div>
     </div>
 
     <div class="info-box">
-        <p><strong>Customer:</strong> {{ customer }}</p>
-        <p><strong>Period:</strong> {{ from_date }} to {{ to_date }}</p>
-        <p><strong>Generated:</strong> {{ generated_on }}</p>
+        <p><strong>{{ t.customer }}:</strong> {{ customer }}</p>
+        <p><strong>{{ t.period }}:</strong> {{ from_date }} - {{ to_date }}</p>
+        <p><strong>{{ t.generated }}:</strong> {{ generated_on }}</p>
     </div>
 
     <div class="summary-grid">
         <div class="summary-card green">
-            <div class="label">Total Received</div>
+            <div class="label">{{ t.total_received }}</div>
             <div class="value">{{ data.summary.total_received | int }}</div>
         </div>
         <div class="summary-card red">
-            <div class="label">Total Dispatched</div>
+            <div class="label">{{ t.total_dispatched }}</div>
             <div class="value">{{ data.summary.total_dispatched | int }}</div>
         </div>
         <div class="summary-card blue">
-            <div class="label">Current Balance</div>
+            <div class="label">{{ t.current_balance }}</div>
             <div class="value">{{ data.summary.total_balance | int }}</div>
         </div>
     </div>
 
-    <h3>📋 Detailed Stock Register</h3>
+    <!-- Charts Section -->
+    <div style="margin-bottom: 30px;">
+        <h3>📊 {{ t.stock_trends }}</h3>
+        <div
+            style="display: table; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            {% if trend_chart and trend_chart|length > 0 %}
+            <div style="display: table-row;">
+                {% for item in trend_chart %}
+                <div
+                    style="display: table-cell; text-align: center; vertical-align: bottom; padding: 0 8px; width: {{ 100 / trend_chart|length }}%;">
+                    <div style="display: inline-block; width: 20px; margin-right: 2px;">
+                        <div
+                            style="height: {{ item.in_pct or 5 }}px; width: 100%; background: #2ecc71; min-height: 5px;">
+                        </div>
+                    </div>
+                    <div style="display: inline-block; width: 20px;">
+                        <div
+                            style="height: {{ item.out_pct or 5 }}px; width: 100%; background: #e74c3c; min-height: 5px;">
+                        </div>
+                    </div>
+                    <div style="font-size: 9px; color: #7f8c8d; margin-top: 5px;">{{ item.label }}</div>
+                    <div style="font-size: 8px; color: #2ecc71;">↑{{ item.in_value }}</div>
+                    <div style="font-size: 8px; color: #e74c3c;">↓{{ item.out_value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 20px; color: #7f8c8d;">{{ t.no_trend_data }}</div>
+            {% endif %}
+            <div style="margin-top: 10px; font-size: 10px;">
+                <span style="color: #2ecc71;">● {{ t.inward }}</span> &nbsp;
+                <span style="color: #e74c3c;">● {{ t.outward }}</span>
+            </div>
+        </div>
+
+        <h3>📦 {{ t.stock_by_bag_type }}</h3>
+        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+            {% if bag_chart and bag_chart|length > 0 %}
+            <table style="width: 100%; margin: 0;">
+                <tr>
+                    {% for item in bag_chart %}
+                    <td style="text-align: center; padding: 10px; border: none;">
+                        <div style="font-size: 24px; font-weight: bold; color: {{ item.color }};">{{ item.pct }}%</div>
+                        <div style="font-size: 12px; color: #2c3e50; font-weight: 600;">{{ item.value }} {{ t.bags }}
+                        </div>
+                        <div style="font-size: 10px; color: #7f8c8d;">{{ item.label }}</div>
+                    </td>
+                    {% endfor %}
+                </tr>
+            </table>
+            <!-- Simple bar representation -->
+            <div style="display: flex; height: 20px; border-radius: 10px; overflow: hidden; margin-top: 10px;">
+                {% for item in bag_chart %}
+                <div style="width: {{ item.pct }}%; background: {{ item.color }};"></div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 20px; color: #7f8c8d;">{{ t.no_data }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <h3>📋 {{ t.detailed_register }}</h3>
 
     <table>
         <thead>
             <tr>
-                <th>Receipt</th>
-                <th>Date</th>
-                <th>Item</th>
-                <th>Batch</th>
-                <th>Warehouse</th>
-                <th class="text-right">Received</th>
-                <th class="text-right">Dispatched</th>
-                <th class="text-right">Balance</th>
-                <th class="text-center">Days</th>
+                <th>{{ t.receipt }}</th>
+                <th>{{ t.date }}</th>
+                <th>{{ t.item }}</th>
+                <th>{{ t.batch }}</th>
+                <th>{{ t.warehouse }}</th>
+                <th class="text-right">{{ t.received }}</th>
+                <th class="text-right">{{ t.dispatched }}</th>
+                <th class="text-right">{{ t.balance }}</th>
+                <th class="text-center">{{ t.days }}</th>
             </tr>
         </thead>
         <tbody>
@@ -224,8 +317,8 @@
     </table>
 
     <div class="footer">
-        <p>This is a computer-generated statement. No signature required.</p>
-        <p>Generated by Cold Storage Management System</p>
+        <p>{{ t.footer1 }}</p>
+        <p>{{ t.footer2 }}</p>
     </div>
 </body>
 
