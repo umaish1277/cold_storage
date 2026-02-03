@@ -100,10 +100,10 @@ class ColdStorageReceipt(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def before_save(self):
-		# Generate QR Code if not exists
-		if not self.qr_code and self.name:
+		# Generate/Update QR Code
+		if self.name:
 			import qrcode
-			from frappe.utils.file_manager import save_file
+			from frappe.utils.file_manager import save_file, remove_file
 			from io import BytesIO
 			
 			# Fetch Customer Name
@@ -113,13 +113,30 @@ class ColdStorageReceipt(Document):
 			items_summary = "; ".join([f"{item.goods_item} ({item.number_of_bags} Bags, Batch: {item.batch_no})" for item in self.items])
 			
 			qr_data = f"Receipt: {self.name}\nCustomer: {customer_name}\nWarehouse: {self.warehouse}\nItems: {items_summary}"
-			qr = qrcode.make(qr_data)
+			
+			# Increase size (default box_size is 10, setting to 40 for very high quality/large)
+			qr = qrcode.QRCode(version=1, box_size=40, border=2)
+			qr.add_data(qr_data)
+			qr.make(fit=True)
+			img = qr.make_image(fill_color="black", back_color="white")
+			
 			buffered = BytesIO()
-			qr.save(buffered, format="PNG")
+			img.save(buffered, format="PNG")
 			img_str = buffered.getvalue()
 			
 			filename = f"QR-{self.name}.png"
-			saved_file = save_file(filename, img_str, "Cold Storage Receipt", self.name, is_private=0)
+			
+			# Delete old file to ensure refresh
+			if self.qr_code:
+				try:
+					# Find the File doc and remove it
+					file_doc = frappe.get_all("File", filters={"file_url": self.qr_code}, fields=["name"])
+					for f in file_doc:
+						remove_file(f.name)
+				except:
+					pass
+
+			saved_file = save_file(filename, img_str, "Cold Storage Receipt", self.name, is_private=0, df="qr_code")
 			self.qr_code = saved_file.file_url
 
 	def on_submit(self):

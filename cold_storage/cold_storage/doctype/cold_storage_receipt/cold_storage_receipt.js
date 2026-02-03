@@ -123,6 +123,23 @@ frappe.ui.form.on('Cold Storage Receipt', {
                 });
             }
         }
+
+        // Inject Custom CSS to resize QR Code image in form view
+        const css = `
+            div[data-fieldname="qr_code"] .attached-file img {
+                width: 300px !important;
+                height: 300px !important;
+                max-width: none !important;
+                max-height: none !important;
+                margin-bottom: 10px;
+            }
+            div[data-fieldname="qr_code"] .attached-file {
+                height: auto !important;
+            }
+        `;
+        if (!$(`#qr-code-style`).length) {
+            $("<style id='qr-code-style'>").prop("type", "text/css").html(css).appendTo("head");
+        }
     },
 
     company: function (frm) {
