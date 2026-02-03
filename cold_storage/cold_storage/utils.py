@@ -70,7 +70,7 @@ def get_batch_balance(linked_receipt, batch_no, current_dispatch=None):
 	) or 0
 	
 	# Check dispatches
-	conditions = "d.linked_receipt = %s AND d_item.batch_no = %s AND d.docstatus = 1"
+	conditions = "d_item.linked_receipt = %s AND d_item.batch_no = %s AND d.docstatus = 1"
 	values = [linked_receipt, batch_no]
 	
 	if current_dispatch:
@@ -103,7 +103,7 @@ def get_total_batch_balance(customer, warehouse, batch_no):
 				FROM `tabCold Storage Dispatch` d
 				JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
 				WHERE d.customer = %(customer)s 
-				  AND d.warehouse = %(warehouse)s 
+				  AND di.warehouse = %(warehouse)s 
 				  AND di.batch_no = %(batch_no)s 
 				  AND d.docstatus = 1
 			) as balance

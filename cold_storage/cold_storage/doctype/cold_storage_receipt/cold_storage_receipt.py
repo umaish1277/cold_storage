@@ -29,10 +29,10 @@ class ColdStorageReceipt(Document):
 			# Validate Available Balance in Source Receipt
 			# Global Balance Check (Optional if Batch Check is strict, but good to keep)
 			dispatched_count = frappe.db.sql("""
-				SELECT SUM(d.number_of_bags) 
+				SELECT SUM(d_item.number_of_bags) 
 				FROM `tabCold Storage Dispatch` p
-				JOIN `tabCold Storage Dispatch Item` d ON d.parent = p.name
-				WHERE p.linked_receipt = %s AND p.docstatus = 1
+				JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = p.name
+				WHERE d_item.linked_receipt = %s AND p.docstatus = 1
 			""", (self.source_receipt))
 			
 			already_dispatched = dispatched_count[0][0] or 0
@@ -209,6 +209,8 @@ class ColdStorageReceipt(Document):
 					"item_group": i.item_group,
 					"batch_no": i.batch_no,
 					"number_of_bags": i.number_of_bags,
+					"linked_receipt": linked_receipt,
+					"warehouse": source_warehouse,
 					"rate": 0
 				})
 			
@@ -243,12 +245,15 @@ class ColdStorageReceipt(Document):
 
 	def on_cancel(self):
 		# Validation: Check for linked dispatches
-		linked_dispatches = frappe.db.exists("Cold Storage Dispatch", {
-			"linked_receipt": self.name, 
-			"docstatus": ["!=", 2]
-		})
+		linked_dispatches = frappe.db.sql("""
+			SELECT p.name 
+			FROM `tabCold Storage Dispatch` p
+			JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = p.name
+			WHERE d_item.linked_receipt = %s AND p.docstatus != 2
+		""", (self.name))
+		
 		if linked_dispatches:
-			frappe.throw(f"Cannot cancel Receipt because linked Dispatch {linked_dispatches} exists. Please cancel the Dispatch first.")
+			frappe.throw(f"Cannot cancel Receipt because linked Dispatch {linked_dispatches[0][0]} exists. Please cancel the Dispatch first.")
 
 		if self.stock_entry:
 			se = frappe.get_doc("Stock Entry", self.stock_entry)

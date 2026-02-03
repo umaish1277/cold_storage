@@ -63,7 +63,6 @@ class ColdStorageDispatch(Document):
 
 			# 1. Check if Batch exists in Receipt
 			# Optimized: Using shared balance logic
-			from cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch import get_batch_balance
 			available_qty = get_batch_balance(row.linked_receipt, row.batch_no, self.name)
 			
 			if row.number_of_bags > available_qty:
