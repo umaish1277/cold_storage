@@ -119,9 +119,7 @@ frappe.ui.form.on('Cold Storage Receipt', {
             frappe.db.get_value("Company", frm.doc.company, "abbr", (r) => {
                 if (r && r.abbr) {
                     let abbr = r.abbr;
-                    // Standard base series defined in Doctype (could fetch meta, but hardcoding base patterns for now or prepending to current)
-                    // Better: Get current options, split, prefix, join
-                    let options = "CSR-.MM.-.YY.-";
+                    let options = "CSR-.YYYY.-";
 
                     // Construct new series
                     let new_series = `${abbr}-${options}`;
