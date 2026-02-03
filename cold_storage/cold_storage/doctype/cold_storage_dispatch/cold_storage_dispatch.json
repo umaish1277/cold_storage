@@ -91,6 +91,7 @@
             "read_only": 1
         },
         {
+            "depends_on": "eval:doc.docstatus == 1",
             "fieldname": "stock_entry",
             "fieldtype": "Link",
             "label": "Stock Entry",

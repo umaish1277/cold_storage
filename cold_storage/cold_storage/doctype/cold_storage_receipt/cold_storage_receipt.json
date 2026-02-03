@@ -17,6 +17,7 @@
         "column_break_jklz",
         "naming_series",
         "qr_code",
+        "stock_entry",
         "warehouse",
         "from_warehouse",
         "section_break_details",
@@ -150,6 +151,7 @@
             "hidden": 0
         },
         {
+            "depends_on": "eval:doc.docstatus == 1",
             "fieldname": "stock_entry",
             "fieldtype": "Link",
             "label": "Stock Entry",
