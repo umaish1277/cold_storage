@@ -1,6 +1,6 @@
 {
     "actions": [],
-    "autoname": "format:CSD-{MM}-{YY}-{####}",
+    "autoname": "format:CSD-{YYYY}-{####}",
     "creation": "2024-05-24 12:00:00.000000",
     "default_view": "List",
     "doctype": "DocType",
@@ -61,11 +61,11 @@
             "fieldtype": "Column Break"
         },
         {
-            "default": "CSD-.MM.-.YY.-",
+            "default": "CSD-.YYYY.-",
             "fieldname": "naming_series",
             "fieldtype": "Select",
             "label": "Series",
-            "options": "CSD-.MM.-.YY.-",
+            "options": "CSD-.YYYY.-",
             "read_only": 1
         },
         {
