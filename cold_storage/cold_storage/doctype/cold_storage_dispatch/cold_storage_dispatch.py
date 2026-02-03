@@ -18,6 +18,16 @@ def get_total_batch_balance(customer, warehouse, batch_no):
 
 
 class ColdStorageDispatch(Document):
+	def onload(self):
+		default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		if not self.company:
+			self.company = default_company
+		self.set_onload("default_company", default_company)
+
+	def set_missing_values(self):
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+
 	def autoname(self):
 		if not self.company:
 			frappe.throw("Company is mandatory for naming")
@@ -41,6 +51,13 @@ class ColdStorageDispatch(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def validate(self):
+		# Server-side fallback for company if not set
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		
+		if not self.company:
+			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
+
 		# Validation: Check for Future Date
 		utils.validate_future_date(self.dispatch_date, "Dispatch Date")
              

@@ -2,7 +2,24 @@ import frappe
 from frappe.model.document import Document
 
 class ColdStorageReceipt(Document):
+	def onload(self):
+		default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		if not self.company:
+			self.company = default_company
+		self.set_onload("default_company", default_company)
+
+	def set_missing_values(self):
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+
 	def validate(self):
+		# Server-side fallback for company if not set
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		
+		if not self.company:
+			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
+
 		from cold_storage.cold_storage import utils
 		self.total_bags = sum([item.number_of_bags for item in self.items])
 		
