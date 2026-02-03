@@ -4,6 +4,9 @@ from frappe.utils import flt, add_days, getdate
 def get_context(context):
     context.no_cache = 1
     context.full_width = 1
+    context.show_sidebar = 0
+    context.hide_sidebar = 1
+
     
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login"

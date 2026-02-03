@@ -2,13 +2,63 @@
 
 {% block style %}
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/cold_storage/www/portal/style.css">
 <style>
-    {
+    /* Full-width overrides - must be inline for highest priority */
+    html,
+    body {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden;
+    }
+
+    .main-section,
+    .page-container,
+    .container,
+    .web-container,
+    .web-page-container,
+    .col-md-12,
+    .row {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .frappe-control {
+        max-width: 100% !important;
+    }
+
+    /* Hide any sidebars */
+    .col-lg-2,
+    .sidebar,
+    .page-sidebar {
+        display: none !important;
+    }
+
+    .col-lg-10 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Portal specific */
+    .portal-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 2rem 3rem;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        min-height: 100vh;
+    }
+
+        {
         % include "cold_storage/www/portal/style.css" %
     }
 </style>
 {% endblock %}
+
 
 {% block page_content %}
 <div class="portal-container">
@@ -20,23 +70,34 @@
     <div class="welcome-header">
         <h1>Welcome, {{ customer }}</h1>
         <p>Here is your stock overview at a glance.</p>
+        <div class="download-buttons" style="margin-top: 1rem;">
+            <a href="/api/method/cold_storage.cold_storage.api.customer_portal.get_customer_statement?format=xlsx"
+                class="btn btn-primary" style="margin-right: 10px;">
+                📥 Download Excel Statement
+            </a>
+            <a href="/api/method/cold_storage.cold_storage.api.customer_portal.get_customer_statement?format=pdf"
+                class="btn btn-secondary">
+                📄 Download PDF Statement
+            </a>
+        </div>
     </div>
 
     <!-- Stats Grid -->
-    <div class="dashboard-grid">
-        <div class="stat-card">
+    <div class="dashboard-grid" style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="stat-card" style="flex: 1; min-width: 200px;">
             <h3>Current Stock</h3>
             <div class="value">{{ total_stored }} <span style="font-size: 1rem; color: #7f8c8d;">Bags</span></div>
         </div>
-        <div class="stat-card" style="border-left-color: #3498db;">
+        <div class="stat-card" style="flex: 1; min-width: 200px; border-left-color: #3498db;">
             <h3>Total Inward</h3>
             <div class="value">{{ total_inward }}</div>
         </div>
-        <div class="stat-card" style="border-left-color: #e74c3c;">
+        <div class="stat-card" style="flex: 1; min-width: 200px; border-left-color: #e74c3c;">
             <h3>Total Outward</h3>
             <div class="value">{{ total_outward }}</div>
         </div>
     </div>
+
 
     <!-- Chart Section -->
     <div class="row">
@@ -54,42 +115,76 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/frappe-charts@1.6.2/dist/frappe-charts.min.iife.js"></script>
+    <script src="/assets/cold_storage/js/frappe-charts.js"></script>
     <script>
-        // Trend Chart
-        const data = {
-            labels: {{ chart_data.labels | tojson }},
-        datasets: { { chart_data.datasets | tojson } }
-        };
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                // UMD exports at window['frappe-charts'].Chart
+                var ChartClass = null;
+                if (window['frappe-charts'] && window['frappe-charts'].Chart) {
+                    ChartClass = window['frappe-charts'].Chart;
+                } else if (window.frappe && window.frappe.Chart) {
+                    ChartClass = window.frappe.Chart;
+                } else if (typeof Chart !== 'undefined') {
+                    ChartClass = Chart;
+                }
 
-        const chart = new frappe.Chart("#stock-chart", {
-            title: "",
-            data: data,
-            type: 'bar',
-            height: 300,
-            colors: ['#2ecc71', '#e74c3c'],
-            barOptions: {
-                spaceRatio: 0.5,
-            },
-            axisOptions: {
-                xAxisMode: 'tick'
-            }
-        });
+                if (!ChartClass) {
+                    console.error('Frappe Charts library not loaded');
+                    return;
+                }
 
-        // Bag Type Chart
-        const bagData = {
-            labels: {{ bag_chart.labels | tojson }},
-        datasets: { { bag_chart.datasets | tojson } }
-        };
 
-        const bagChart = new frappe.Chart("#bag-chart", {
-            title: "",
-            data: bagData,
-            type: 'donut',
-            height: 300,
-            colors: ['#3498db', '#9b59b6', '#f1c40f', '#e67e22'],
+                // Trend Chart Data
+                var chartLabels = {{ chart_data.labels | tojson | default ('[]', true)
+            }};
+        var chartDatasets = {{ chart_data.datasets | tojson | default ('[]', true) }};
+
+        if (chartLabels.length > 0 && document.getElementById('stock-chart')) {
+            new ChartClass("#stock-chart", {
+                title: "",
+                data: {
+                    labels: chartLabels,
+                    datasets: chartDatasets
+                },
+                type: 'bar',
+                height: 300,
+                colors: ['#2ecc71', '#e74c3c'],
+                barOptions: {
+                    spaceRatio: 0.5
+                },
+                axisOptions: {
+                    xAxisMode: 'tick'
+                }
+            });
+        } else {
+            document.getElementById('stock-chart').innerHTML = '<p style="text-align:center;color:#7f8c8d;padding:2rem;">No trend data available</p>';
+        }
+
+        // Bag Chart Data
+        var bagLabels = {{ bag_chart.labels | tojson | default ('[]', true) }};
+        var bagDatasets = {{ bag_chart.datasets | tojson | default ('[]', true) }};
+
+        if (bagLabels.length > 0 && document.getElementById('bag-chart')) {
+            new ChartClass("#bag-chart", {
+                title: "",
+                data: {
+                    labels: bagLabels,
+                    datasets: bagDatasets
+                },
+                type: 'donut',
+                height: 300,
+                colors: ['#3498db', '#9b59b6', '#f1c40f', '#e67e22']
+            });
+        } else {
+            document.getElementById('bag-chart').innerHTML = '<p style="text-align:center;color:#7f8c8d;padding:2rem;">No bag data available</p>';
+        }
+            } catch (e) {
+            console.error('Chart rendering error:', e);
+        }
         });
     </script>
+
 
     <div class="row">
         <!-- Recent Receipts -->
