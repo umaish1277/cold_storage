@@ -268,7 +268,11 @@ class ColdStorageDispatch(Document):
 		si.base_net_total = 0.0
 
 		if si.items:
-			si.save()
+			try:
+				si.save()
+				si.submit()
+			except Exception as e:
+				frappe.msgprint(f"Warning: Sales Invoice {si.name} was created but could not be auto-submitted. Error: {str(e)}")
 		
 			# Link Invoice to Dispatch
 			self.db_set("sales_invoice", si.name)
@@ -276,7 +280,7 @@ class ColdStorageDispatch(Document):
 			# Send Notification
 			self.notify_customer(si.grand_total)
 			
-			frappe.msgprint(f"Sales Invoice <a href='/app/sales-invoice/{si.name}'>{si.name}</a> created.")
+			frappe.msgprint(f"Sales Invoice <a href='/app/sales-invoice/{si.name}'>{si.name}</a> created and submitted.")
 
 	def notify_customer(self, amount):
 		if not self.customer: return
