@@ -5,6 +5,8 @@
     "editable_grid": 1,
     "engine": "InnoDB",
     "field_order": [
+        "linked_receipt",
+        "warehouse",
         "goods_item",
         "item_group",
         "batch_no",
@@ -13,6 +15,22 @@
         "description"
     ],
     "fields": [
+        {
+            "fieldname": "linked_receipt",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Linked Receipt",
+            "options": "Cold Storage Receipt",
+            "reqd": 1
+        },
+        {
+            "fieldname": "warehouse",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Warehouse",
+            "options": "Warehouse",
+            "reqd": 1
+        },
         {
             "fieldname": "goods_item",
             "fieldtype": "Link",
