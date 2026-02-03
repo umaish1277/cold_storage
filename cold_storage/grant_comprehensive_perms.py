@@ -2,6 +2,8 @@ import frappe
 
 def execute():
     role = "Cold Storage Manager"
+    
+    # 1. Update DocType Permissions
     doctypes = [
         "Stock Ledger Entry",
         "GL Entry",
@@ -36,11 +38,25 @@ def execute():
             perm.amend = 1
             perm.delete = 1
         
-        # Ensure only read for Stock Settings if needed, but the loop sets all basic ones.
-        # Most managers need read/write for settings if they are "Managers".
-        
         perm.save(ignore_permissions=True)
         print(f"Set permissions for {dt}")
+
+    # 2. Update Report Permissions
+    reports = ["Customer Stock Ledger"]
+    for report_name in reports:
+        if frappe.db.exists("Report", report_name):
+            report = frappe.get_doc("Report", report_name)
+            # Check if role already exists in Has Role child table
+            found = False
+            for r in report.roles:
+                if r.role == role:
+                    found = True
+                    break
+            
+            if not found:
+                report.append("roles", {"role": role})
+                report.save(ignore_permissions=True)
+                print(f"Set permissions for Report: {report_name}")
 
     frappe.db.commit()
     print("Done!")
