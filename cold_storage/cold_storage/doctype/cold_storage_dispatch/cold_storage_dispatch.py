@@ -162,11 +162,14 @@ class ColdStorageDispatch(Document):
 					"item_code": item.goods_item,
 					"s_warehouse": warehouse,
 					"qty": item.number_of_bags,
+					"transfer_qty": item.number_of_bags,
 					"batch_no": item.batch_no,
 					"uom": frappe.db.get_value("Item", item.goods_item, "stock_uom") or "Nos",
 					"conversion_factor": 1.0,
+					"use_serial_batch_fields": 1
 				})
 				
+			se.set_missing_values()
 			se.insert()
 			se.submit()
 			stock_entries.append(se.name)
