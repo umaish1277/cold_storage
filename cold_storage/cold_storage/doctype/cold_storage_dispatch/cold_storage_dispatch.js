@@ -112,7 +112,7 @@ frappe.ui.form.on('Cold Storage Dispatch', {
             frappe.db.get_value("Company", frm.doc.company, "abbr", (r) => {
                 if (r && r.abbr) {
                     let abbr = r.abbr;
-                    let options = "CSD-.MM.-.YY.-";
+                    let options = "CSD-.YYYY.-";
 
                     let new_series = `${abbr}-${options}`;
 

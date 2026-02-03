@@ -30,8 +30,8 @@ class ColdStorageDispatch(Document):
 		if not abbr:
 			frappe.throw(f"Abbreviation not found for Company {self.company}")
 			
-		# series e.g. "CSD-.MM.-.YY.-"
-		series = self.naming_series or "CSD-.MM.-.YY.-"
+		# series e.g. "CSD-.YYYY.-"
+		series = self.naming_series or "CSD-.YYYY.-"
 		
 		# Prevent double prefixing if frontend already added it
 		if not series.startswith(abbr):
