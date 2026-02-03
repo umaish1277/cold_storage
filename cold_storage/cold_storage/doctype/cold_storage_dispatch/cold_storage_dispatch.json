@@ -51,7 +51,7 @@
             "reqd": 1
         },
         {
-            "default": "Daily",
+            "default": "Seasonal",
             "fieldname": "billing_type",
             "fieldtype": "Select",
             "label": "Billing Type",
