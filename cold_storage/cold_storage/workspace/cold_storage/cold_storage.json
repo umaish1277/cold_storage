@@ -10,7 +10,7 @@
    "label": "Outgoing Bags"
   }
  ],
- "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"ntYjhsr-oV\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"Y6aY40UH8S\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"Ajh0eM2rh-\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"Xji9XmjLTN\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"FQwbpNL8ju\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"id\":\"Tf4y5B8w9l\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":12}},{\"id\":\"fVs1y9G4py\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"id\":\"nJ1yl0Rcdr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"id\":\"bA4G7qFC89\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}},{\"id\":\"settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Settings\",\"col\":4}},{\"id\":\"wa_settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"WhatsApp Settings\",\"col\":4}}]",
+ "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"ntYjhsr-oV\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"Y6aY40UH8S\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"m02k6-TEGg\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"Xji9XmjLTN\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"FQwbpNL8ju\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"id\":\"Tf4y5B8w9l\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":12}},{\"id\":\"fVs1y9G4py\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"id\":\"nJ1yl0Rcdr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"id\":\"bA4G7qFC89\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}},{\"id\":\"settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Settings\",\"col\":4}},{\"id\":\"wa_settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"WhatsApp Settings\",\"col\":4}}]",
  "creation": "2024-05-24 12:00:00",
  "custom_blocks": [],
  "docstatus": 0,
@@ -22,15 +22,6 @@
  "is_hidden": 0,
  "label": "Cold Storage",
  "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Documents",
-   "link_count": 0,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
   {
    "hidden": 0,
    "is_query_report": 0,
@@ -54,15 +45,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Reports",
-   "link_count": 0,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Customer Stock Ledger",
    "link_count": 0,
    "link_to": "Customer Stock Ledger",
@@ -70,15 +52,6 @@
    "onboard": 0,
    "report_ref_doctype": "Cold Storage Receipt",
    "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Settings",
-   "link_count": 0,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
   },
   {
    "hidden": 0,
@@ -101,26 +74,22 @@
    "type": "Link"
   }
  ],
- "modified": "2026-02-02 15:03:25.647133",
+ "modified": "2026-02-03 17:16:55.627858",
  "modified_by": "Administrator",
  "module": "Cold Storage",
  "name": "Cold Storage",
  "number_cards": [
   {
+   "label": "Total Outgoing Bills",
+   "number_card_name": "Total Warehouses-1"
+  },
+  {
    "label": "Active Customers",
    "number_card_name": "Active Customers"
   },
   {
-   "label": "Total Outgoing Bills",
-   "number_card_name": "Total Outgoing Bills"
-  },
-  {
    "label": "Active Batches",
    "number_card_name": "Active Batches"
-  },
-  {
-   "label": "Total Warehouses",
-   "number_card_name": "Total Warehouses"
   }
  ],
  "owner": "Administrator",

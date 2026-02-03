@@ -171,3 +171,14 @@ def send_via_twilio(settings, to_number, message):
 	except Exception as e:
 		frappe.log_error("WhatsApp Exception", str(e))
 
+@frappe.whitelist()
+def get_total_warehouses_count(filters=None):
+	default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+	if not default_company:
+		return 0
+	
+	return frappe.db.count("Warehouse", {
+		"company": default_company,
+		"disabled": 0,
+		"is_group": 0
+	})

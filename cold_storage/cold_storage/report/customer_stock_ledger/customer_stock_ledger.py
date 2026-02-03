@@ -51,12 +51,11 @@ def execute(filters=None):
 
 	for r in receipts:
 		# Calculate Out Qty from Dispatches
-		# Dispatch logic might need looking at batch no + receipt combo
 		out_qty = frappe.db.sql("""
 			SELECT SUM(d_item.number_of_bags) 
 			FROM `tabCold Storage Dispatch` d
 			JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = d.name
-			WHERE d.docstatus = 1 AND d.linked_receipt = %s AND d_item.batch_no = %s
+			WHERE d.docstatus = 1 AND d_item.linked_receipt = %s AND d_item.batch_no = %s
 		""", (r.receipt, r.batch_no), as_dict=False)[0][0] or 0
 		
 		balance = r.in_qty - out_qty
