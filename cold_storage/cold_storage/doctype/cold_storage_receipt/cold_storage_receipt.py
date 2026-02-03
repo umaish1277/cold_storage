@@ -197,10 +197,8 @@ class ColdStorageReceipt(Document):
 			dispatch = frappe.new_doc("Cold Storage Dispatch")
 			dispatch.company = self.company
 			dispatch.customer = source_customer
-			dispatch.warehouse = source_warehouse
 			dispatch.dispatch_date = self.receipt_date
 			dispatch.billing_type = billing_type
-			dispatch.linked_receipt = linked_receipt
 			dispatch.remarks = f"Auto-generated Transfer to {self.customer} via Receipt {self.name}"
 			
 			for i in items_to_dispatch:

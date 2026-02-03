@@ -123,36 +123,6 @@ frappe.ui.form.on('Cold Storage Dispatch', {
         }
     },
 
-    linked_receipt: function (frm) {
-        // Bulk apply receipt to all rows that don't have one
-        if (frm.doc.linked_receipt) {
-            $.each(frm.doc.items || [], function (i, row) {
-                if (!row.linked_receipt) {
-                    frappe.model.set_value(row.doctype, row.name, "linked_receipt", frm.doc.linked_receipt);
-                }
-            });
-            // Fetch warehouse from receipt and set in parent if empty
-            if (!frm.doc.warehouse) {
-                frappe.db.get_value("Cold Storage Receipt", frm.doc.linked_receipt, "warehouse", (r) => {
-                    if (r && r.warehouse) {
-                        frm.set_value("warehouse", r.warehouse);
-                    }
-                });
-            }
-        }
-    },
-
-    warehouse: function (frm) {
-        // Bulk apply warehouse to all rows that don't have one
-        if (frm.doc.warehouse) {
-            $.each(frm.doc.items || [], function (i, row) {
-                if (!row.warehouse) {
-                    frappe.model.set_value(row.doctype, row.name, "warehouse", frm.doc.warehouse);
-                }
-            });
-        }
-    },
-
     validate: function (frm) {
         // Ensure Number of Bags is positive
         $.each(frm.doc.items || [], function (i, row) {

@@ -12,10 +12,8 @@
         "customer",
         "dispatch_date",
         "billing_type",
-        "linked_receipt",
         "column_break_jklz",
         "naming_series",
-        "warehouse",
         "section_break_details",
         "items",
         "section_break_billing",
@@ -59,14 +57,6 @@
             "reqd": 1
         },
         {
-            "fieldname": "linked_receipt",
-            "fieldtype": "Link",
-            "label": "Linked Receipt",
-            "options": "Cold Storage Receipt",
-            "reqd": 0,
-            "description": "Default receipt for all items (optional)"
-        },
-        {
             "fieldname": "column_break_jklz",
             "fieldtype": "Column Break"
         },
@@ -77,14 +67,6 @@
             "label": "Series",
             "options": "CSD-.MM.-.YY.-",
             "read_only": 1
-        },
-        {
-            "fieldname": "warehouse",
-            "fieldtype": "Link",
-            "label": "Warehouse",
-            "options": "Warehouse",
-            "reqd": 0,
-            "description": "Default warehouse for all items (optional)"
         },
         {
             "fieldname": "section_break_details",
