@@ -1,6 +1,6 @@
 {
     "actions": [],
-    "autoname": "format:CSR-{YYYY}-{####}",
+    "autoname": "naming_series:",
     "creation": "2024-05-24 12:00:00.000000",
     "default_view": "List",
     "doctype": "DocType",
