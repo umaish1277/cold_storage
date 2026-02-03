@@ -1,0 +1,27 @@
+{
+    "chart_name": "Outgoing Bags",
+    "chart_type": "Report",
+    "doctype": "Dashboard Chart",
+    "filters_json": "{\"from_date\": \"2025-01-01\", \"to_date\": \"2026-12-31\"}",
+    "idx": 0,
+    "is_public": 1,
+    "roles": [
+        {
+            "role": "System Manager"
+        },
+        {
+            "role": "Cold Storage Manager"
+        }
+    ],
+    "is_standard": 1,
+    "module": "Cold Storage",
+    "name": "Outgoing Bags",
+    "report_name": "Bag Outflow Trends",
+    "show_values_over_chart": 0,
+    "time_interval": "Daily",
+    "timeseries": 0,
+    "timespan": "Last Year",
+    "type": "Bar",
+    "use_report_chart": 1,
+    "y_axis": []
+}

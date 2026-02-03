@@ -1,0 +1,184 @@
+{
+ "app": "cold_storage",
+ "charts": [
+  {
+   "chart_name": "Incoming Bags",
+   "label": "Incoming Bags"
+  },
+  {
+   "chart_name": "Outgoing Bags",
+   "label": "Outgoing Bags"
+  }
+ ],
+ "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"ntYjhsr-oV\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"Y6aY40UH8S\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"Ajh0eM2rh-\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"Xji9XmjLTN\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"FQwbpNL8ju\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"id\":\"Tf4y5B8w9l\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":12}},{\"id\":\"fVs1y9G4py\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"id\":\"nJ1yl0Rcdr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"id\":\"bA4G7qFC89\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}},{\"id\":\"settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Settings\",\"col\":4}},{\"id\":\"wa_settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"WhatsApp Settings\",\"col\":4}}]",
+ "creation": "2024-05-24 12:00:00",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "box",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Cold Storage",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Documents",
+   "link_count": 0,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Receipt",
+   "link_count": 0,
+   "link_to": "Cold Storage Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Dispatch",
+   "link_count": 0,
+   "link_to": "Cold Storage Dispatch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 0,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Stock Ledger",
+   "link_count": 0,
+   "link_to": "Customer Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Settings",
+   "link_count": 0,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-02-02 15:03:25.647133",
+ "modified_by": "Administrator",
+ "module": "Cold Storage",
+ "name": "Cold Storage",
+ "number_cards": [
+  {
+   "label": "Active Customers",
+   "number_card_name": "Active Customers"
+  },
+  {
+   "label": "Total Outgoing Bills",
+   "number_card_name": "Total Outgoing Bills"
+  },
+  {
+   "label": "Active Batches",
+   "number_card_name": "Active Batches"
+  },
+  {
+   "label": "Total Warehouses",
+   "number_card_name": "Total Warehouses"
+  }
+ ],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "Cold Storage Manager"
+  }
+ ],
+ "sequence_id": 0.0,
+ "shortcuts": [
+  {
+   "doc_view": "",
+   "label": "New Receipt",
+   "link_to": "Cold Storage Receipt",
+   "type": "DocType",
+   "url": "/app/cold-storage-receipt/new"
+  },
+  {
+   "doc_view": "",
+   "label": "New Dispatch",
+   "link_to": "Cold Storage Dispatch",
+   "type": "DocType",
+   "url": "/app/cold-storage-dispatch/new"
+  },
+  {
+   "doc_view": "",
+   "label": "Customer Ledger",
+   "link_to": "Customer Stock Ledger",
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Report",
+   "url": "/app/query-report/Customer Stock Ledger"
+  },
+  {
+   "doc_view": "",
+   "label": "Settings",
+   "link_to": "Cold Storage Settings",
+   "type": "DocType",
+   "url": "/app/cold-storage-settings"
+  },
+  {
+   "doc_view": "",
+   "label": "WhatsApp Settings",
+   "link_to": "Cold Storage WhatsApp Settings",
+   "type": "DocType",
+   "url": "/app/cold-storage-whatsapp-settings"
+  }
+ ],
+ "title": "Cold Storage",
+ "type": "Workspace"
+}

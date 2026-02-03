@@ -1,0 +1,87 @@
+{
+    "actions": [],
+    "creation": "2024-05-24 12:00:00.000000",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+        "goods_item",
+        "item_group",
+        "batch_no",
+        "number_of_bags",
+        "rate",
+        "description"
+    ],
+    "fields": [
+        {
+            "fieldname": "goods_item",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Goods Item",
+            "options": "Item",
+            "reqd": 1
+        },
+        {
+            "fieldname": "item_group",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Item Group",
+            "options": "Item Group",
+            "reqd": 1
+        },
+        {
+            "fieldname": "number_of_bags",
+            "fieldtype": "Int",
+            "in_list_view": 1,
+            "label": "Number of Bags",
+            "non_negative": 1,
+            "reqd": 1
+        },
+        {
+            "fieldname": "batch_no",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Batch No",
+            "options": "Batch",
+            "reqd": 1
+        },
+        {
+            "fieldname": "rate",
+            "fieldtype": "Currency",
+            "label": "Rate"
+        },
+        {
+            "fieldname": "description",
+            "fieldtype": "Small Text",
+            "label": "Description"
+        },
+        {
+            "fieldname": "amount",
+            "fieldtype": "Currency",
+            "label": "Handling Amount",
+            "read_only": 1
+        },
+        {
+            "fieldname": "loading_rate",
+            "fieldtype": "Currency",
+            "label": "Loading Rate"
+        },
+        {
+            "fieldname": "loading_amount",
+            "fieldtype": "Currency",
+            "label": "Loading Amount",
+            "read_only": 1
+        }
+    ],
+    "istable": 1,
+    "links": [],
+    "modified": "2024-05-24 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Cold Storage Dispatch Item",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}

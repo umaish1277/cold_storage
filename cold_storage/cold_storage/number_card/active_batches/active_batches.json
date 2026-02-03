@@ -1,0 +1,23 @@
+{
+ "aggregate_function_based_on": "",
+ "creation": "2024-05-24 12:00:00",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "document_type": "Cold Storage Receipt",
+ "filters_json": "[[\"Cold Storage Receipt\",\"status\",\"=\",\"Submitted\",false]]",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Active Batches",
+ "method": "cold_storage.cold_storage.utils.get_active_batches_count",
+ "modified": "2026-02-01 00:47:28.266618",
+ "modified_by": "Administrator",
+ "module": "Cold Storage",
+ "name": "Active Batches",
+ "owner": "Administrator",
+ "show_full_number": 0,
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily",
+ "type": "Custom"
+}

@@ -1,0 +1,234 @@
+{
+    "actions": [],
+    "autoname": "format:CSD-{MM}-{YY}-{####}",
+    "creation": "2024-05-24 12:00:00.000000",
+    "default_view": "List",
+    "doctype": "DocType",
+    "document_type": "Document",
+    "engine": "InnoDB",
+    "field_order": [
+        "section_break_gkhy",
+        "company",
+        "customer",
+        "dispatch_date",
+        "billing_type",
+        "linked_receipt",
+        "column_break_jklz",
+        "naming_series",
+        "warehouse",
+        "section_break_details",
+        "items",
+        "section_break_billing",
+        "total_amount",
+        "remarks"
+    ],
+    "fields": [
+        {
+            "fieldname": "section_break_gkhy",
+            "fieldtype": "Section Break"
+        },
+        {
+            "default": "Company",
+            "fieldname": "company",
+            "fieldtype": "Link",
+            "label": "Company",
+            "options": "Company",
+            "read_only": 1,
+            "reqd": 1
+        },
+        {
+            "fieldname": "customer",
+            "fieldtype": "Link",
+            "label": "Customer",
+            "options": "Customer",
+            "reqd": 1
+        },
+        {
+            "default": "Today",
+            "fieldname": "dispatch_date",
+            "fieldtype": "Date",
+            "label": "Dispatch Date",
+            "reqd": 1
+        },
+        {
+            "default": "Daily",
+            "fieldname": "billing_type",
+            "fieldtype": "Select",
+            "label": "Billing Type",
+            "options": "Daily\nMonthly\nSeasonal",
+            "reqd": 1
+        },
+        {
+            "fieldname": "linked_receipt",
+            "fieldtype": "Link",
+            "label": "Linked Receipt",
+            "options": "Cold Storage Receipt",
+            "reqd": 1,
+            "description": "Receipt being dispatched"
+        },
+        {
+            "fieldname": "column_break_jklz",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "CSD-.MM.-.YY.-",
+            "fieldname": "naming_series",
+            "fieldtype": "Select",
+            "label": "Series",
+            "options": "CSD-.MM.-.YY.-",
+            "read_only": 1
+        },
+        {
+            "fieldname": "warehouse",
+            "fieldtype": "Link",
+            "label": "Warehouse",
+            "options": "Warehouse",
+            "reqd": 1
+        },
+        {
+            "fieldname": "section_break_details",
+            "fieldtype": "Section Break",
+            "label": "Items"
+        },
+        {
+            "fieldname": "items",
+            "fieldtype": "Table",
+            "label": "Items",
+            "options": "Cold Storage Dispatch Item"
+        },
+        {
+            "fieldname": "section_break_billing",
+            "fieldtype": "Section Break",
+            "label": "Billing"
+        },
+        {
+            "fieldname": "sales_invoice",
+            "fieldtype": "Link",
+            "label": "Sales Invoice",
+            "options": "Sales Invoice",
+            "read_only": 1
+        },
+        {
+            "fieldname": "stock_entry",
+            "fieldtype": "Link",
+            "label": "Stock Entry",
+            "options": "Stock Entry",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_loading_amount",
+            "fieldtype": "Currency",
+            "label": "Total Loading Amount",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_amount",
+            "fieldtype": "Currency",
+            "label": "Total Handling Amount",
+            "read_only": 1
+        },
+        {
+            "default": "0",
+            "fieldname": "gst_applicable",
+            "fieldtype": "Check",
+            "label": "GST on Services Applicable"
+        },
+        {
+            "depends_on": "eval:doc.gst_applicable",
+            "fieldname": "gst_rate",
+            "fieldtype": "Percent",
+            "label": "GST on Services Rate (%)",
+            "mandatory_depends_on": "eval:doc.gst_applicable"
+        },
+        {
+            "fieldname": "total_gst_amount",
+            "fieldtype": "Currency",
+            "label": "Total GST on Services Amount",
+            "read_only": 1
+        },
+        {
+            "fieldname": "grand_total",
+            "fieldtype": "Currency",
+            "label": "Grand Total",
+            "read_only": 1
+        },
+        {
+            "fieldname": "in_words",
+            "fieldtype": "Small Text",
+            "label": "In Words",
+            "read_only": 1
+        },
+        {
+            "fieldname": "remarks",
+            "fieldtype": "Small Text",
+            "label": "Remarks"
+        },
+        {
+            "fieldname": "workflow_state",
+            "fieldtype": "Link",
+            "label": "Workflow State",
+            "options": "Workflow State",
+            "read_only": 1,
+            "hidden": 1
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "is_submittable": 1,
+    "links": [],
+    "modified": "2024-05-24 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Cold Storage Dispatch",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "submit": 1,
+            "write": 1
+        },
+        {
+            "amend": 1,
+            "cancel": 1,
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage Manager",
+            "share": 1,
+            "submit": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage Accountant",
+            "write": 1
+        },
+        {
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage User",
+            "if_owner": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1
+}

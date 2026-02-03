@@ -1,0 +1,93 @@
+{
+    "actions": [],
+    "creation": "2024-05-24 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "default_company",
+        "bag_type_rates",
+        "gst_on_services_account"
+    ],
+    "fields": [
+        {
+            "fieldname": "default_company",
+            "fieldtype": "Link",
+            "label": "Default Company",
+            "options": "Company"
+        },
+        {
+            "fieldname": "bag_type_rates",
+            "fieldtype": "Table",
+            "label": "Bag Type Rates",
+            "options": "Bag Type Rate",
+            "permlevel": 1
+        },
+        {
+            "fieldname": "gst_on_services_account",
+            "fieldtype": "Link",
+            "label": "GST on Services Account",
+            "options": "Account",
+            "permlevel": 1
+        }
+    ],
+    "issingle": 1,
+    "links": [],
+    "modified": "2024-05-24 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Cold Storage Settings",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "read": 1,
+            "role": "Cold Storage Accountant"
+        },
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "permlevel": 1,
+            "print": 1,
+            "read": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "permlevel": 1,
+            "print": 1,
+            "read": 1,
+            "role": "Cold Storage Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1
+}

@@ -1,0 +1,146 @@
+{% extends "templates/web.html" %}
+
+{% block style %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/cold_storage/www/portal/style.css">
+<style>
+    {
+        % include "cold_storage/www/portal/style.css" %
+    }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="portal-container">
+
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+
+    <div class="welcome-header">
+        <h1>Welcome, {{ customer }}</h1>
+        <p>Here is your stock overview at a glance.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <h3>Current Stock</h3>
+            <div class="value">{{ total_stored }} <span style="font-size: 1rem; color: #7f8c8d;">Bags</span></div>
+        </div>
+        <div class="stat-card" style="border-left-color: #3498db;">
+            <h3>Total Inward</h3>
+            <div class="value">{{ total_inward }}</div>
+        </div>
+        <div class="stat-card" style="border-left-color: #e74c3c;">
+            <h3>Total Outward</h3>
+            <div class="value">{{ total_outward }}</div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm h-100" style="border-radius: 12px; border: none; padding: 1.5rem;">
+                <h2 class="section-title">📊 Stock Trends (Last 6 Months)</h2>
+                <div id="stock-chart"></div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100" style="border-radius: 12px; border: none; padding: 1.5rem;">
+                <h2 class="section-title">📦 Stock by Bag Type</h2>
+                <div id="bag-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/frappe-charts@1.6.2/dist/frappe-charts.min.iife.js"></script>
+    <script>
+        // Trend Chart
+        const data = {
+            labels: {{ chart_data.labels | tojson }},
+        datasets: { { chart_data.datasets | tojson } }
+        };
+
+        const chart = new frappe.Chart("#stock-chart", {
+            title: "",
+            data: data,
+            type: 'bar',
+            height: 300,
+            colors: ['#2ecc71', '#e74c3c'],
+            barOptions: {
+                spaceRatio: 0.5,
+            },
+            axisOptions: {
+                xAxisMode: 'tick'
+            }
+        });
+
+        // Bag Type Chart
+        const bagData = {
+            labels: {{ bag_chart.labels | tojson }},
+        datasets: { { bag_chart.datasets | tojson } }
+        };
+
+        const bagChart = new frappe.Chart("#bag-chart", {
+            title: "",
+            data: bagData,
+            type: 'donut',
+            height: 300,
+            colors: ['#3498db', '#9b59b6', '#f1c40f', '#e67e22'],
+        });
+    </script>
+
+    <div class="row">
+        <!-- Recent Receipts -->
+        <div class="col-md-6 mb-4">
+            <h2 class="section-title">📥 Recent Inward</h2>
+            <div class="activity-feed">
+                {% if recent_receipts %}
+                {% for row in recent_receipts %}
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <h4>{{ row.name }}</h4>
+                        <div class="activity-meta">{{ row.receipt_date.strftime("%d %b %Y") }} &bull; {{ row.warehouse
+                            }}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="d-block font-weight-bold">{{ row.total_bags }} Bags</span>
+                        <span class="badge badge-success">Received</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">No recent receipts found.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Dispatches -->
+        <div class="col-md-6 mb-4">
+            <h2 class="section-title">📤 Recent Outward</h2>
+            <div class="activity-feed">
+                {% if recent_dispatches %}
+                {% for row in recent_dispatches %}
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <h4>{{ row.name }}</h4>
+                        <div class="activity-meta">{{ row.dispatch_date.strftime("%d %b %Y") }} &bull; Linked: {{
+                            row.linked_receipt }}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="d-block font-weight-bold">{{ row.total_amount }} (Bill)</span>
+                        <span class="badge badge-warning">Dispatched</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">No recent dispatches found.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}
