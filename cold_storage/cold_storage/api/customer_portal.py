@@ -200,7 +200,7 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
             "total_dispatched": "Total Dispatched",
             "current_balance": "Current Balance",
             "stock_trends": "Stock Trends (Last 6 Months)",
-            "stock_by_bag_type": "Stock by Bag Type",
+            "stock_by_batch_no": "Stock by Batch No",
             "inward": "Inward",
             "outward": "Outward",
             "detailed_register": "Detailed Stock Register",
@@ -230,7 +230,7 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
             "total_dispatched": "کل روانہ",
             "current_balance": "موجودہ بیلنس",
             "stock_trends": "اسٹاک رجحانات (آخری 6 ماہ)",
-            "stock_by_bag_type": "بیگ کی قسم کے لحاظ سے اسٹاک",
+            "stock_by_batch_no": "بیچ نمبر کے لحاظ سے اسٹاک",
             "inward": "اندر آنے والا",
             "outward": "باہر جانے والا",
             "detailed_register": "تفصیلی اسٹاک رجسٹر",
@@ -343,19 +343,19 @@ def get_bag_chart_data(customer):
     from frappe.utils import flt
     
     in_bags = frappe.db.sql("""
-        SELECT ri.item_group, SUM(ri.number_of_bags)
+        SELECT ri.batch_no, SUM(ri.number_of_bags)
         FROM `tabCold Storage Receipt` r
         JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
         WHERE r.customer = %s AND r.docstatus = 1
-        GROUP BY ri.item_group
+        GROUP BY ri.batch_no
     """, (customer,))
     
     out_bags = frappe.db.sql("""
-        SELECT di.item_group, SUM(di.number_of_bags)
+        SELECT di.batch_no, SUM(di.number_of_bags)
         FROM `tabCold Storage Dispatch` d
         JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
         WHERE d.customer = %s AND d.docstatus = 1
-        GROUP BY di.item_group
+        GROUP BY di.batch_no
     """, (customer,))
     
     bag_balance = {}

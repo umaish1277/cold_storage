@@ -63,9 +63,38 @@
 {% block page_content %}
 <div class="portal-container">
 
+    {% if is_manager %}
+    <!-- Manager Customer Selector -->
+    <div
+        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <span style="color: white; font-weight: 600; font-size: 14px;">👔 Manager View</span>
+            <select id="customerSelect" onchange="selectCustomer(this.value)"
+                style="padding: 8px 15px; border-radius: 8px; border: none; font-size: 14px; min-width: 250px; cursor: pointer; background: white;">
+                <option value="">-- Select Customer --</option>
+                {% for c in all_customers %}
+                <option value="{{ c }}" {% if c==customer %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+            {% if customer %}
+            <span style="color: rgba(255,255,255,0.8); font-size: 13px;">Viewing: <strong style="color: white;">{{
+                    customer }}</strong></span>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        function selectCustomer(customerName) {
+            if (customerName) {
+                window.location.href = '/portal?customer=' + encodeURIComponent(customerName);
+            }
+        }
+    </script>
+    {% endif %}
+
     {% if error %}
     <div class="alert alert-danger">{{ error }}</div>
     {% else %}
+
 
     <div class="welcome-header">
         <h1>Welcome, {{ customer }}</h1>
@@ -134,7 +163,7 @@
         </div>
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm h-100" style="border-radius: 12px; border: none; padding: 1.5rem;">
-                <h2 class="section-title">📦 Stock by Bag Type</h2>
+                <h2 class="section-title">📦 Stock by Batch No</h2>
                 <div id="bag-chart"></div>
             </div>
         </div>
