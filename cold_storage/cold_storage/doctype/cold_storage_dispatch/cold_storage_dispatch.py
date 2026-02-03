@@ -45,8 +45,18 @@ class ColdStorageDispatch(Document):
 		utils.validate_future_date(self.dispatch_date, "Dispatch Date")
              
 		for row in self.items:
+			# Fallback to parent fields if child fields are empty
+			if not row.linked_receipt and self.linked_receipt:
+				row.linked_receipt = self.linked_receipt
+			
+			if not row.warehouse and self.warehouse:
+				row.warehouse = self.warehouse
+
 			if not row.linked_receipt:
 				frappe.throw(f"Row {row.idx}: Please select a Linked Receipt")
+			
+			if not row.warehouse:
+				frappe.throw(f"Row {row.idx}: Please select a Warehouse")
 			
 			if row.number_of_bags <= 0:
 				frappe.throw(f"Row {row.idx}: Number of Bags must be greater than 0")
