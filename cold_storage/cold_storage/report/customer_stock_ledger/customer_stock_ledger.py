@@ -1,8 +1,10 @@
 import frappe
 from frappe import _
-from frappe.utils import flt
 
 def execute(filters=None):
+	# Explicitly define flt to avoid NameError due to server caching
+	from frappe.utils import flt
+	
 	if not filters: filters = {}
 	columns = [
 		{"label": _("Receipt Date"), "fieldname": "receipt_date", "fieldtype": "Date", "width": 100},
@@ -105,4 +107,3 @@ def execute(filters=None):
 		})
 
 	return columns, data
-
