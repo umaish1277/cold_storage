@@ -15,9 +15,8 @@ class ColdStorageReceipt(Document):
 			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 
 	def validate(self):
-		# Server-side fallback for company if not set
-		if not self.company:
-			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		# Enforce default company from settings
+		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		
 		if not self.company:
 			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
@@ -102,6 +101,9 @@ class ColdStorageReceipt(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def before_save(self):
+		# Enforce company again just in case
+		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+
 		# Generate/Update QR Code
 		if self.name:
 			import qrcode

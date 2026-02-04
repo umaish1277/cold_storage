@@ -51,9 +51,8 @@ class ColdStorageDispatch(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def validate(self):
-		# Server-side fallback for company if not set
-		if not self.company:
-			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		# Enforce default company from settings
+		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		
 		if not self.company:
 			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
