@@ -157,6 +157,11 @@ class ColdStorageDispatch(Document):
 		if not self.items:
 			return
 
+		# Amendment Handling
+		old_se = None
+		if self.amended_from:
+			old_se = frappe.db.get_value("Cold Storage Dispatch", self.amended_from, "stock_entry")
+
 		# Group items by warehouse for separate stock entries
 		warehouse_items = {}
 		for item in self.items:
@@ -167,6 +172,12 @@ class ColdStorageDispatch(Document):
 		stock_entries = []
 		for warehouse, items in warehouse_items.items():
 			se = frappe.new_doc("Stock Entry")
+			
+			if old_se and frappe.db.exists("Stock Entry", old_se):
+				se.amended_from = old_se
+				# Only use amended_from for the first SE created if there are multiple warehouses
+				# This is a simplification; usually dispatches are from one warehouse anyway in this app context
+				old_se = None 
 			se.purpose = "Material Issue"
 			se.set_stock_entry_type()
 			se.from_warehouse = warehouse
@@ -326,16 +337,22 @@ class ColdStorageDispatch(Document):
 			frappe.sendmail(recipients=[contact_email], subject=subject, message=message)
 	def on_cancel(self):
 		if self.stock_entry:
-			se = frappe.get_doc("Stock Entry", self.stock_entry)
-			if se.docstatus == 1:
-				se.cancel()
-				frappe.msgprint(f"Stock Entry {se.name} cancelled.")
+			try:
+				se = frappe.get_doc("Stock Entry", self.stock_entry)
+				if se.docstatus == 1:
+					se.cancel()
+					frappe.msgprint(_("Linked Stock Entry {0} cancelled").format(se.name))
+			except Exception as e:
+				frappe.msgprint(_("Note: Linked Stock Entry {0} could not be automatically cancelled: {1}").format(self.stock_entry, str(e)))
 
 		if self.sales_invoice:
-			si = frappe.get_doc("Sales Invoice", self.sales_invoice)
-			if si.docstatus == 1:
-				si.cancel()
-				frappe.msgprint(f"Sales Invoice {si.name} cancelled.")
+			try:
+				si = frappe.get_doc("Sales Invoice", self.sales_invoice)
+				if si.docstatus == 1:
+					si.cancel()
+					frappe.msgprint(_("Linked Sales Invoice {0} cancelled").format(si.name))
+			except Exception as e:
+				frappe.msgprint(_("Note: Linked Sales Invoice {0} could not be automatically cancelled: {1}").format(self.sales_invoice, str(e)))
 
 
 

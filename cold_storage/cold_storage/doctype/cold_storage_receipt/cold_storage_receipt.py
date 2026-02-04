@@ -218,11 +218,16 @@ class ColdStorageReceipt(Document):
 		frappe.msgprint(f"Journal Entry <a href='/app/journal-entry/{je.name}'>{je.name}</a> created for transfer loading charges.")
 
 	def make_stock_entry(self):
-
 		if not self.items:
 			return
 
 		se = frappe.new_doc("Stock Entry")
+		
+		# Amendment Handling: link new stock entry to the old one
+		if self.amended_from:
+			old_se = frappe.db.get_value("Cold Storage Receipt", self.amended_from, "stock_entry")
+			if old_se and frappe.db.exists("Stock Entry", old_se):
+				se.amended_from = old_se
 		
 		# Determine Purpose and Warehouse Logic
 		if self.receipt_type == "Warehouse Transfer":
@@ -351,10 +356,13 @@ class ColdStorageReceipt(Document):
 			frappe.throw(f"Cannot cancel Receipt because linked Dispatch {linked_dispatches[0][0]} exists. Please cancel the Dispatch first.")
 
 		if self.stock_entry:
-			se = frappe.get_doc("Stock Entry", self.stock_entry)
-			if se.docstatus == 1:
-				se.cancel()
-				frappe.msgprint(f"Stock Entry {se.name} cancelled.")
+			try:
+				se = frappe.get_doc("Stock Entry", self.stock_entry)
+				if se.docstatus == 1:
+					se.cancel()
+					frappe.msgprint(_("Linked Stock Entry {0} cancelled").format(se.name))
+			except Exception as e:
+				frappe.msgprint(_("Note: Linked Stock Entry {0} could not be automatically cancelled: {1}").format(self.stock_entry, str(e)))
 
 		if self.transfer_loading_journal_entry:
 			je = frappe.get_doc("Journal Entry", self.transfer_loading_journal_entry)
