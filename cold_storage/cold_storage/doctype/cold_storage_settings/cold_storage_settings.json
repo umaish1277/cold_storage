@@ -6,7 +6,13 @@
     "field_order": [
         "default_company",
         "bag_type_rates",
-        "gst_on_services_account"
+        "gst_on_services_account",
+        "transfer_loading_section",
+        "inter_warehouse_loading_rate",
+        "intra_warehouse_loading_rate",
+        "column_break_transfer",
+        "transfer_loading_expense_account",
+        "transfer_loading_payable_account"
     ],
     "fields": [
         {
@@ -28,11 +34,46 @@
             "label": "GST on Services Account",
             "options": "Account",
             "permlevel": 1
+        },
+        {
+            "fieldname": "transfer_loading_section",
+            "fieldtype": "Section Break",
+            "label": "Warehouse Transfer Loading Charges"
+        },
+        {
+            "fieldname": "inter_warehouse_loading_rate",
+            "fieldtype": "Currency",
+            "label": "Inter-Warehouse Loading Rate (Per Bag)",
+            "description": "Loading charge per bag when transferring between different warehouses"
+        },
+        {
+            "fieldname": "intra_warehouse_loading_rate",
+            "fieldtype": "Currency",
+            "label": "Intra-Warehouse Loading Rate (Per Bag)",
+            "description": "Loading charge per bag when transferring within the same warehouse"
+        },
+        {
+            "fieldname": "column_break_transfer",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "transfer_loading_expense_account",
+            "fieldtype": "Link",
+            "label": "Transfer Loading Expense Account",
+            "options": "Account",
+            "description": "Expense account to debit for transfer loading charges"
+        },
+        {
+            "fieldname": "transfer_loading_payable_account",
+            "fieldtype": "Link",
+            "label": "Transfer Loading Payable Account",
+            "options": "Account",
+            "description": "Payable/Cash account to credit for transfer loading charges"
         }
     ],
     "issingle": 1,
     "links": [],
-    "modified": "2024-05-24 12:00:00.000000",
+    "modified": "2026-02-04 09:52:00.000000",
     "modified_by": "Administrator",
     "module": "Cold Storage",
     "name": "Cold Storage Settings",

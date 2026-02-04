@@ -1,4 +1,6 @@
 import frappe
+from frappe import _
+from frappe.utils import flt
 from frappe.model.document import Document
 
 class ColdStorageReceipt(Document):
@@ -148,17 +150,75 @@ class ColdStorageReceipt(Document):
 			)
 
 		# Warehouse Transfer is now handled directly via Stock Entry (Material Transfer) in make_stock_entry
-		# elif self.receipt_type == "Warehouse Transfer":
-		# 	pass
-
+		if self.receipt_type == "Warehouse Transfer":
+			self.make_transfer_loading_journal_entry()
 
 		self.status = "Submitted"
 		self.make_stock_entry()
 
 		self.status = "Submitted"
 		self.notify_customer()
+
+	def make_transfer_loading_journal_entry(self):
+		settings = frappe.get_single("Cold Storage Settings")
 		
+		# Skip if accounts are not configured
+		if not settings.transfer_loading_expense_account or not settings.transfer_loading_payable_account:
+			frappe.msgprint("Transfer Loading charges skipped: Expense/Payable accounts not set in Cold Storage Settings.")
+			return
+
+		# Determine rate
+		is_intra = (self.from_warehouse == self.warehouse)
+		rate = settings.intra_warehouse_loading_rate if is_intra else settings.inter_warehouse_loading_rate
+		
+		if not rate or rate <= 0:
+			return
+
+		# Calculate equated bags: 1 Jute Bag = 2 Net Bags (Net Bag = 0.5 Jute Bag equivalent)
+		# Logic follows Item Group as requested
+		equated_bags = 0
+		for item in self.items:
+			if item.item_group == "Net Bag":
+				equated_bags += flt(item.number_of_bags) * 0.5
+			else:
+				# Default to Jute Bag (1:1) if it's Jute Bag or any other group
+				equated_bags += flt(item.number_of_bags)
+
+
+		amount = flt(rate) * flt(equated_bags)
+		if amount <= 0:
+			return
+
+		self.transfer_loading_amount = amount
+
+		je = frappe.new_doc("Journal Entry")
+		je.voucher_type = "Journal Entry"
+		je.posting_date = self.receipt_date
+		je.company = self.company
+		je.remark = f"Loading Charges for Warehouse Transfer: {self.name} ({'Intra' if is_intra else 'Inter'}-Warehouse)"
+
+		# Debit: Expense Account
+		je.append("accounts", {
+			"account": settings.transfer_loading_expense_account,
+			"debit_in_account_currency": amount,
+		})
+
+		# Credit: Payable/Cash Account
+		je.append("accounts", {
+			"account": settings.transfer_loading_payable_account,
+			"credit_in_account_currency": amount,
+		})
+
+
+		je.insert()
+		je.submit()
+
+		self.db_set("transfer_loading_journal_entry", je.name)
+		self.db_set("transfer_loading_amount", amount)
+		frappe.msgprint(f"Journal Entry <a href='/app/journal-entry/{je.name}'>{je.name}</a> created for transfer loading charges.")
+
 	def make_stock_entry(self):
+
 		if not self.items:
 			return
 
@@ -295,6 +355,13 @@ class ColdStorageReceipt(Document):
 			if se.docstatus == 1:
 				se.cancel()
 				frappe.msgprint(f"Stock Entry {se.name} cancelled.")
+
+		if self.transfer_loading_journal_entry:
+			je = frappe.get_doc("Journal Entry", self.transfer_loading_journal_entry)
+			if je.docstatus == 1:
+				je.cancel()
+				frappe.msgprint(f"Journal Entry {je.name} for transfer loading charges cancelled.")
+
 
 @frappe.whitelist()
 def get_customer_warehouses(doctype, txt, searchfield, start, page_len, filters):

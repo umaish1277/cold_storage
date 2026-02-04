@@ -25,6 +25,9 @@
         "remarks",
         "total_bags",
         "stock_entry",
+        "transfer_loading_section",
+        "transfer_loading_amount",
+        "transfer_loading_journal_entry",
         "workflow_state",
         "amended_from"
     ],
@@ -156,6 +159,27 @@
             "fieldtype": "Link",
             "label": "Stock Entry",
             "options": "Stock Entry",
+            "read_only": 1
+        },
+        {
+            "depends_on": "eval:doc.receipt_type=='Warehouse Transfer' && doc.docstatus == 1",
+            "fieldname": "transfer_loading_section",
+            "fieldtype": "Section Break",
+            "label": "Transfer Loading Charges"
+        },
+        {
+            "depends_on": "eval:doc.receipt_type=='Warehouse Transfer' && doc.docstatus == 1",
+            "fieldname": "transfer_loading_amount",
+            "fieldtype": "Currency",
+            "label": "Transfer Loading Amount",
+            "read_only": 1
+        },
+        {
+            "depends_on": "eval:doc.receipt_type=='Warehouse Transfer' && doc.docstatus == 1",
+            "fieldname": "transfer_loading_journal_entry",
+            "fieldtype": "Link",
+            "label": "Transfer Loading Journal Entry",
+            "options": "Journal Entry",
             "read_only": 1
         },
         {
