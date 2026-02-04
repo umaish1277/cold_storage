@@ -1,108 +1,110 @@
 import frappe
-from frappe.model.naming import make_autoname
 
 def run():
-	print("Starting Cold Storage Data Cleanup...")
+	print("Starting Comprehensive Cold Storage Data Cleanup...")
 	
-	# 1. Clear Cold Storage Dispatch and linked Sales Invoices
-	dispatches = frappe.get_all("Cold Storage Dispatch", fields=["name", "docstatus", "sales_invoice"])
-	for d in dispatches:
-		print(f"Processing Dispatch: {d.name}")
-		if d.docstatus == 1:
-			doc = frappe.get_doc("Cold Storage Dispatch", d.name)
-			doc.cancel()
-		
-	# 1. Clear Cold Storage Dispatch and linked Sales Invoices
-	dispatches = frappe.get_all("Cold Storage Dispatch", fields=["name", "docstatus", "sales_invoice"])
-	for d in dispatches:
-		print(f"Processing Dispatch: {d.name}")
-		if d.docstatus == 1:
-			doc = frappe.get_doc("Cold Storage Dispatch", d.name)
-			try:
-				doc.cancel()
-			except Exception as e:
-				print(f"Failed to cancel Dispatch {d.name}: {e}")
-		
-		# Delete Sales Invoice if exists
-		if d.sales_invoice:
-			if frappe.db.exists("Sales Invoice", d.sales_invoice):
-				si = frappe.get_doc("Sales Invoice", d.sales_invoice)
-				if si.docstatus == 1:
-					try:
-						si.cancel()
-					except Exception as e:
-						print(f"Failed to cancel Invoice {d.sales_invoice}: {e}")
-				
-				# Clear the link first to avoid circular dependency check
-				frappe.db.set_value("Cold Storage Dispatch", d.name, "sales_invoice", None)
-				try:
-					frappe.delete_doc("Sales Invoice", d.sales_invoice, ignore_permissions=True)
-				except Exception as e:
-					print(f"Failed to delete Invoice {d.sales_invoice}: {e}")
-		
-		try:
-			frappe.delete_doc("Cold Storage Dispatch", d.name, ignore_permissions=True)
-		except Exception as e:
-			print(f"Failed to delete Dispatch {d.name}: {e}")
+	company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+	if not company:
+		print("Error: Default Company not found in Cold Storage Settings.")
+		return
 
-	# 2. Clear Cold Storage Receipt and linked Stock Entries / Journal Entries
-	receipts = frappe.get_all("Cold Storage Receipt", fields=["name", "docstatus", "stock_entry", "transfer_loading_journal_entry"])
+	print(f"Target Company: {company}")
+
+	# 1. Clear Transactions
+	print("Clearing Transactional Data...")
+	
+	# Dispatch & linked Sales Invoices
+	dispatches = frappe.get_all("Cold Storage Dispatch", filters={"company": company}, fields=["name", "sales_invoice"])
+	for d in dispatches:
+		print(f"Deleting Dispatch: {d.name}")
+		if d.sales_invoice and frappe.db.exists("Sales Invoice", d.sales_invoice):
+			frappe.db.set_value("Cold Storage Dispatch", d.name, "sales_invoice", None)
+			try:
+				frappe.delete_doc("Sales Invoice", d.sales_invoice, ignore_permissions=True, force=True)
+			except Exception as e:
+				print(f"Could not delete Invoice {d.sales_invoice}: {e}")
+		
+		frappe.delete_doc("Cold Storage Dispatch", d.name, ignore_permissions=True, force=True)
+
+	# Receipt & linked Stock Entries / Journals
+	receipts = frappe.get_all("Cold Storage Receipt", filters={"company": company}, fields=["name", "stock_entry", "transfer_loading_journal_entry"])
 	for r in receipts:
-		print(f"Processing Receipt: {r.name}")
-		if r.docstatus == 1:
-			doc = frappe.get_doc("Cold Storage Receipt", r.name)
-			try:
-				doc.cancel()
-			except Exception as e:
-				print(f"Failed to cancel Receipt {r.name}: {e}")
-		
-		# Ensure linked docs are deleted
+		print(f"Deleting Receipt: {r.name}")
 		if r.stock_entry and frappe.db.exists("Stock Entry", r.stock_entry):
-			se = frappe.get_doc("Stock Entry", r.stock_entry)
-			if se.docstatus == 1: 
-				try:
-					se.cancel()
-				except Exception as e:
-					print(f"Failed to cancel Stock Entry {r.stock_entry}: {e}")
+			frappe.db.set_value("Cold Storage Receipt", r.name, "stock_entry", None)
 			try:
-				frappe.delete_doc("Stock Entry", r.stock_entry, ignore_permissions=True)
+				frappe.delete_doc("Stock Entry", r.stock_entry, ignore_permissions=True, force=True)
 			except Exception as e:
-				print(f"Failed to delete Stock Entry {r.stock_entry}: {e}")
-			
+				print(f"Could not delete Stock Entry {r.stock_entry}: {e}")
+		
 		if r.transfer_loading_journal_entry and frappe.db.exists("Journal Entry", r.transfer_loading_journal_entry):
-			je = frappe.get_doc("Journal Entry", r.transfer_loading_journal_entry)
-			if je.docstatus == 1:
-				try:
-					je.cancel()
-				except Exception as e:
-					print(f"Failed to cancel Journal Entry {r.transfer_loading_journal_entry}: {e}")
+			frappe.db.set_value("Cold Storage Receipt", r.name, "transfer_loading_journal_entry", None)
 			try:
-				frappe.delete_doc("Journal Entry", r.transfer_loading_journal_entry, ignore_permissions=True)
+				frappe.delete_doc("Journal Entry", r.transfer_loading_journal_entry, ignore_permissions=True, force=True)
 			except Exception as e:
-				print(f"Failed to delete Journal Entry {r.transfer_loading_journal_entry}: {e}")
+				print(f"Could not delete Journal Entry {r.transfer_loading_journal_entry}: {e}")
+		
+		frappe.delete_doc("Cold Storage Receipt", r.name, ignore_permissions=True, force=True)
 
-		try:
-			frappe.delete_doc("Cold Storage Receipt", r.name, ignore_permissions=True)
-		except Exception as e:
-			print(f"Failed to delete Receipt {r.name}: {e}")
+	# 2. Clear Accounting & Ledger
+	print("Clearing GL and Ledger Entries...")
+	# Delete GL Entry, Stock Ledger Entry, Payment Ledger Entry for the company
+	ledger_doctypes = ["GL Entry", "Stock Ledger Entry", "Payment Ledger Entry"]
+	for dt in ledger_doctypes:
+		count = frappe.db.sql(f"DELETE FROM `tab{dt}` WHERE company = %s", (company,))
+		print(f"Deleted records from {dt}: {count}")
 
-	# 3. Reset Naming Series
-	# We need to find the series used and reset them in tabSeries
-	# Usually they are like 'CS-CSR-.MM.-.YY.-' or similar
-	# We can just clear the whole tabSeries or specific ones if we know the keys.
-	# Better: Reset for 'CSR-', 'CSD-' prefixes
+	# 3. Clear Master Data
+	print("Clearing Master Data (Warehouses & Customers)...")
 	
+	warehouses = frappe.get_all("Warehouse", filters={"company": company}, fields=["name"])
+	for w in warehouses:
+		print(f"Deleting Warehouse: {w.name}")
+		try:
+			frappe.delete_doc("Warehouse", w.name, ignore_permissions=True, force=True)
+		except Exception as e:
+			print(f"Could not delete Warehouse {w.name}: {e}")
+
+	customers = frappe.get_all("Customer", fields=["name"])
+	for c in customers:
+		print(f"Deleting Customer: {c.name}")
+		try:
+			frappe.delete_doc("Customer", c.name, ignore_permissions=True, force=True)
+		except Exception as e:
+			print(f"Could not delete Customer {c.name}: {e}")
+
+	items = frappe.get_all("Item", fields=["name"])
+	for i in items:
+		print(f"Deleting Item: {i.name}")
+		try:
+			frappe.delete_doc("Item", i.name, ignore_permissions=True, force=True)
+		except Exception as e:
+			print(f"Could not delete Item {i.name}: {e}")
+
+	item_groups = frappe.get_all("Item Group", filters={"name": ["!=", "All Item Groups"]}, fields=["name"])
+	for ig in item_groups:
+		print(f"Deleting Item Group: {ig.name}")
+		try:
+			frappe.delete_doc("Item Group", ig.name, ignore_permissions=True, force=True)
+		except Exception as e:
+			print(f"Could not delete Item Group {ig.name}: {e}")
+
+	batches = frappe.get_all("Batch", fields=["name"])
+	for b in batches:
+		print(f"Deleting Batch: {b.name}")
+		try:
+			frappe.delete_doc("Batch", b.name, ignore_permissions=True, force=True)
+		except Exception as e:
+			print(f"Could not delete Batch {b.name}: {e}")
+
+	# 4. Reset Naming Series
+	print("Resetting Naming Series...")
 	series_to_reset = ["CSR-", "CSD-"]
 	for prefix in series_to_reset:
-		# Use wildcard to catch Company-prefixed series like 'CS-CSR-'
-		count = frappe.db.sql("DELETE FROM `tabSeries` WHERE name LIKE %s", (f"%{prefix}%",))
-		print(f"Reset {count} series entries for {prefix}")
-	
-	# Also clear Global Defaults or other naming states if needed
-	# But tabSeries is the main one for .#### naming
+		frappe.db.sql("DELETE FROM `tabSeries` WHERE name LIKE %s", (f"%{prefix}%",))
 	
 	frappe.db.commit()
-	print("Cleanup Complete. Cold Storage is now fresh for data entry.")
+	print("Comprehensive Cleanup Complete.")
 
 if __name__ == "__main__":
 	run()
