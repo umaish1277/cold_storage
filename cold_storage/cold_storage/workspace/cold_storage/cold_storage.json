@@ -26,7 +26,7 @@
    "label": "Warehouse Utilization"
   }
  ],
- "content": "[{\"id\": \"WLUDg2RSL9\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\", \"col\": 12}}, {\"id\": \"card1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Customers\", \"col\": 3}}, {\"id\": \"card2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Batches\", \"col\": 3}}, {\"id\": \"card3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Warehouses\", \"col\": 3}}, {\"id\": \"card4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Outgoing Bills\", \"col\": 3}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Receipt\", \"col\": 4}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Dispatch\", \"col\": 4}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Customer Ledger\", \"col\": 4}}, {\"id\": \"chart3\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Monthly Movement Trend\", \"col\": 12}}, {\"id\": \"chart1\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Incoming Bags\", \"col\": 6}}, {\"id\": \"chart2\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Outgoing Bags\", \"col\": 6}}, {\"id\": \"chart5\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inventory Aging\", \"col\": 6}}, {\"id\": \"chart4\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Average Storage Days by Item\", \"col\": 6}}, {\"id\": \"8e1a8b3b-a\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Warehouse Utilization\", \"col\": 12}}]",
+ "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"card1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"card2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"card3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"card4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"sc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"id\":\"sc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"id\":\"sc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}},{\"id\":\"chart3\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Monthly Movement Trend\",\"col\":12}},{\"id\":\"chart1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":6}},{\"id\":\"chart2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":6}},{\"id\":\"chart5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Inventory Aging\",\"col\":6}},{\"id\":\"8e1a8b3b-a\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Warehouse Utilization\",\"col\":6}},{\"id\":\"chart4\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Average Storage Days by Item\",\"col\":12}}]",
  "creation": "2026-02-03 22:43:37.424177",
  "custom_blocks": [],
  "docstatus": 0,
@@ -346,7 +346,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-02-04 09:25:58.031067",
+ "modified": "2026-02-04 09:40:39.373002",
  "modified_by": "Administrator",
  "module": "Cold Storage",
  "name": "Cold Storage",
@@ -356,28 +356,12 @@
    "number_card_name": "Total Outgoing Bills"
   },
   {
-   "label": "Total Outgoing Bills",
-   "number_card_name": "Total Outgoing Bills"
-  },
-  {
-   "label": "Total Warehouses",
-   "number_card_name": "Total Warehouses"
-  },
-  {
    "label": "Total Warehouses",
    "number_card_name": "Total Warehouses"
   },
   {
    "label": "Active Customers",
    "number_card_name": "Active Customers"
-  },
-  {
-   "label": "Active Customers",
-   "number_card_name": "Active Customers"
-  },
-  {
-   "label": "Active Batches",
-   "number_card_name": "Active Batches"
   },
   {
    "label": "Active Batches",
