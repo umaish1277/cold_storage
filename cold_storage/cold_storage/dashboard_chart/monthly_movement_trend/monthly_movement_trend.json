@@ -1,0 +1,28 @@
+{
+    "chart_name": "Monthly Movement Trend",
+    "chart_type": "Report",
+    "creation": "2026-02-03 19:42:00.000000",
+    "docstatus": 0,
+    "doctype": "Dashboard Chart",
+    "filters_json": "{}",
+    "idx": 0,
+    "is_public": 1,
+    "is_standard": 1,
+    "modified": "2026-02-03 19:42:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Monthly Movement Trend",
+    "owner": "Administrator",
+    "report_name": "Monthly Movement Trend",
+    "roles": [
+        {
+            "role": "System Manager"
+        },
+        {
+            "role": "Cold Storage Manager"
+        }
+    ],
+    "timespan": "Last Year",
+    "type": "Bar",
+    "use_report_chart": 1
+}

@@ -4,30 +4,52 @@ from frappe.utils import flt, add_days, getdate
 def get_context(context):
     context.no_cache = 1
     context.full_width = 1
+    context.show_sidebar = 0
+    context.hide_sidebar = 1
+
     
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login"
         raise frappe.Redirect
 
-    # 1. Identify Customer
-    # Assuming the Logged In User is a Contact for a Customer, or the Customer itself
-    # Check if User is linked to a Customer
-    customer = frappe.db.get_value("Portal User", {"user": frappe.session.user}, "parent")
-    # Alternatively simpler: Check standard Customer contact
-    if not customer:
-        contact_name = frappe.db.get_value("Contact", {"user": frappe.session.user})
-        if contact_name:
-            customer = frappe.db.get_value("Dynamic Link", {"parent": contact_name, "link_doctype": "Customer"}, "link_name")
+    # Check if user is a manager (can view any customer)
+    is_manager = "Cold Storage Manager" in frappe.get_roles(frappe.session.user) or frappe.session.user == "Administrator"
+    context.is_manager = is_manager
     
-    # Fallback for demo/admin: Use first customer
-    if not customer and frappe.session.user == "Administrator":
-        customer = frappe.get_all("Customer", limit=1)[0].name if frappe.get_all("Customer") else None
+    # Get all customers for manager dropdown
+    if is_manager:
+        context.all_customers = frappe.get_all("Customer", pluck="name", order_by="name")
+    
+    # Get selected customer from URL parameter (for managers)
+    selected_customer = frappe.form_dict.get("customer")
+    
+    # 1. Identify Customer
+    if is_manager and selected_customer:
+        # Manager viewing a specific customer
+        customer = selected_customer
+    else:
+        # Regular user - get linked customer
+        # Check if User is linked to a Customer via Portal User
+        customer = frappe.db.get_value("Portal User", {"user": frappe.session.user}, "parent")
+        # Alternatively simpler: Check standard Customer contact
+        if not customer:
+            contact_name = frappe.db.get_value("Contact", {"user": frappe.session.user})
+            if contact_name:
+                customer = frappe.db.get_value("Dynamic Link", {"parent": contact_name, "link_doctype": "Customer"}, "link_name")
+        
+        # Fallback for demo/admin: Use first customer
+        if not customer and frappe.session.user == "Administrator":
+            customer = frappe.get_all("Customer", limit=1)[0].name if frappe.get_all("Customer") else None
 
     context.customer = customer
     
     if not customer:
-        context.error = "No Customer linked to your account."
+        if is_manager:
+            context.error = "Please select a customer from the dropdown above."
+        else:
+            context.error = "No Customer linked to your account."
         return context
+
 
     # 2. Stats
     # Total Bags Stored (Sum of Receipts - Sum of Dispatches)
@@ -137,23 +159,23 @@ def get_context(context):
         ]
     }
     
-    # Chart 2: Stock by Item Group
-    # Inward by Item Group
+    # Chart 2: Stock by Batch No
+    # Inward by Batch No
     in_bags = frappe.db.sql("""
-        SELECT ri.item_group, SUM(ri.number_of_bags)
+        SELECT ri.batch_no, SUM(ri.number_of_bags)
         FROM `tabCold Storage Receipt` r
         JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
         WHERE r.customer = %s AND r.docstatus = 1
-        GROUP BY ri.item_group
+        GROUP BY ri.batch_no
     """, (customer,))
     
-    # Outward by Item Group
+    # Outward by Batch No
     out_bags = frappe.db.sql("""
-        SELECT di.item_group, SUM(di.number_of_bags)
+        SELECT di.batch_no, SUM(di.number_of_bags)
         FROM `tabCold Storage Dispatch` d
         JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
         WHERE d.customer = %s AND d.docstatus = 1
-        GROUP BY di.item_group
+        GROUP BY di.batch_no
     """, (customer,))
     
     bag_balance = {}

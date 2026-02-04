@@ -8,10 +8,26 @@
   {
    "chart_name": "Outgoing Bags",
    "label": "Outgoing Bags"
+  },
+  {
+   "chart_name": "Monthly Movement Trend",
+   "label": "Monthly Movement Trend"
+  },
+  {
+   "chart_name": "Average Storage Days by Item",
+   "label": "Average Storage Days by Item"
+  },
+  {
+   "chart_name": "Inventory Aging",
+   "label": "Inventory Aging"
+  },
+  {
+   "chart_name": "Warehouse Utilization",
+   "label": "Warehouse Utilization"
   }
  ],
- "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"ntYjhsr-oV\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"Y6aY40UH8S\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"Ajh0eM2rh-\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"Xji9XmjLTN\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"FQwbpNL8ju\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":12}},{\"id\":\"Tf4y5B8w9l\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":12}},{\"id\":\"fVs1y9G4py\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"id\":\"nJ1yl0Rcdr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"id\":\"bA4G7qFC89\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}},{\"id\":\"settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Settings\",\"col\":4}},{\"id\":\"wa_settings_sh\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"WhatsApp Settings\",\"col\":4}}]",
- "creation": "2024-05-24 12:00:00",
+ "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"card1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"card2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"card3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"card4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"sc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":4}},{\"id\":\"sc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":4}},{\"id\":\"sc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Ledger\",\"col\":4}},{\"id\":\"chart3\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Monthly Movement Trend\",\"col\":12}},{\"id\":\"chart1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":6}},{\"id\":\"chart2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":6}},{\"id\":\"chart5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Inventory Aging\",\"col\":6}},{\"id\":\"8e1a8b3b-a\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Warehouse Utilization\",\"col\":6}},{\"id\":\"chart4\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Average Storage Days by Item\",\"col\":12}}]",
+ "creation": "2026-02-03 22:43:37.424177",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
@@ -21,15 +37,27 @@
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Cold Storage",
+ "link_type": "DocType",
  "links": [
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Documents",
+   "label": "Cold Storage Receipt",
    "link_count": 0,
+   "link_to": "Cold Storage Receipt",
    "link_type": "DocType",
    "onboard": 0,
-   "type": "Card Break"
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Receipt",
+   "link_count": 0,
+   "link_to": "Cold Storage Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   },
   {
    "hidden": 0,
@@ -54,11 +82,32 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Reports",
+   "label": "Cold Storage Receipt",
    "link_count": 0,
+   "link_to": "Cold Storage Receipt",
    "link_type": "DocType",
    "onboard": 0,
-   "type": "Card Break"
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Dispatch",
+   "link_count": 0,
+   "link_to": "Cold Storage Dispatch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Receipt",
+   "link_count": 0,
+   "link_to": "Cold Storage Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   },
   {
    "hidden": 0,
@@ -74,11 +123,207 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Settings",
+   "label": "Cold Storage Dispatch",
    "link_count": 0,
+   "link_to": "Cold Storage Dispatch",
    "link_type": "DocType",
    "onboard": 0,
-   "type": "Card Break"
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Stock Ledger",
+   "link_count": 0,
+   "link_to": "Customer Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Dispatch",
+   "link_count": 0,
+   "link_to": "Cold Storage Dispatch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Receipt",
+   "link_count": 0,
+   "link_to": "Cold Storage Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Stock Ledger",
+   "link_count": 0,
+   "link_to": "Customer Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Dispatch",
+   "link_count": 0,
+   "link_to": "Cold Storage Dispatch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Stock Ledger",
+   "link_count": 0,
+   "link_to": "Customer Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Dispatch",
+   "link_count": 0,
+   "link_to": "Cold Storage Dispatch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Stock Ledger",
+   "link_count": 0,
+   "link_to": "Customer Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Stock Ledger",
+   "link_count": 0,
+   "link_to": "Customer Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   },
   {
    "hidden": 0,
@@ -101,26 +346,26 @@
    "type": "Link"
   }
  ],
- "modified": "2026-02-02 15:03:25.647133",
+ "modified": "2026-02-04 09:40:39.373002",
  "modified_by": "Administrator",
  "module": "Cold Storage",
  "name": "Cold Storage",
  "number_cards": [
   {
-   "label": "Active Customers",
-   "number_card_name": "Active Customers"
-  },
-  {
    "label": "Total Outgoing Bills",
    "number_card_name": "Total Outgoing Bills"
   },
   {
-   "label": "Active Batches",
-   "number_card_name": "Active Batches"
-  },
-  {
    "label": "Total Warehouses",
    "number_card_name": "Total Warehouses"
+  },
+  {
+   "label": "Active Customers",
+   "number_card_name": "Active Customers"
+  },
+  {
+   "label": "Active Batches",
+   "number_card_name": "Active Batches"
   }
  ],
  "owner": "Administrator",
@@ -131,10 +376,70 @@
    "role": "System Manager"
   },
   {
+   "role": "System Manager"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Cold Storage Manager"
+  },
+  {
+   "role": "Cold Storage Manager"
+  },
+  {
+   "role": "Cold Storage Manager"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
    "role": "Stock Manager"
   },
   {
    "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "Cold Storage Manager"
+  },
+  {
+   "role": "Cold Storage Manager"
   },
   {
    "role": "Cold Storage Manager"
@@ -163,20 +468,6 @@
    "report_ref_doctype": "Cold Storage Receipt",
    "type": "Report",
    "url": "/app/query-report/Customer Stock Ledger"
-  },
-  {
-   "doc_view": "",
-   "label": "Settings",
-   "link_to": "Cold Storage Settings",
-   "type": "DocType",
-   "url": "/app/cold-storage-settings"
-  },
-  {
-   "doc_view": "",
-   "label": "WhatsApp Settings",
-   "link_to": "Cold Storage WhatsApp Settings",
-   "type": "DocType",
-   "url": "/app/cold-storage-whatsapp-settings"
   }
  ],
  "title": "Cold Storage",

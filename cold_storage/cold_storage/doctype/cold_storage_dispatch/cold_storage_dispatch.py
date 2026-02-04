@@ -18,6 +18,16 @@ def get_total_batch_balance(customer, warehouse, batch_no):
 
 
 class ColdStorageDispatch(Document):
+	def onload(self):
+		default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		if not self.company:
+			self.company = default_company
+		self.set_onload("default_company", default_company)
+
+	def set_missing_values(self):
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+
 	def autoname(self):
 		if not self.company:
 			frappe.throw("Company is mandatory for naming")
@@ -30,8 +40,8 @@ class ColdStorageDispatch(Document):
 		if not abbr:
 			frappe.throw(f"Abbreviation not found for Company {self.company}")
 			
-		# series e.g. "CSD-.MM.-.YY.-"
-		series = self.naming_series or "CSD-.MM.-.YY.-"
+		# series e.g. "CSD-.YYYY.-"
+		series = self.naming_series or "CSD-.YYYY.-"
 		
 		# Prevent double prefixing if frontend already added it
 		if not series.startswith(abbr):
@@ -41,20 +51,29 @@ class ColdStorageDispatch(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def validate(self):
-		if not self.linked_receipt:
-			frappe.throw("Please select a Linked Receipt")
+		# Server-side fallback for company if not set
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		
+		if not self.company:
+			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
 
 		# Validation: Check for Future Date
 		utils.validate_future_date(self.dispatch_date, "Dispatch Date")
              
 		for row in self.items:
+			if not row.linked_receipt:
+				frappe.throw(f"Row {row.idx}: Please select a Linked Receipt")
+			
+			if not row.warehouse:
+				frappe.throw(f"Row {row.idx}: Please select a Warehouse")
+			
 			if row.number_of_bags <= 0:
 				frappe.throw(f"Row {row.idx}: Number of Bags must be greater than 0")
 
 			# 1. Check if Batch exists in Receipt
 			# Optimized: Using shared balance logic
-			from cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch import get_batch_balance
-			available_qty = get_batch_balance(self.linked_receipt, row.batch_no, self.name)
+			available_qty = get_batch_balance(row.linked_receipt, row.batch_no, self.name)
 			
 			if row.number_of_bags > available_qty:
 				frappe.throw(f"Row {row.idx}: Insufficient balance for Batch {row.batch_no}. Available: {available_qty}, Requested: {row.number_of_bags}")
@@ -138,29 +157,44 @@ class ColdStorageDispatch(Document):
 		if not self.items:
 			return
 
-		se = frappe.new_doc("Stock Entry")
-		se.purpose = "Material Issue"
-		se.set_stock_entry_type()
-		se.from_warehouse = self.warehouse
-		se.company = self.company
-		se.posting_date = self.dispatch_date
-		se.remarks = f"Against Cold Storage Dispatch: {self.name}"
-		
+		# Group items by warehouse for separate stock entries
+		warehouse_items = {}
 		for item in self.items:
-			se.append("items", {
-				"item_code": item.goods_item,
-				"s_warehouse": self.warehouse,
-				"qty": item.number_of_bags,
-				"batch_no": item.batch_no,
-				"uom": frappe.db.get_value("Item", item.goods_item, "stock_uom") or "Nos",
-				"conversion_factor": 1.0,
-			})
-			
-		se.insert()
-		se.submit()
+			if item.warehouse not in warehouse_items:
+				warehouse_items[item.warehouse] = []
+			warehouse_items[item.warehouse].append(item)
 		
-		self.db_set("stock_entry", se.name)
-		frappe.msgprint(f"Stock Entry <a href='/app/stock-entry/{se.name}'>{se.name}</a> created.")
+		stock_entries = []
+		for warehouse, items in warehouse_items.items():
+			se = frappe.new_doc("Stock Entry")
+			se.purpose = "Material Issue"
+			se.set_stock_entry_type()
+			se.from_warehouse = warehouse
+			se.company = self.company
+			se.posting_date = self.dispatch_date
+			se.remarks = f"Against Cold Storage Dispatch: {self.name}"
+			
+			for item in items:
+				se.append("items", {
+					"item_code": item.goods_item,
+					"s_warehouse": warehouse,
+					"qty": item.number_of_bags,
+					"transfer_qty": item.number_of_bags,
+					"batch_no": item.batch_no,
+					"uom": frappe.db.get_value("Item", item.goods_item, "stock_uom") or "Nos",
+					"conversion_factor": 1.0,
+					"use_serial_batch_fields": 1
+				})
+				
+			se.set_missing_values()
+			se.insert()
+			se.submit()
+			stock_entries.append(se.name)
+		
+		# Store first stock entry (for backward compatibility)
+		if stock_entries:
+			self.db_set("stock_entry", stock_entries[0])
+			frappe.msgprint(f"Stock Entry(s) created: {', '.join([f'<a href=\'/app/stock-entry/{se}\'>{se}</a>' for se in stock_entries])}")
 
 	def on_submit(self):
 		self.make_stock_entry()
@@ -177,10 +211,14 @@ class ColdStorageDispatch(Document):
 		si.set_posting_time = 1
 		si.currency = frappe.get_cached_value('Company', self.company, 'default_currency')
 		
-		receipt = frappe.get_doc("Cold Storage Receipt", self.linked_receipt)
-        
-		days = frappe.utils.date_diff(self.dispatch_date, receipt.receipt_date)
-		if days < 1: days = 1
+		# Get first item's receipt for billing calculation
+		first_receipt = self.items[0].linked_receipt if self.items else None
+		if first_receipt:
+			receipt = frappe.get_doc("Cold Storage Receipt", first_receipt)
+			days = frappe.utils.date_diff(self.dispatch_date, receipt.receipt_date)
+			if days < 1: days = 1
+		else:
+			days = 1
 		
 		# Billing Calculation
 		billing_type = self.billing_type
@@ -250,7 +288,11 @@ class ColdStorageDispatch(Document):
 		si.base_net_total = 0.0
 
 		if si.items:
-			si.save()
+			try:
+				si.save()
+				si.submit()
+			except Exception as e:
+				frappe.msgprint(f"Warning: Sales Invoice {si.name} was created but could not be auto-submitted. Error: {str(e)}")
 		
 			# Link Invoice to Dispatch
 			self.db_set("sales_invoice", si.name)
@@ -258,7 +300,7 @@ class ColdStorageDispatch(Document):
 			# Send Notification
 			self.notify_customer(si.grand_total)
 			
-			frappe.msgprint(f"Sales Invoice <a href='/app/sales-invoice/{si.name}'>{si.name}</a> created.")
+			frappe.msgprint(f"Sales Invoice <a href='/app/sales-invoice/{si.name}'>{si.name}</a> created and submitted.")
 
 	def notify_customer(self, amount):
 		if not self.customer: return

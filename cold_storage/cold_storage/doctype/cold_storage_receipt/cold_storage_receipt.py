@@ -1,8 +1,27 @@
 import frappe
+from frappe import _
+from frappe.utils import flt
 from frappe.model.document import Document
 
 class ColdStorageReceipt(Document):
+	def onload(self):
+		default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		if not self.company:
+			self.company = default_company
+		self.set_onload("default_company", default_company)
+
+	def set_missing_values(self):
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+
 	def validate(self):
+		# Server-side fallback for company if not set
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		
+		if not self.company:
+			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
+
 		from cold_storage.cold_storage import utils
 		self.total_bags = sum([item.number_of_bags for item in self.items])
 		
@@ -29,10 +48,10 @@ class ColdStorageReceipt(Document):
 			# Validate Available Balance in Source Receipt
 			# Global Balance Check (Optional if Batch Check is strict, but good to keep)
 			dispatched_count = frappe.db.sql("""
-				SELECT SUM(d.number_of_bags) 
+				SELECT SUM(d_item.number_of_bags) 
 				FROM `tabCold Storage Dispatch` p
-				JOIN `tabCold Storage Dispatch Item` d ON d.parent = p.name
-				WHERE p.linked_receipt = %s AND p.docstatus = 1
+				JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = p.name
+				WHERE d_item.linked_receipt = %s AND p.docstatus = 1
 			""", (self.source_receipt))
 			
 			already_dispatched = dispatched_count[0][0] or 0
@@ -83,10 +102,10 @@ class ColdStorageReceipt(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def before_save(self):
-		# Generate QR Code if not exists
-		if not self.qr_code and self.name:
+		# Generate/Update QR Code
+		if self.name:
 			import qrcode
-			from frappe.utils.file_manager import save_file
+			from frappe.utils.file_manager import save_file, remove_file
 			from io import BytesIO
 			
 			# Fetch Customer Name
@@ -96,13 +115,30 @@ class ColdStorageReceipt(Document):
 			items_summary = "; ".join([f"{item.goods_item} ({item.number_of_bags} Bags, Batch: {item.batch_no})" for item in self.items])
 			
 			qr_data = f"Receipt: {self.name}\nCustomer: {customer_name}\nWarehouse: {self.warehouse}\nItems: {items_summary}"
-			qr = qrcode.make(qr_data)
+			
+			# Increase size (default box_size is 10, setting to 40 for very high quality/large)
+			qr = qrcode.QRCode(version=1, box_size=40, border=2)
+			qr.add_data(qr_data)
+			qr.make(fit=True)
+			img = qr.make_image(fill_color="black", back_color="white")
+			
 			buffered = BytesIO()
-			qr.save(buffered, format="PNG")
+			img.save(buffered, format="PNG")
 			img_str = buffered.getvalue()
 			
 			filename = f"QR-{self.name}.png"
-			saved_file = save_file(filename, img_str, "Cold Storage Receipt", self.name, is_private=0)
+			
+			# Delete old file to ensure refresh
+			if self.qr_code:
+				try:
+					# Find the File doc and remove it
+					file_doc = frappe.get_all("File", filters={"file_url": self.qr_code}, fields=["name"])
+					for f in file_doc:
+						remove_file(f.name)
+				except:
+					pass
+
+			saved_file = save_file(filename, img_str, "Cold Storage Receipt", self.name, is_private=0, df="qr_code")
 			self.qr_code = saved_file.file_url
 
 	def on_submit(self):
@@ -114,17 +150,75 @@ class ColdStorageReceipt(Document):
 			)
 
 		# Warehouse Transfer is now handled directly via Stock Entry (Material Transfer) in make_stock_entry
-		# elif self.receipt_type == "Warehouse Transfer":
-		# 	pass
-
+		if self.receipt_type == "Warehouse Transfer":
+			self.make_transfer_loading_journal_entry()
 
 		self.status = "Submitted"
 		self.make_stock_entry()
 
 		self.status = "Submitted"
 		self.notify_customer()
+
+	def make_transfer_loading_journal_entry(self):
+		settings = frappe.get_single("Cold Storage Settings")
 		
+		# Skip if accounts are not configured
+		if not settings.transfer_loading_expense_account or not settings.transfer_loading_payable_account:
+			frappe.msgprint("Transfer Loading charges skipped: Expense/Payable accounts not set in Cold Storage Settings.")
+			return
+
+		# Determine rate
+		is_intra = (self.from_warehouse == self.warehouse)
+		rate = settings.intra_warehouse_loading_rate if is_intra else settings.inter_warehouse_loading_rate
+		
+		if not rate or rate <= 0:
+			return
+
+		# Calculate equated bags: 1 Jute Bag = 2 Net Bags (Net Bag = 0.5 Jute Bag equivalent)
+		# Logic follows Item Group as requested
+		equated_bags = 0
+		for item in self.items:
+			if item.item_group == "Net Bag":
+				equated_bags += flt(item.number_of_bags) * 0.5
+			else:
+				# Default to Jute Bag (1:1) if it's Jute Bag or any other group
+				equated_bags += flt(item.number_of_bags)
+
+
+		amount = flt(rate) * flt(equated_bags)
+		if amount <= 0:
+			return
+
+		self.transfer_loading_amount = amount
+
+		je = frappe.new_doc("Journal Entry")
+		je.voucher_type = "Journal Entry"
+		je.posting_date = self.receipt_date
+		je.company = self.company
+		je.remark = f"Loading Charges for Warehouse Transfer: {self.name} ({'Intra' if is_intra else 'Inter'}-Warehouse)"
+
+		# Debit: Expense Account
+		je.append("accounts", {
+			"account": settings.transfer_loading_expense_account,
+			"debit_in_account_currency": amount,
+		})
+
+		# Credit: Payable/Cash Account
+		je.append("accounts", {
+			"account": settings.transfer_loading_payable_account,
+			"credit_in_account_currency": amount,
+		})
+
+
+		je.insert()
+		je.submit()
+
+		self.db_set("transfer_loading_journal_entry", je.name)
+		self.db_set("transfer_loading_amount", amount)
+		frappe.msgprint(f"Journal Entry <a href='/app/journal-entry/{je.name}'>{je.name}</a> created for transfer loading charges.")
+
 	def make_stock_entry(self):
+
 		if not self.items:
 			return
 
@@ -148,9 +242,11 @@ class ColdStorageReceipt(Document):
 			item_row = {
 				"item_code": item.goods_item,
 				"qty": item.number_of_bags,
+				"transfer_qty": item.number_of_bags,
 				"batch_no": item.batch_no,
 				"uom": frappe.db.get_value("Item", item.goods_item, "stock_uom") or "Nos",
 				"conversion_factor": 1.0,
+				"use_serial_batch_fields": 1
 			}
 			
 			if self.receipt_type == "Warehouse Transfer":
@@ -162,6 +258,7 @@ class ColdStorageReceipt(Document):
 				
 			se.append("items", item_row)
 			
+		se.set_missing_values()
 		se.insert()
 		se.submit()
 		
@@ -197,10 +294,8 @@ class ColdStorageReceipt(Document):
 			dispatch = frappe.new_doc("Cold Storage Dispatch")
 			dispatch.company = self.company
 			dispatch.customer = source_customer
-			dispatch.warehouse = source_warehouse
 			dispatch.dispatch_date = self.receipt_date
 			dispatch.billing_type = billing_type
-			dispatch.linked_receipt = linked_receipt
 			dispatch.remarks = f"Auto-generated Transfer to {self.customer} via Receipt {self.name}"
 			
 			for i in items_to_dispatch:
@@ -209,6 +304,8 @@ class ColdStorageReceipt(Document):
 					"item_group": i.item_group,
 					"batch_no": i.batch_no,
 					"number_of_bags": i.number_of_bags,
+					"linked_receipt": linked_receipt,
+					"warehouse": source_warehouse,
 					"rate": 0
 				})
 			
@@ -243,18 +340,28 @@ class ColdStorageReceipt(Document):
 
 	def on_cancel(self):
 		# Validation: Check for linked dispatches
-		linked_dispatches = frappe.db.exists("Cold Storage Dispatch", {
-			"linked_receipt": self.name, 
-			"docstatus": ["!=", 2]
-		})
+		linked_dispatches = frappe.db.sql("""
+			SELECT p.name 
+			FROM `tabCold Storage Dispatch` p
+			JOIN `tabCold Storage Dispatch Item` d_item ON d_item.parent = p.name
+			WHERE d_item.linked_receipt = %s AND p.docstatus != 2
+		""", (self.name))
+		
 		if linked_dispatches:
-			frappe.throw(f"Cannot cancel Receipt because linked Dispatch {linked_dispatches} exists. Please cancel the Dispatch first.")
+			frappe.throw(f"Cannot cancel Receipt because linked Dispatch {linked_dispatches[0][0]} exists. Please cancel the Dispatch first.")
 
 		if self.stock_entry:
 			se = frappe.get_doc("Stock Entry", self.stock_entry)
 			if se.docstatus == 1:
 				se.cancel()
 				frappe.msgprint(f"Stock Entry {se.name} cancelled.")
+
+		if self.transfer_loading_journal_entry:
+			je = frappe.get_doc("Journal Entry", self.transfer_loading_journal_entry)
+			if je.docstatus == 1:
+				je.cancel()
+				frappe.msgprint(f"Journal Entry {je.name} for transfer loading charges cancelled.")
+
 
 @frappe.whitelist()
 def get_customer_warehouses(doctype, txt, searchfield, start, page_len, filters):

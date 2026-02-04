@@ -103,14 +103,42 @@ frappe.ui.form.on('Cold Storage Receipt Item', {
 });
 
 frappe.ui.form.on('Cold Storage Receipt', {
-    setup: function (frm) {
+    onload: function (frm) {
         if (frm.is_new()) {
-            frappe.db.get_single_value("Cold Storage Settings", "default_company")
-                .then(value => {
-                    if (value) {
-                        frm.set_value("company", value);
-                    }
+            let default_company = (frm.doc.__onload && frm.doc.__onload.default_company) ? frm.doc.__onload.default_company : null;
+
+            let set_comp = function (val) {
+                if (val && frm.doc.company !== val) {
+                    frm.set_df_property("company", "read_only", 0);
+                    frm.set_value("company", val);
+                    frm.set_df_property("company", "read_only", 1);
+                }
+            };
+
+            if (default_company) {
+                set_comp(default_company);
+            } else {
+                frappe.db.get_single_value("Cold Storage Settings", "default_company", (value) => {
+                    set_comp(value);
                 });
+            }
+        }
+
+        // Inject Custom CSS to resize QR Code image in form view
+        const css = `
+            div[data-fieldname="qr_code"] .attached-file img {
+                width: 300px !important;
+                height: 300px !important;
+                max-width: none !important;
+                max-height: none !important;
+                margin-bottom: 10px;
+            }
+            div[data-fieldname="qr_code"] .attached-file {
+                height: auto !important;
+            }
+        `;
+        if (!$(`#qr-code-style`).length) {
+            $("<style id='qr-code-style'>").prop("type", "text/css").html(css).appendTo("head");
         }
     },
 
@@ -119,9 +147,7 @@ frappe.ui.form.on('Cold Storage Receipt', {
             frappe.db.get_value("Company", frm.doc.company, "abbr", (r) => {
                 if (r && r.abbr) {
                     let abbr = r.abbr;
-                    // Standard base series defined in Doctype (could fetch meta, but hardcoding base patterns for now or prepending to current)
-                    // Better: Get current options, split, prefix, join
-                    let options = "CSR-.MM.-.YY.-";
+                    let options = "CSR-.YYYY.-";
 
                     // Construct new series
                     let new_series = `${abbr}-${options}`;
@@ -134,9 +160,26 @@ frappe.ui.form.on('Cold Storage Receipt', {
     },
 
     refresh: function (frm) {
-        // Trigger company logic to set series on load if company exists is new
-        if (frm.doc.company && frm.is_new()) {
-            frm.trigger("company");
+        if (frm.is_new()) {
+            let default_company = (frm.doc.__onload && frm.doc.__onload.default_company) ? frm.doc.__onload.default_company : null;
+
+            let set_comp = function (val) {
+                if (val && frm.doc.company !== val) {
+                    frm.set_df_property("company", "read_only", 0);
+                    frm.set_value("company", val);
+                    frm.set_df_property("company", "read_only", 1);
+                } else if (frm.doc.company === val) {
+                    frm.trigger("company");
+                }
+            };
+
+            if (default_company) {
+                set_comp(default_company);
+            } else {
+                frappe.db.get_single_value("Cold Storage Settings", "default_company", (value) => {
+                    set_comp(value);
+                });
+            }
         }
 
         // Inject Custom CSS to resize QR Code image in form view

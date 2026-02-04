@@ -70,7 +70,7 @@ def get_batch_balance(linked_receipt, batch_no, current_dispatch=None):
 	) or 0
 	
 	# Check dispatches
-	conditions = "d.linked_receipt = %s AND d_item.batch_no = %s AND d.docstatus = 1"
+	conditions = "d_item.linked_receipt = %s AND d_item.batch_no = %s AND d.docstatus = 1"
 	values = [linked_receipt, batch_no]
 	
 	if current_dispatch:
@@ -103,7 +103,7 @@ def get_total_batch_balance(customer, warehouse, batch_no):
 				FROM `tabCold Storage Dispatch` d
 				JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
 				WHERE d.customer = %(customer)s 
-				  AND d.warehouse = %(warehouse)s 
+				  AND di.warehouse = %(warehouse)s 
 				  AND di.batch_no = %(batch_no)s 
 				  AND d.docstatus = 1
 			) as balance
@@ -171,3 +171,33 @@ def send_via_twilio(settings, to_number, message):
 	except Exception as e:
 		frappe.log_error("WhatsApp Exception", str(e))
 
+@frappe.whitelist()
+def get_total_warehouses_count(filters=None):
+	default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+	if not default_company:
+		return 0
+	return frappe.db.count("Warehouse", {
+		"company": default_company,
+		"disabled": 0,
+		"is_group": 0
+	})
+@frappe.whitelist()
+def get_total_outgoing_bills(filters=None):
+	default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+	if not default_company:
+		return 0
+	
+	from frappe.utils import getdate, nowdate
+	today = getdate(nowdate())
+	year_start = f"{today.year}-01-01"
+	year_end = f"{today.year}-12-31"
+
+	result = frappe.db.sql("""
+		SELECT SUM(base_net_total)
+		FROM `tabSales Invoice`
+		WHERE company = %s
+		  AND docstatus = 1
+		  AND posting_date BETWEEN %s AND %s
+	""", (default_company, year_start, year_end))
+	
+	return flt(result[0][0]) if result else 0.0

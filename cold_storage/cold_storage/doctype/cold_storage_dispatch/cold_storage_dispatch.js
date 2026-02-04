@@ -1,4 +1,29 @@
 frappe.ui.form.on('Cold Storage Dispatch Item', {
+    linked_receipt: function (frm, cdt, cdn) {
+        // Clear dependent fields when linked_receipt changes
+        frappe.model.set_value(cdt, cdn, "warehouse", "");
+        frappe.model.set_value(cdt, cdn, "goods_item", "");
+        frappe.model.set_value(cdt, cdn, "item_group", "");
+        frappe.model.set_value(cdt, cdn, "batch_no", "");
+
+        // Fetch warehouse from receipt
+        var row = locals[cdt][cdn];
+        if (row.linked_receipt) {
+            frappe.db.get_value("Cold Storage Receipt", row.linked_receipt, "warehouse", (r) => {
+                if (r && r.warehouse) {
+                    frappe.model.set_value(cdt, cdn, "warehouse", r.warehouse);
+                }
+            });
+        }
+    },
+
+    warehouse: function (frm, cdt, cdn) {
+        // Clear dependent fields when warehouse changes
+        frappe.model.set_value(cdt, cdn, "goods_item", "");
+        frappe.model.set_value(cdt, cdn, "item_group", "");
+        frappe.model.set_value(cdt, cdn, "batch_no", "");
+    },
+
     goods_item: function (frm, cdt, cdn) {
         // Clear dependent fields
         frappe.model.set_value(cdt, cdn, "item_group", "");
@@ -44,11 +69,11 @@ frappe.ui.form.on('Cold Storage Dispatch Item', {
         }
 
         // Validate against available balance
-        if (row.batch_no) {
+        if (row.batch_no && row.linked_receipt) {
             frappe.call({
                 method: 'cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_batch_balance',
                 args: {
-                    linked_receipt: frm.doc.linked_receipt,
+                    linked_receipt: row.linked_receipt,
                     batch_no: row.batch_no,
                     current_dispatch: frm.doc.name
                 },
@@ -64,21 +89,32 @@ frappe.ui.form.on('Cold Storage Dispatch Item', {
                 }
             });
         } else {
-            // Just Calulate
+            // Just Calculate
             frappe.model.set_value(cdt, cdn, 'amount', row.rate * row.number_of_bags);
         }
     }
 });
 
 frappe.ui.form.on('Cold Storage Dispatch', {
-    setup: function (frm) {
+    onload: function (frm) {
         if (frm.is_new()) {
-            frappe.db.get_single_value("Cold Storage Settings", "default_company")
-                .then(value => {
-                    if (value) {
-                        frm.set_value("company", value);
-                    }
+            let default_company = (frm.doc.__onload && frm.doc.__onload.default_company) ? frm.doc.__onload.default_company : null;
+
+            let set_comp = function (val) {
+                if (val && frm.doc.company !== val) {
+                    frm.set_df_property("company", "read_only", 0);
+                    frm.set_value("company", val);
+                    frm.set_df_property("company", "read_only", 1);
+                }
+            };
+
+            if (default_company) {
+                set_comp(default_company);
+            } else {
+                frappe.db.get_single_value("Cold Storage Settings", "default_company", (value) => {
+                    set_comp(value);
                 });
+            }
         }
     },
 
@@ -87,7 +123,7 @@ frappe.ui.form.on('Cold Storage Dispatch', {
             frappe.db.get_value("Company", frm.doc.company, "abbr", (r) => {
                 if (r && r.abbr) {
                     let abbr = r.abbr;
-                    let options = "CSD-.MM.-.YY.-";
+                    let options = "CSD-.YYYY.-";
 
                     let new_series = `${abbr}-${options}`;
 
@@ -110,11 +146,59 @@ frappe.ui.form.on('Cold Storage Dispatch', {
     },
 
     refresh: function (frm) {
-        if (frm.doc.company && frm.is_new()) {
-            frm.trigger("company");
+        if (frm.is_new()) {
+            let default_company = (frm.doc.__onload && frm.doc.__onload.default_company) ? frm.doc.__onload.default_company : null;
+
+            let set_comp = function (val) {
+                if (val && frm.doc.company !== val) {
+                    frm.set_df_property("company", "read_only", 0);
+                    frm.set_value("company", val);
+                    frm.set_df_property("company", "read_only", 1);
+                } else if (frm.doc.company === val) {
+                    frm.trigger("company");
+                }
+            };
+
+            if (default_company) {
+                set_comp(default_company);
+            } else {
+                frappe.db.get_single_value("Cold Storage Settings", "default_company", (value) => {
+                    set_comp(value);
+                });
+            }
         }
 
-        // Filter Batch No by Customer, Item, Item Group and Warehouse
+        // Filter Linked Receipt by Customer
+        frm.set_query("linked_receipt", "items", function (doc, cdt, cdn) {
+            return {
+                filters: {
+                    "customer": doc.customer,
+                    "docstatus": 1
+                }
+            };
+        });
+
+        // Filter Warehouse by Customer (Active Warehouses)
+        frm.set_query("warehouse", "items", function (doc, cdt, cdn) {
+            var row = locals[cdt][cdn];
+            if (row.linked_receipt) {
+                // If receipt is selected, filter to that receipt's warehouse
+                return {
+                    query: "cold_storage.get_customer_items_query.get_receipt_warehouses",
+                    filters: {
+                        "linked_receipt": row.linked_receipt
+                    }
+                };
+            }
+            return {
+                query: "cold_storage.get_customer_items_query.get_customer_warehouses",
+                filters: {
+                    "customer": doc.customer
+                }
+            };
+        });
+
+        // Filter Batch No by Customer, Item, Item Group and row-level Warehouse/Receipt
         frm.set_query("batch_no", "items", function (doc, cdt, cdn) {
             var row = locals[cdt][cdn];
             return {
@@ -123,25 +207,26 @@ frappe.ui.form.on('Cold Storage Dispatch', {
                     "customer": doc.customer,
                     "item_group": row.item_group,
                     "goods_item": row.goods_item,
-                    "warehouse": doc.warehouse,
-                    "linked_receipt": doc.linked_receipt
+                    "warehouse": row.warehouse,
+                    "linked_receipt": row.linked_receipt
                 }
             };
         });
 
-        // Filter Goods Item by Customer and Warehouse
+        // Filter Goods Item by Customer and row-level Warehouse/Receipt
         frm.set_query("goods_item", "items", function (doc, cdt, cdn) {
+            var row = locals[cdt][cdn];
             return {
                 query: "cold_storage.get_customer_items_query.get_customer_items",
                 filters: {
                     "customer": doc.customer,
-                    "warehouse": doc.warehouse,
-                    "linked_receipt": doc.linked_receipt
+                    "warehouse": row.warehouse,
+                    "linked_receipt": row.linked_receipt
                 }
             };
         });
 
-        // Filter Item Group by Customer, Goods Item, and Warehouse
+        // Filter Item Group by Customer, Goods Item, and row-level Warehouse/Receipt
         frm.set_query("item_group", "items", function (doc, cdt, cdn) {
             var row = locals[cdt][cdn];
             return {
@@ -149,49 +234,21 @@ frappe.ui.form.on('Cold Storage Dispatch', {
                 filters: {
                     "customer": doc.customer,
                     "goods_item": row.goods_item,
-                    "warehouse": doc.warehouse,
-                    "linked_receipt": doc.linked_receipt
+                    "warehouse": row.warehouse,
+                    "linked_receipt": row.linked_receipt
                 }
             };
         });
-
-        // Filter Linked Receipt by Customer and Warehouse
-        frm.set_query("linked_receipt", function (doc) {
-            return {
-                filters: {
-                    "customer": doc.customer,
-                    "warehouse": doc.warehouse
-                }
-            };
-        });
-
-        // Filter Warehouse by Customer (Active Warehouses)
-        frm.set_query("warehouse", function (doc) {
-            return {
-                query: "cold_storage.get_customer_items_query.get_customer_warehouses",
-                filters: {
-                    "customer": doc.customer
-                }
-            };
-        });
-    },
-
-    warehouse: function (frm) {
-        // Clear child table items when warehouse changes to prevent invalid selections
-        frm.clear_table("items");
-        // Clear linked receipt as it depends on warehouse
-        frm.set_value("linked_receipt", "");
-        frm.refresh_field("items");
     },
 
     billing_type: function (frm) {
         // Update rates for all items when billing type changes
         $.each(frm.doc.items || [], function (i, row) {
-            if (row.bag_type) {
+            if (row.item_group) {
                 frappe.call({
                     method: 'cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_bag_rate',
                     args: {
-                        bag_type: row.bag_type,
+                        item_group: row.item_group,
                         billing_type: frm.doc.billing_type,
                         goods_item: row.goods_item
                     },

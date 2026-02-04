@@ -124,3 +124,16 @@ def get_customer_warehouses(doctype, txt, searchfield, start, page_len, filters)
 		WHERE customer = %(customer)s AND docstatus = 1 AND warehouse LIKE %(txt)s
 		LIMIT %(start)s, %(page_len)s
 	""", {"customer": customer, "txt": f"%{txt}%", "start": start, "page_len": page_len})
+
+@frappe.whitelist()
+def get_receipt_warehouses(doctype, txt, searchfield, start, page_len, filters):
+	linked_receipt = filters.get("linked_receipt")
+	if not linked_receipt:
+		return []
+
+	return frappe.db.sql(f"""
+		SELECT DISTINCT warehouse
+		FROM `tabCold Storage Receipt`
+		WHERE name = %(linked_receipt)s AND docstatus = 1 AND warehouse LIKE %(txt)s
+		LIMIT %(start)s, %(page_len)s
+	""", {"linked_receipt": linked_receipt, "txt": f"%{txt}%", "start": start, "page_len": page_len})
