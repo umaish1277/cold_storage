@@ -6,6 +6,7 @@
     "doctype": "DocType",
     "document_type": "Document",
     "engine": "InnoDB",
+    "full_width": 1,
     "field_order": [
         "section_break_gkhy",
         "receipt_type",
