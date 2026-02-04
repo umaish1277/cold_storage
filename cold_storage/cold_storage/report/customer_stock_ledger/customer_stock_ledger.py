@@ -82,9 +82,9 @@ def execute(filters=None):
 			"cumulative_balance": cumulative_balance
 		})
 
-		total_in_qty += r.in_qty
-		total_out_qty += out_qty
-		total_balance += balance
+		total_in_qty += flt(r.in_qty)
+		total_out_qty += flt(out_qty)
+		total_balance += flt(balance)
 
 	if data:
 		data.append({

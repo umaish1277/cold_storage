@@ -139,12 +139,12 @@ class ColdStorageDispatch(Document):
 		# GST API
 		if self.gst_applicable:
 			# GST applies to both? Usually yes on services.
-			taxable_amount = self.total_amount + self.total_loading_amount
+			taxable_amount = flt(self.total_amount) + flt(self.total_loading_amount)
 			self.total_gst_amount = taxable_amount * (flt(self.gst_rate) / 100)
 		else:
 			self.total_gst_amount = 0
 			
-		self.grand_total = self.total_amount + self.total_loading_amount + self.total_gst_amount
+		self.grand_total = flt(self.total_amount) + flt(self.total_loading_amount) + flt(self.total_gst_amount)
 
 		# Set In Words
 		from frappe.utils import money_in_words
@@ -247,8 +247,8 @@ class ColdStorageDispatch(Document):
 			if rate > 0:
 				si.append("items", {
 					"item_code": "Cold Storage Service",
-					"qty": row.number_of_bags * duration,
-					"rate": rate,
+					"qty": flt(row.number_of_bags) * flt(duration),
+					"rate": flt(rate),
 					"description": f"Storage Charges ({billing_type}) for {row.number_of_bags} bags (Batch {row.batch_no}) {description_suffix} @ {rate}/{billing_type[:-2] if billing_type != 'Daily' else 'Day'}",
 					"uom": "Nos"
 				})
@@ -258,8 +258,8 @@ class ColdStorageDispatch(Document):
 			if loading_rate > 0:
 				si.append("items", {
 					"item_code": "Cold Storage Service",
-					"qty": row.number_of_bags, # One time charge
-					"rate": loading_rate,
+					"qty": flt(row.number_of_bags), # One time charge
+					"rate": flt(loading_rate),
 					"description": f"Loading/Unloading Charges for {row.number_of_bags} bags (Batch {row.batch_no}) @ {loading_rate}/Bag",
 					"uom": "Nos"
 				})
