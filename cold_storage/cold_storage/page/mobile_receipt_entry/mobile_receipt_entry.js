@@ -31,7 +31,7 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 					</div>
 					<div class="field-row">
 						<label>Driver Phone</label>
-						<input type="tel" id="driver_phone" class="form-control" placeholder="0300-1234567" value="+92 ">
+						<div id="driver-phone-picker"></div>
 					</div>
 				</div>
 			</div>
@@ -117,6 +117,23 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 				margin-bottom: 15px;
 				color: #2c3e50;
 			}
+			/* Phone Control Mobile Adjustments */
+			.phone-control {
+				width: 100% !important;
+			}
+			.iti {
+				width: 100%;
+			}
+			.iti__selected-flag {
+				padding: 0 10px;
+				background: #f0f0f0;
+				border-top-left-radius: 8px;
+				border-bottom-left-radius: 8px;
+			}
+			.iti__country-list {
+				max-width: 300px;
+				white-space: normal;
+			}
 		</style>
 	`);
 
@@ -161,6 +178,23 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 		},
 		render_input: true
 	});
+
+	var driver_phone_field = frappe.ui.form.make_control({
+		parent: $(wrapper).find('#driver-phone-picker'),
+		df: {
+			fieldtype: 'Phone',
+			fieldname: 'driver_phone',
+			placeholder: '0300-1234567',
+			default: '+92'
+		},
+		render_input: true
+	});
+	// Ensure the value is set after a short delay to allow internal library to init
+	setTimeout(() => {
+		if (driver_phone_field.get_value() !== '+92') {
+			driver_phone_field.set_value('+92');
+		}
+	}, 500);
 
 	// Default Company & Warehouse
 	frappe.db.get_single_value("Cold Storage Settings", "default_company").then(val => {
@@ -264,7 +298,7 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 			warehouse: warehouse_field.get_value(),
 			vehicle_no: $(wrapper).find('#vehicle_no').val(),
 			driver_name: $(wrapper).find('#driver_name').val(),
-			driver_phone: $(wrapper).find('#driver_phone').val(),
+			driver_phone: driver_phone_field.get_value(),
 			items: items
 		};
 
@@ -289,7 +323,7 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 					// Reset Form ONLY on success
 					customer_field.set_value('');
 					$(wrapper).find('#vehicle_no, #driver_name').val('');
-					$(wrapper).find('#driver_phone').val('+92 ');
+					driver_phone_field.set_value('+92');
 					items = [];
 					// Add one empty row back
 					items.push({ item_code: '', qty: 0, batch: '', item_group: '' });
