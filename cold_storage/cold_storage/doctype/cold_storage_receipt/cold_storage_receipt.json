@@ -17,6 +17,11 @@
         "column_break_jklz",
         "naming_series",
         "qr_code",
+        "section_break_gate",
+        "vehicle_no",
+        "column_break_gate",
+        "driver_name",
+        "driver_phone",
         "warehouse",
         "from_warehouse",
         "section_break_details",
@@ -110,6 +115,30 @@
             "label": "From Warehouse",
             "mandatory_depends_on": "eval:doc.receipt_type=='Warehouse Transfer'",
             "options": "Warehouse"
+        },
+        {
+            "fieldname": "section_break_gate",
+            "fieldtype": "Section Break",
+            "label": "Gate Entry Details"
+        },
+        {
+            "fieldname": "vehicle_no",
+            "fieldtype": "Data",
+            "label": "Vehicle No"
+        },
+        {
+            "fieldname": "column_break_gate",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "driver_name",
+            "fieldtype": "Data",
+            "label": "Driver Name"
+        },
+        {
+            "fieldname": "driver_phone",
+            "fieldtype": "Phone",
+            "label": "Driver Phone"
         },
         {
             "fieldname": "section_break_details",

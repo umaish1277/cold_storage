@@ -436,3 +436,32 @@ def get_customer_warehouse_item_groups(doctype, txt, searchfield, start, page_le
 		WHERE p.customer = %s AND p.warehouse = %s AND p.docstatus = 1 AND i.item_group LIKE %s
 		LIMIT %s, %s
 	""", (customer, warehouse, f"%{txt}%", start, page_len))
+
+@frappe.whitelist()
+def create_mobile_receipt(data):
+	"""
+	Creates a Cold Storage Receipt from simplified mobile data.
+	"""
+	if isinstance(data, str):
+		import json
+		data = json.loads(data)
+
+	receipt = frappe.new_doc("Cold Storage Receipt")
+	receipt.receipt_type = "New Receipt"
+	receipt.customer = data.get("customer")
+	receipt.warehouse = data.get("warehouse")
+	receipt.vehicle_no = data.get("vehicle_no")
+	receipt.driver_name = data.get("driver_name")
+	receipt.driver_phone = data.get("driver_phone")
+	receipt.receipt_date = frappe.utils.nowdate()
+
+	for item in data.get("items", []):
+		receipt.append("items", {
+			"goods_item": item.get("item_code"),
+			"number_of_bags": item.get("qty"),
+			"batch_no": item.get("batch"),
+			"item_group": item.get("item_group")
+		})
+
+	receipt.insert()
+	return receipt.name
