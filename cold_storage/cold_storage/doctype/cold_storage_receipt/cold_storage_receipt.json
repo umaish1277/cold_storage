@@ -188,6 +188,7 @@
             "fieldname": "stock_entry",
             "fieldtype": "Link",
             "label": "Stock Entry",
+            "no_copy": 1,
             "options": "Stock Entry",
             "read_only": 1
         },
@@ -209,6 +210,7 @@
             "fieldname": "transfer_loading_journal_entry",
             "fieldtype": "Link",
             "label": "Transfer Loading Journal Entry",
+            "no_copy": 1,
             "options": "Journal Entry",
             "read_only": 1
         },
