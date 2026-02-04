@@ -11,6 +11,9 @@ def get_customer_statement(customer=None, from_date=None, to_date=None, format="
     Format can be 'json', 'pdf', or 'xlsx'
     Lang can be 'en' (English) or 'ur' (Urdu)
     """
+    if lang:
+        frappe.local.lang = lang
+    
     # Force reload of utils within the call to bypass caching
     from frappe.utils import today, add_days
 
@@ -144,26 +147,28 @@ def generate_excel(data, customer, from_date, to_date):
     """Generate Excel file for statement"""
     from frappe.utils.xlsxutils import build_xlsx_response
     from frappe.utils import today
+    from frappe import _
     
     # Prepare data for Excel
     rows = []
     
     # Header row
-    rows.append(["Customer Stock Statement"])
-    rows.append([f"Customer: {customer}"])
-    rows.append([f"Period: {from_date.strftime('%d:%m:%Y') if hasattr(from_date, 'strftime') else from_date} to {to_date.strftime('%d:%m:%Y') if hasattr(to_date, 'strftime') else to_date}"])
-    rows.append([f"Generated: {today()}"])
+    rows.append([_("Customer Stock Statement")])
+    rows.append([f"{_('Customer')}: {customer}"])
+    p_from = from_date.strftime('%d:%m:%Y') if hasattr(from_date, 'strftime') else from_date
+    p_to = to_date.strftime('%d:%m:%Y') if hasattr(to_date, 'strftime') else to_date
+    rows.append([f"{_('Period')}: {p_from} {_('to')} {p_to}"])
+    rows.append([f"{_('Generated')}: {today()}"])
     rows.append([])  # Empty row
     
     # Summary
-    rows.append(["Summary"])
-    rows.append(["Total Received", data["summary"]["total_received"]])
-    rows.append(["Total Dispatched", data["summary"]["total_dispatched"]])
-    rows.append(["Current Balance", data["summary"]["total_balance"]])
+    rows.append([_("Summary")])
+    rows.append([_("Total Received"), data["summary"]["total_received"]])
+    rows.append([_("Total Dispatched"), data["summary"]["total_dispatched"]])
+    rows.append([_("Current Balance"), data["summary"]["total_balance"]])
     rows.append([])  # Empty row
     
     # Detail header
-    rows.append(["Receipt", "Receipt Date", "Warehouse", "Item", "Item Group", "Batch No", 
                  "Received", "Dispatched", "Balance", "Days in Store"])
     
     for item in data.get("line_items", []):
@@ -185,13 +190,13 @@ def generate_excel(data, customer, from_date, to_date):
     
     # Add Total row at the bottom
     rows.append([])
-    rows.append(["TOTAL", "", "", "", "", "", 
+    rows.append([_("TOTAL"), "", "", "", "", "", 
                  data["summary"]["total_received"], 
                  data["summary"]["total_dispatched"], 
                  data["summary"]["total_balance"], ""])
     
     # Use standard build_xlsx_response which handles both creation and response setup
-    filename = f"Stock_Statement_{customer}_{today()}"
+    filename = f"{_('Stock_Statement')}_{customer}_{today()}"
     build_xlsx_response(rows, filename)
 
 

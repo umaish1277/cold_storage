@@ -7,6 +7,18 @@ def get_context(context):
     context.show_sidebar = 0
     context.hide_sidebar = 1
 
+    # Language Handling
+    lang = frappe.form_dict.get("lang") or frappe.local.lang or "en"
+    if lang not in ["en", "ur"]:
+        lang = "en"
+    
+    frappe.local.lang = lang
+    context.lang = lang
+    context.lang_dir = "rtl" if lang == "ur" else "ltr"
+    
+    # Pre-translate common strings for the template
+    from frappe import _
+    context._ = _
     
     if frappe.session.user == "Guest":
         frappe.local.flags.redirect_location = "/login"
