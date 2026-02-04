@@ -1,7 +1,9 @@
 import frappe
 from frappe import _
+from frappe.utils import flt
 
 def execute(filters=None):
+	if not filters: filters = {}
 	columns = [
 		{"label": _("Receipt Date"), "fieldname": "receipt_date", "fieldtype": "Date", "width": 100},
 		{"label": _("Receipt"), "fieldname": "receipt", "fieldtype": "Link", "options": "Cold Storage Receipt", "width": 150},
