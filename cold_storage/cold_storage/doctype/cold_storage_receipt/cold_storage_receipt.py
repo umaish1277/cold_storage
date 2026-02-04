@@ -370,6 +370,9 @@ class ColdStorageReceipt(Document):
 				je.cancel()
 				frappe.msgprint(f"Journal Entry {je.name} for transfer loading charges cancelled.")
 
+		# Ensure Workflow State is updated to 'Cancelled'
+		self.db_set("workflow_state", "Cancelled")
+
 
 @frappe.whitelist()
 def get_customer_warehouses(doctype, txt, searchfield, start, page_len, filters):

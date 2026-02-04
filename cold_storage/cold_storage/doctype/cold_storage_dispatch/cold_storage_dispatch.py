@@ -354,6 +354,9 @@ class ColdStorageDispatch(Document):
 			except Exception as e:
 				frappe.msgprint(_("Note: Linked Sales Invoice {0} could not be automatically cancelled: {1}").format(self.sales_invoice, str(e)))
 
+		# Ensure Workflow State is updated to 'Cancelled'
+		self.db_set("workflow_state", "Cancelled")
+
 
 
 
