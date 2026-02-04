@@ -5,99 +5,59 @@ A comprehensive Cold Storage Management application built on the Frappe Framewor
 ## Features
 
 ### 1. Inward & Outward Management
-*   **Cold Storage Receipt**: Record incoming stock with details like Customer, Warehouse, Item, **Item Group**, and Batch Number.
+*   **Cold Storage Receipt**: Record incoming stock with details like Customer, Warehouse, Item, **Item Group**, and Batch Number. Supports full-width UI for large data tables.
 *   **Cold Storage Dispatch**: Manage outgoing stock linked to specific receipts. Ensures you cannot dispatch more than the received quantity (Batch-level validation).
 *   **QR Code Tracking**: Print Receipts with embedded QR codes for quick scanning and retrieval.
 
 ### 2. Automated Billing & Invoicing
 *   **Flexible Billing Types**: Support for **Daily**, **Monthly**, and **Seasonal** billing cycles.
-*   **Smart Rate Fetching**:
-    *   Define Handling and Loading charges per **Item Group** (e.g., Jute Bag = 10).
-    *   Override rates for specific **Item + Item Group** combinations (e.g., Potato in Jute Bag = 15).
-*   **Loading/Unloading Charges**: Automatically calculates and adds loading charges to the invoice.
-*   **GST Integration**: Automatically applies GST on storage and service charges based on your configuration.
-*   **Sales Invoice Automation**: Automatically creates and links an ERPNext Sales Invoice upon submission of a Dispatch.
+*   **Smart Rate Fetching**: Automatically calculates Handling, Loading, and Storage charges based on **Item Group**.
+*   **ERPNext Integration**: Automatically creates and links an ERPNext Sales Invoice upon submission of a Dispatch.
 
-### 3. CRM & Notifications
-*   **WhatsApp Integration**: Built-in support for sending WhatsApp notifications using **Twilio**.
-*   **Standard Notifications**: Uses Frappe's standard `Notification` doctype.
-    *   **Automated Alerts**: Customers receive instant WhatsApp updates for "Goods Received" and "Goods Dispatched".
-    *   **Customizable Templates**: Edit message content directly via the Desk UI using Jinja templates.
+### 3. Mobile Entry System
+*   **Simplified UI**: A dedicated page for fast, mobile-friendly receipt entry.
+*   **Smart Defaults**: Automatically pulls the Default Company from settings and filters warehouses accordingly.
+*   **Pro Driver Tracking**: Driver name and phone fields with a searchable country code selector (Defaults to Pakistan +92).
+*   **Fault Tolerance**: Preserves all form data if a submission fails, allowing for quick correction and retry.
 
-### 4. Inventory & Reporting
-*   **Customer Stock Ledger**: A detailed report showing Inward, Outward, and Balance quantity per Customer and Batch. Includes filters for Date Range, Item, and Item Group.
-*   **Dashboard**:
-    *   **Inflow Trends**: Charts visualizing incoming stock over time by Item Group.
-    *   **Outflow Trends**: Charts visualizing outgoing stock over time by Item Group.
-    *   **Total Stock**: Line chart showing stock trends showing the net balance of bags.
-    *   **Active Batches**: Number card for quick status updates.
+### 4. Advanced Reporting & Audit
+*   **Audit Trail Report**: A detailed log of **who changed what and when**, tracking field-level changes (Old vs. New values) across core documents.
+*   **Warehouse Heatmaps**: Visual reports for warehouse utilization and occupancy trends.
+*   **Customer Stock Ledger**: Real-time visibility into customer-wise and batch-wise stock levels.
 
-### 5. Customer Portal
-*   **Self-Service**: Customers can log in to view their own stock status.
-*   **Dashboard**: Interactive charts showing Recent Activity, Inward vs. Outward totals, and Stock by Item Group.
+### 5. Notifications & Approvals
+*   **Approval System**: Automated manager notifications for arrivals and dispatches requiring approval.
+*   **Smart Persistence**: Popup notifications stay dismissed across logins and automatically suppress themselves on relevant list views.
+*   **WhatsApp Integration**: Instant customer alerts for "Goods Received" and "Goods Dispatched" via Twilio.
 
 ## Configuration
 
 ### Cold Storage Settings
-Navigate to **Cold Storage > Cold Storage Settings** to configure:
-
-1.  **Rate Configuration**:
-    *   Add rows for each **Item Group**.
-    *   Set **Handling Charge (Per Bag)** and **Loading Charge**.
-    *   *(Optional)* Link a specific **Goods Item** to set a special rate for that item.
-2.  **GST Configuration**:
-    *   Link the **GST on Services Account** (e.g., "Output Tax GST").
-
-### WhatsApp Configuration
-Navigate to **Cold Storage > Cold Storage WhatsApp Settings**:
-
-1.  **Provider**: Select "Twilio".
-2.  **Credentials**: Enter your Account SID, Auth Token, and Sender Number (e.g., `whatsapp:+14155238886`).
-3.  **Enable**: Toggle "Enabled" to start sending messages.
+Navigate to **Cold Storage > Cold Storage Settings** to configure global defaults:
+1.  **Default Company**: Primary company for auto-naming and mobile entry.
+2.  **Item Group Rates**: Set Handling and Loading charges per bag type.
+3.  **Transfer Rates**: Configure inter and intra-warehouse loading rates.
 
 ## Roles and Permissions
-
-The app comes with pre-configured roles to manage access control:
-
-1.  **Cold Storage Manager**
-    *   **Access**: Full Admin Access.
-    *   **Capabilities**: Can Create, Edit, **Submit**, Cancel, and Amend Receipts and Dispatches. Can configure Settings.
-
-2.  **Cold Storage Accountant**
-    *   **Access**: Operational / Accounts.
-    *   **Capabilities**: Can Create and Edit documents (Draft state only). Can View Reports. **Cannot Submit** documents.
-
-3.  **Cold Storage User**
-    *   **Access**: Customer / External User.
-    *   **Capabilities**: View-only access to their **own** entries (documents they created or are owner of).
+1.  **Cold Storage Manager**: Full administrative access, including system configuration and document submission.
+2.  **Cold Storage Accountant**: Created/Edit draft documents and view all finance reports.
+3.  **Cold Storage User**: Restricted access to view own stock and activity.
 
 ## Installation
 
-1.  Get the app:
-    ```bash
-    bench get-app cold_storage https://github.com/your-repo/cold_storage
-    ```
-2.  Install on site:
-    ```bash
-    bench --site [site-name] install-app cold_storage
-    ```
-3.  Migrate database:
-    ```bash
-    bench --site [site-name] migrate
-    ```
+```bash
+bench get-app cold_storage [repo-url]
+bench --site [site-name] install-app cold_storage
+bench --site [site-name] migrate
+```
 
 ## Usage Workflow
 
-1.  **Setup**: Configure `Cold Storage Settings` with your rates and `Cold Storage WhatsApp Settings` with credentials.
-2.  **Inward**: Create a `Cold Storage Receipt` when goods arrive. Select the **Item Group** (e.g., Jute Bag).
-    *   *Result*: Whatsapp notification sent to customer.
-3.  **Outward**: Create a `Cold Storage Dispatch`. Select the `Linked Receipt` and the Batch.
-4.  **Billing**: The system calculates Handling + Loading charges based on the quantity, duration, and Item Group rates.
-5.  **Invoice**: Upon Submitting the Dispatch, a **Sales Invoice** is generated in ERPNext.
-    *   *Result*: Whatsapp notification sent to customer.
+1.  **Setup**: Configure rates and default company in `Cold Storage Settings`.
+2.  **Inward**: Create a `Receipt` (Desktop or Mobile).
+3.  **Approve**: Manager approves the inward movement.
+4.  **Outward**: Create a `Dispatch` linked to the receipt.
+5.  **Invoicing**: Submission automatically generates the Sales Invoice in ERPNext.
 
 ## License
-
 MIT
-# cold_storage
-# cold_storage
