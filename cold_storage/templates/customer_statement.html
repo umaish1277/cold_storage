@@ -295,7 +295,8 @@
             {% for item in data.line_items %}
             <tr>
                 <td>{{ item.receipt }}</td>
-                <td>{{ item.receipt_date }}</td>
+                <td>{{ item.receipt_date.strftime("%d:%m:%Y") if item.receipt_date and item.receipt_date.strftime else
+                    item.receipt_date }}</td>
                 <td>{{ item.item }}</td>
                 <td>{{ item.batch_no }}</td>
                 <td>{{ item.warehouse }}</td>
@@ -314,6 +315,20 @@
             </tr>
             {% endfor %}
         </tbody>
+        <tfoot style="background: #ecf0f1; font-weight: bold;">
+            <tr>
+                <td colspan="5" style="border-top: 2px solid #2c3e50;">{{ _("TOTAL") }}</td>
+                <td class="text-right" style="border-top: 2px solid #2c3e50;">{{ data.summary.total_received | int }}
+                </td>
+                <td class="text-right" style="border-top: 2px solid #2c3e50;">{{ data.summary.total_dispatched | int }}
+                </td>
+                <td class="text-right" style="border-top: 2px solid #2c3e50;">
+                    <span class="badge badge-success" style="font-size: 11px;">{{ data.summary.total_balance | int
+                        }}</span>
+                </td>
+                <td style="border-top: 2px solid #2c3e50;"></td>
+            </tr>
+        </tfoot>
     </table>
 
     <div class="footer">

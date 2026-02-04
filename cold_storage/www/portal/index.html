@@ -250,7 +250,7 @@
                 <div class="activity-item">
                     <div class="activity-info">
                         <h4>{{ row.name }}</h4>
-                        <div class="activity-meta">{{ row.receipt_date.strftime("%d %b %Y") }} &bull; {{ row.warehouse
+                        <div class="activity-meta">{{ row.receipt_date.strftime("%d:%m:%Y") }} &bull; {{ row.warehouse
                             }}</div>
                     </div>
                     <div class="text-right">
@@ -274,8 +274,8 @@
                 <div class="activity-item">
                     <div class="activity-info">
                         <h4>{{ row.name }}</h4>
-                        <div class="activity-meta">{{ row.dispatch_date.strftime("%d %b %Y") }} &bull; Linked: {{
-                            row.linked_receipt }}</div>
+                        <div class="activity-meta">{{ row.dispatch_date.strftime("%d:%m:%Y") }} &bull; Linked: {{
+                            row.receipt }}</div>
                     </div>
                     <div class="text-right">
                         <span class="d-block font-weight-bold">{{ row.total_amount }} (Bill)</span>

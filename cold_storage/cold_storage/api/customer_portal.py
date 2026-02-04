@@ -151,7 +151,7 @@ def generate_excel(data, customer, from_date, to_date):
     # Header row
     rows.append(["Customer Stock Statement"])
     rows.append([f"Customer: {customer}"])
-    rows.append([f"Period: {from_date} to {to_date}"])
+    rows.append([f"Period: {from_date.strftime('%d:%m:%Y') if hasattr(from_date, 'strftime') else from_date} to {to_date.strftime('%d:%m:%Y') if hasattr(to_date, 'strftime') else to_date}"])
     rows.append([f"Generated: {today()}"])
     rows.append([])  # Empty row
     
@@ -166,11 +166,13 @@ def generate_excel(data, customer, from_date, to_date):
     rows.append(["Receipt", "Receipt Date", "Warehouse", "Item", "Item Group", "Batch No", 
                  "Received", "Dispatched", "Balance", "Days in Store"])
     
-    # Detail rows
     for item in data.get("line_items", []):
+        receipt_date = item.get("receipt_date")
+        formatted_date = receipt_date.strftime("%d:%m:%Y") if receipt_date and hasattr(receipt_date, "strftime") else str(receipt_date)
+        
         rows.append([
             item.get("receipt"),
-            str(item.get("receipt_date")),
+            formatted_date,
             item.get("warehouse"),
             item.get("item"),
             item.get("item_group"),
@@ -180,6 +182,13 @@ def generate_excel(data, customer, from_date, to_date):
             item.get("balance_qty"),
             item.get("days_in_store")
         ])
+    
+    # Add Total row at the bottom
+    rows.append([])
+    rows.append(["TOTAL", "", "", "", "", "", 
+                 data["summary"]["total_received"], 
+                 data["summary"]["total_dispatched"], 
+                 data["summary"]["total_balance"], ""])
     
     # Use standard build_xlsx_response which handles both creation and response setup
     filename = f"Stock_Statement_{customer}_{today()}"
