@@ -3,8 +3,6 @@
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate, today
-import io
 
 @frappe.whitelist()
 def get_customer_statement(customer=None, from_date=None, to_date=None, format="json", lang="en"):
@@ -13,6 +11,9 @@ def get_customer_statement(customer=None, from_date=None, to_date=None, format="
     Format can be 'json', 'pdf', or 'xlsx'
     Lang can be 'en' (English) or 'ur' (Urdu)
     """
+    # Force reload of utils within the call to bypass caching
+    from frappe.utils import today, add_days
+
     # Validate customer access
     if not customer:
         customer = get_customer_for_user()
@@ -26,7 +27,7 @@ def get_customer_statement(customer=None, from_date=None, to_date=None, format="
     
     # Default date range: last 1 year
     if not from_date:
-        from_date = frappe.utils.add_days(today(), -365)
+        from_date = add_days(today(), -365)
     if not to_date:
         to_date = today()
     
@@ -36,12 +37,13 @@ def get_customer_statement(customer=None, from_date=None, to_date=None, format="
     if format == "json":
         return data
     elif format == "xlsx":
-        return generate_excel(data, customer, from_date, to_date)
+        generate_excel(data, customer, from_date, to_date)
+        return
     elif format == "pdf":
-        return generate_pdf(data, customer, from_date, to_date, lang)
+        generate_pdf(data, customer, from_date, to_date, lang)
+        return
     else:
         frappe.throw(_("Invalid format. Use 'json', 'xlsx', or 'pdf'"))
-
 
 
 def get_customer_for_user():
@@ -86,6 +88,7 @@ def can_access_customer(customer):
 
 def get_statement_data(customer, from_date, to_date):
     """Get detailed stock statement for a customer"""
+    from frappe.utils import flt, getdate, today
     
     # Get all receipt items with dispatched quantities
     data = frappe.db.sql("""
@@ -139,7 +142,8 @@ def get_statement_data(customer, from_date, to_date):
 
 def generate_excel(data, customer, from_date, to_date):
     """Generate Excel file for statement"""
-    from frappe.utils.xlsxutils import make_xlsx
+    from frappe.utils.xlsxutils import build_xlsx_response
+    from frappe.utils import today
     
     # Prepare data for Excel
     rows = []
@@ -163,7 +167,7 @@ def generate_excel(data, customer, from_date, to_date):
                  "Received", "Dispatched", "Balance", "Days in Store"])
     
     # Detail rows
-    for item in data["line_items"]:
+    for item in data.get("line_items", []):
         rows.append([
             item.get("receipt"),
             str(item.get("receipt_date")),
@@ -177,16 +181,14 @@ def generate_excel(data, customer, from_date, to_date):
             item.get("days_in_store")
         ])
     
-    xlsx_file = make_xlsx(rows, "Stock Statement")
-    
-    # Return as downloadable file
-    frappe.response["filename"] = f"Stock_Statement_{customer}_{today()}.xlsx"
-    frappe.response["filecontent"] = xlsx_file.getvalue()
-    frappe.response["type"] = "download"
+    # Use standard build_xlsx_response which handles both creation and response setup
+    filename = f"Stock_Statement_{customer}_{today()}"
+    build_xlsx_response(rows, filename)
 
 
 def generate_pdf(data, customer, from_date, to_date, lang="en"):
     """Generate PDF statement using Frappe's PDF generator"""
+    from frappe.utils import today
     
     # Translations
     translations = {
@@ -279,7 +281,6 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
     frappe.response["filename"] = f"Stock_Statement_{customer}_{today()}.pdf"
     frappe.response["filecontent"] = pdf
     frappe.response["type"] = "download"
-
 
 
 def get_trend_chart_data(customer):
@@ -380,7 +381,6 @@ def get_bag_chart_data(customer):
         })
     
     return chart_items
-
 
 
 @frappe.whitelist()
