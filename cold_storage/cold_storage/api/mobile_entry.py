@@ -16,9 +16,11 @@ def submit_mobile_receipt(data):
     receipt.vehicle_no = data.get("vehicle_no")
     receipt.driver_name = data.get("driver_name")
     receipt.driver_phone = data.get("driver_phone")
-    # Set default company for correct naming series prefix
-    default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
-    receipt.company = default_company
+    # Set company for naming series
+    company = data.get("company")
+    if not company:
+        company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+    receipt.company = company
     receipt.receipt_date = frappe.utils.nowdate()
 
     for item in data.get("items", []):

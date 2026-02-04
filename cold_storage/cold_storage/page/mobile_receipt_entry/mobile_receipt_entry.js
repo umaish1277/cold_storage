@@ -9,6 +9,10 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 		<div id="mobile-entry-container" class="mobile-container">
 			<div class="form-section">
 				<div class="field-row">
+					<label>Company</label>
+					<div id="company-picker"></div>
+				</div>
+				<div class="field-row">
 					<label>Customer</label>
 					<div id="customer-picker"></div>
 				</div>
@@ -117,6 +121,17 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 	`);
 
 	// Initialize Controls
+	var company_field = frappe.ui.form.make_control({
+		parent: $(wrapper).find('#company-picker'),
+		df: {
+			fieldtype: 'Link',
+			options: 'Company',
+			fieldname: 'company',
+			read_only: 1
+		},
+		render_input: true
+	});
+
 	var customer_field = frappe.ui.form.make_control({
 		parent: $(wrapper).find('#customer-picker'),
 		df: {
@@ -136,7 +151,12 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 			fieldname: 'warehouse',
 			placeholder: 'Search Warehouse...',
 			get_query: function () {
-				return { filters: { is_group: 0 } };
+				return {
+					filters: {
+						is_group: 0,
+						company: company_field.get_value() || ""
+					}
+				};
 			}
 		},
 		render_input: true
@@ -145,6 +165,7 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 	// Default Company & Warehouse
 	frappe.db.get_single_value("Cold Storage Settings", "default_company").then(val => {
 		wrapper.default_company = val;
+		company_field.set_value(val);
 	});
 
 	// Items Handling
@@ -238,6 +259,7 @@ frappe.pages['mobile-receipt-entry'].on_page_load = function (wrapper) {
 	// Submit
 	$(wrapper).find('#submit-receipt-btn').click(() => {
 		var data = {
+			company: company_field.get_value(),
 			customer: customer_field.get_value(),
 			warehouse: warehouse_field.get_value(),
 			vehicle_no: $(wrapper).find('#vehicle_no').val(),
