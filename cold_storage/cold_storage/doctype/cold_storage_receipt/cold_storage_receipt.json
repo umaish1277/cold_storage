@@ -6,6 +6,7 @@
     "doctype": "DocType",
     "document_type": "Document",
     "engine": "InnoDB",
+    "full_width": 1,
     "field_order": [
         "section_break_gkhy",
         "receipt_type",
@@ -17,6 +18,11 @@
         "column_break_jklz",
         "naming_series",
         "qr_code",
+        "section_break_gate",
+        "vehicle_no",
+        "column_break_gate",
+        "driver_name",
+        "driver_phone",
         "warehouse",
         "from_warehouse",
         "section_break_details",
@@ -112,6 +118,30 @@
             "options": "Warehouse"
         },
         {
+            "fieldname": "section_break_gate",
+            "fieldtype": "Section Break",
+            "label": "Gate Entry Details"
+        },
+        {
+            "fieldname": "vehicle_no",
+            "fieldtype": "Data",
+            "label": "Vehicle No"
+        },
+        {
+            "fieldname": "column_break_gate",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "driver_name",
+            "fieldtype": "Data",
+            "label": "Driver Name"
+        },
+        {
+            "fieldname": "driver_phone",
+            "fieldtype": "Phone",
+            "label": "Driver Phone"
+        },
+        {
             "fieldname": "section_break_details",
             "fieldtype": "Section Break",
             "label": "Goods Details"
@@ -158,6 +188,7 @@
             "fieldname": "stock_entry",
             "fieldtype": "Link",
             "label": "Stock Entry",
+            "no_copy": 1,
             "options": "Stock Entry",
             "read_only": 1
         },
@@ -179,6 +210,7 @@
             "fieldname": "transfer_loading_journal_entry",
             "fieldtype": "Link",
             "label": "Transfer Loading Journal Entry",
+            "no_copy": 1,
             "options": "Journal Entry",
             "read_only": 1
         },

@@ -14,12 +14,12 @@ def get_pending_approvals():
     receipts_count = frappe.db.count("Cold Storage Receipt", {"workflow_state": "Pending Approval"})
     if receipts_count > 0:
         url = "/app/cold-storage-receipt?workflow_state=Pending%20Approval"
-        pending.append(f'{receipts_count} Receipts <a href="{url}" class="btn btn-xs btn-primary" style="margin-left: 5px;">View</a>')
+        pending.append(f'{receipts_count} Receipts <a href="{url}" class="btn btn-xs btn-primary btn-view-approval" style="margin-left: 5px;">View</a>')
         
     # Dispatches
     dispatches_count = frappe.db.count("Cold Storage Dispatch", {"workflow_state": "Pending Approval"})
     if dispatches_count > 0:
         url = "/app/cold-storage-dispatch?workflow_state=Pending%20Approval"
-        pending.append(f'{dispatches_count} Dispatches <a href="{url}" class="btn btn-xs btn-primary" style="margin-left: 5px;">View</a>')
+        pending.append(f'{dispatches_count} Dispatches <a href="{url}" class="btn btn-xs btn-primary btn-view-approval" style="margin-left: 5px;">View</a>')
         
     return pending

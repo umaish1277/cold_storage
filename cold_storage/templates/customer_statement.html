@@ -249,24 +249,26 @@
         </div>
 
         <h3>📦 {{ t.stock_by_batch_no }}</h3>
-        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+        <div
+            style="display: table; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
             {% if bag_chart and bag_chart|length > 0 %}
-            <table style="width: 100%; margin: 0;">
-                <tr>
-                    {% for item in bag_chart %}
-                    <td style="text-align: center; padding: 10px; border: none;">
-                        <div style="font-size: 24px; font-weight: bold; color: {{ item.color }};">{{ item.pct }}%</div>
-                        <div style="font-size: 12px; color: #2c3e50; font-weight: 600;">{{ item.value }} {{ t.bags }}
-                        </div>
-                        <div style="font-size: 10px; color: #7f8c8d;">{{ item.label }}</div>
-                    </td>
-                    {% endfor %}
-                </tr>
-            </table>
-            <!-- Simple bar representation -->
-            <div style="display: flex; height: 20px; border-radius: 10px; overflow: hidden; margin-top: 10px;">
+            <div style="display: table-row;">
                 {% for item in bag_chart %}
-                <div style="width: {{ item.pct }}%; background: {{ item.color }};"></div>
+                <div
+                    style="display: table-cell; text-align: center; vertical-align: bottom; padding: 0 8px; width: {{ 100 / bag_chart|length }}%;">
+                    <div style="font-size: 8px; color: {{ item.color }}; font-weight: bold; margin-bottom: 5px;">
+                        {{ item.value }}
+                    </div>
+                    <div style="display: inline-block; width: 30px;">
+                        <div
+                            style="height: {{ (item.pct * 1.5) | int }}px; width: 100%; background: {{ item.color }}; border-radius: 3px 3px 0 0; min-height: 2px;">
+                        </div>
+                    </div>
+                    <div
+                        style="font-size: 9px; color: #7f8c8d; margin-top: 5px; word-break: break-all; line-height: 1;">
+                        {{ item.label }}
+                    </div>
+                </div>
                 {% endfor %}
             </div>
             {% else %}
@@ -295,7 +297,8 @@
             {% for item in data.line_items %}
             <tr>
                 <td>{{ item.receipt }}</td>
-                <td>{{ item.receipt_date }}</td>
+                <td>{{ item.receipt_date.strftime("%d:%m:%Y") if item.receipt_date and item.receipt_date.strftime else
+                    item.receipt_date }}</td>
                 <td>{{ item.item }}</td>
                 <td>{{ item.batch_no }}</td>
                 <td>{{ item.warehouse }}</td>
@@ -314,6 +317,20 @@
             </tr>
             {% endfor %}
         </tbody>
+        <tfoot style="background: #ecf0f1; font-weight: bold;">
+            <tr>
+                <td colspan="5" style="border-top: 2px solid #2c3e50;">{{ _("TOTAL") }}</td>
+                <td class="text-right" style="border-top: 2px solid #2c3e50;">{{ data.summary.total_received | int }}
+                </td>
+                <td class="text-right" style="border-top: 2px solid #2c3e50;">{{ data.summary.total_dispatched | int }}
+                </td>
+                <td class="text-right" style="border-top: 2px solid #2c3e50;">
+                    <span class="badge badge-success" style="font-size: 11px;">{{ data.summary.total_balance | int
+                        }}</span>
+                </td>
+                <td style="border-top: 2px solid #2c3e50;"></td>
+            </tr>
+        </tfoot>
     </table>
 
     <div class="footer">

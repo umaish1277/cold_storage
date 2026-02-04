@@ -6,6 +6,7 @@
     "doctype": "DocType",
     "document_type": "Document",
     "engine": "InnoDB",
+    "full_width": 1,
     "field_order": [
         "section_break_gkhy",
         "company",
@@ -87,6 +88,7 @@
             "fieldname": "sales_invoice",
             "fieldtype": "Link",
             "label": "Sales Invoice",
+            "no_copy": 1,
             "options": "Sales Invoice",
             "read_only": 1
         },
@@ -95,6 +97,7 @@
             "fieldname": "stock_entry",
             "fieldtype": "Link",
             "label": "Stock Entry",
+            "no_copy": 1,
             "options": "Stock Entry",
             "read_only": 1
         },

@@ -51,9 +51,8 @@ class ColdStorageDispatch(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def validate(self):
-		# Server-side fallback for company if not set
-		if not self.company:
-			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		# Enforce default company from settings
+		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		
 		if not self.company:
 			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
@@ -139,12 +138,12 @@ class ColdStorageDispatch(Document):
 		# GST API
 		if self.gst_applicable:
 			# GST applies to both? Usually yes on services.
-			taxable_amount = self.total_amount + self.total_loading_amount
+			taxable_amount = flt(self.total_amount) + flt(self.total_loading_amount)
 			self.total_gst_amount = taxable_amount * (flt(self.gst_rate) / 100)
 		else:
 			self.total_gst_amount = 0
 			
-		self.grand_total = self.total_amount + self.total_loading_amount + self.total_gst_amount
+		self.grand_total = flt(self.total_amount) + flt(self.total_loading_amount) + flt(self.total_gst_amount)
 
 		# Set In Words
 		from frappe.utils import money_in_words
@@ -157,6 +156,11 @@ class ColdStorageDispatch(Document):
 		if not self.items:
 			return
 
+		# Amendment Handling
+		old_se = None
+		if self.amended_from:
+			old_se = frappe.db.get_value("Cold Storage Dispatch", self.amended_from, "stock_entry")
+
 		# Group items by warehouse for separate stock entries
 		warehouse_items = {}
 		for item in self.items:
@@ -167,6 +171,12 @@ class ColdStorageDispatch(Document):
 		stock_entries = []
 		for warehouse, items in warehouse_items.items():
 			se = frappe.new_doc("Stock Entry")
+			
+			if old_se and frappe.db.exists("Stock Entry", old_se):
+				se.amended_from = old_se
+				# Only use amended_from for the first SE created if there are multiple warehouses
+				# This is a simplification; usually dispatches are from one warehouse anyway in this app context
+				old_se = None 
 			se.purpose = "Material Issue"
 			se.set_stock_entry_type()
 			se.from_warehouse = warehouse
@@ -247,8 +257,8 @@ class ColdStorageDispatch(Document):
 			if rate > 0:
 				si.append("items", {
 					"item_code": "Cold Storage Service",
-					"qty": row.number_of_bags * duration,
-					"rate": rate,
+					"qty": flt(row.number_of_bags) * flt(duration),
+					"rate": flt(rate),
 					"description": f"Storage Charges ({billing_type}) for {row.number_of_bags} bags (Batch {row.batch_no}) {description_suffix} @ {rate}/{billing_type[:-2] if billing_type != 'Daily' else 'Day'}",
 					"uom": "Nos"
 				})
@@ -258,8 +268,8 @@ class ColdStorageDispatch(Document):
 			if loading_rate > 0:
 				si.append("items", {
 					"item_code": "Cold Storage Service",
-					"qty": row.number_of_bags, # One time charge
-					"rate": loading_rate,
+					"qty": flt(row.number_of_bags), # One time charge
+					"rate": flt(loading_rate),
 					"description": f"Loading/Unloading Charges for {row.number_of_bags} bags (Batch {row.batch_no}) @ {loading_rate}/Bag",
 					"uom": "Nos"
 				})
@@ -326,16 +336,25 @@ class ColdStorageDispatch(Document):
 			frappe.sendmail(recipients=[contact_email], subject=subject, message=message)
 	def on_cancel(self):
 		if self.stock_entry:
-			se = frappe.get_doc("Stock Entry", self.stock_entry)
-			if se.docstatus == 1:
-				se.cancel()
-				frappe.msgprint(f"Stock Entry {se.name} cancelled.")
+			try:
+				se = frappe.get_doc("Stock Entry", self.stock_entry)
+				if se.docstatus == 1:
+					se.cancel()
+					frappe.msgprint(_("Linked Stock Entry {0} cancelled").format(se.name))
+			except Exception as e:
+				frappe.msgprint(_("Note: Linked Stock Entry {0} could not be automatically cancelled: {1}").format(self.stock_entry, str(e)))
 
 		if self.sales_invoice:
-			si = frappe.get_doc("Sales Invoice", self.sales_invoice)
-			if si.docstatus == 1:
-				si.cancel()
-				frappe.msgprint(f"Sales Invoice {si.name} cancelled.")
+			try:
+				si = frappe.get_doc("Sales Invoice", self.sales_invoice)
+				if si.docstatus == 1:
+					si.cancel()
+					frappe.msgprint(_("Linked Sales Invoice {0} cancelled").format(si.name))
+			except Exception as e:
+				frappe.msgprint(_("Note: Linked Sales Invoice {0} could not be automatically cancelled: {1}").format(self.sales_invoice, str(e)))
+
+		# Ensure Workflow State is updated to 'Cancelled'
+		self.db_set("workflow_state", "Cancelled")
 
 
 

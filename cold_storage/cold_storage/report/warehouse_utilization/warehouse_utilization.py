@@ -43,13 +43,12 @@ def get_data(filters):
         if capacity <= 0:
             continue
         
-        # Get Jute Bags in stock (bag_type = 'Jute Bag' or NULL treated as Jute Bag)
         jute_in = frappe.db.sql("""
             SELECT IFNULL(SUM(ri.number_of_bags), 0)
             FROM `tabCold Storage Receipt` r 
             JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name 
             WHERE r.docstatus = 1 AND r.warehouse = %s 
-            AND (ri.bag_type = 'Jute Bag' OR ri.bag_type IS NULL OR ri.bag_type = '')
+            AND (ri.item_group = 'Jute Bag' OR ri.item_group IS NULL OR ri.item_group = '')
         """, (w.name,))[0][0] or 0
         
         jute_out = frappe.db.sql("""
@@ -57,18 +56,17 @@ def get_data(filters):
             FROM `tabCold Storage Dispatch` d 
             JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name 
             WHERE d.docstatus = 1 AND d.warehouse = %s
-            AND (di.bag_type = 'Jute Bag' OR di.bag_type IS NULL OR di.bag_type = '')
+            AND (di.item_group = 'Jute Bag' OR di.item_group IS NULL OR di.item_group = '')
         """, (w.name,))[0][0] or 0
         
         jute_bags = jute_in - jute_out
         
-        # Get Net Bags in stock
         net_in = frappe.db.sql("""
             SELECT IFNULL(SUM(ri.number_of_bags), 0)
             FROM `tabCold Storage Receipt` r 
             JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name 
             WHERE r.docstatus = 1 AND r.warehouse = %s 
-            AND ri.bag_type = 'Net Bag'
+            AND ri.item_group = 'Net Bag'
         """, (w.name,))[0][0] or 0
         
         net_out = frappe.db.sql("""
@@ -76,7 +74,7 @@ def get_data(filters):
             FROM `tabCold Storage Dispatch` d 
             JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name 
             WHERE d.docstatus = 1 AND d.warehouse = %s
-            AND di.bag_type = 'Net Bag'
+            AND di.item_group = 'Net Bag'
         """, (w.name,))[0][0] or 0
         
         net_bags = net_in - net_out

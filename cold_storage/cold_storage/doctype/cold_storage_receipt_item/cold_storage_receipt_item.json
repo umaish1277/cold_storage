@@ -7,7 +7,6 @@
     "field_order": [
         "goods_item",
         "item_group",
-        "bag_type",
         "batch_no",
         "number_of_bags",
         "rate",
@@ -36,13 +35,6 @@
             "in_list_view": 1,
             "label": "Number of Bags",
             "reqd": 1
-        },
-        {
-            "fieldname": "bag_type",
-            "fieldtype": "Select",
-            "in_list_view": 1,
-            "label": "Bag Type",
-            "options": "Jute Bag\nNet Bag"
         },
         {
             "fieldname": "batch_no",

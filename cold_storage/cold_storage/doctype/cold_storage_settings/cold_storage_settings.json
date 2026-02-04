@@ -24,7 +24,7 @@
         {
             "fieldname": "bag_type_rates",
             "fieldtype": "Table",
-            "label": "Bag Type Rates",
+            "label": "Item Group Rates",
             "options": "Bag Type Rate",
             "permlevel": 1
         },

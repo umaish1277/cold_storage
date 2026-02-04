@@ -97,11 +97,14 @@ frappe.ui.form.on('Cold Storage Dispatch Item', {
 
 frappe.ui.form.on('Cold Storage Dispatch', {
     onload: function (frm) {
+        // Enforce read-only company
+        frm.set_df_property("company", "read_only", 1);
+
         if (frm.is_new()) {
             let default_company = (frm.doc.__onload && frm.doc.__onload.default_company) ? frm.doc.__onload.default_company : null;
 
             let set_comp = function (val) {
-                if (val && frm.doc.company !== val) {
+                if (val) {
                     frm.set_df_property("company", "read_only", 0);
                     frm.set_value("company", val);
                     frm.set_df_property("company", "read_only", 1);

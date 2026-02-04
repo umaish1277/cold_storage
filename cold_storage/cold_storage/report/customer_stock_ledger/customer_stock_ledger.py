@@ -2,6 +2,10 @@ import frappe
 from frappe import _
 
 def execute(filters=None):
+	# Explicitly define flt to avoid NameError due to server caching
+	from frappe.utils import flt
+	
+	if not filters: filters = {}
 	columns = [
 		{"label": _("Receipt Date"), "fieldname": "receipt_date", "fieldtype": "Date", "width": 100},
 		{"label": _("Receipt"), "fieldname": "receipt", "fieldtype": "Link", "options": "Cold Storage Receipt", "width": 150},
@@ -82,9 +86,9 @@ def execute(filters=None):
 			"cumulative_balance": cumulative_balance
 		})
 
-		total_in_qty += r.in_qty
-		total_out_qty += out_qty
-		total_balance += balance
+		total_in_qty += flt(r.in_qty)
+		total_out_qty += flt(out_qty)
+		total_balance += flt(balance)
 
 	if data:
 		data.append({
@@ -103,4 +107,3 @@ def execute(filters=None):
 		})
 
 	return columns, data
-

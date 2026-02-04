@@ -15,15 +15,14 @@ class ColdStorageReceipt(Document):
 			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 
 	def validate(self):
-		# Server-side fallback for company if not set
-		if not self.company:
-			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		# Enforce default company from settings
+		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		
 		if not self.company:
 			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
 
 		from cold_storage.cold_storage import utils
-		self.total_bags = sum([item.number_of_bags for item in self.items])
+		self.total_bags = sum([flt(item.number_of_bags) for item in self.items])
 		
 		# Validation: Check for positive number of bags
 		for item in self.items:
@@ -102,6 +101,9 @@ class ColdStorageReceipt(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def before_save(self):
+		# Enforce company again just in case
+		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+
 		# Generate/Update QR Code
 		if self.name:
 			import qrcode
@@ -218,11 +220,16 @@ class ColdStorageReceipt(Document):
 		frappe.msgprint(f"Journal Entry <a href='/app/journal-entry/{je.name}'>{je.name}</a> created for transfer loading charges.")
 
 	def make_stock_entry(self):
-
 		if not self.items:
 			return
 
 		se = frappe.new_doc("Stock Entry")
+		
+		# Amendment Handling: link new stock entry to the old one
+		if self.amended_from:
+			old_se = frappe.db.get_value("Cold Storage Receipt", self.amended_from, "stock_entry")
+			if old_se and frappe.db.exists("Stock Entry", old_se):
+				se.amended_from = old_se
 		
 		# Determine Purpose and Warehouse Logic
 		if self.receipt_type == "Warehouse Transfer":
@@ -351,16 +358,22 @@ class ColdStorageReceipt(Document):
 			frappe.throw(f"Cannot cancel Receipt because linked Dispatch {linked_dispatches[0][0]} exists. Please cancel the Dispatch first.")
 
 		if self.stock_entry:
-			se = frappe.get_doc("Stock Entry", self.stock_entry)
-			if se.docstatus == 1:
-				se.cancel()
-				frappe.msgprint(f"Stock Entry {se.name} cancelled.")
+			try:
+				se = frappe.get_doc("Stock Entry", self.stock_entry)
+				if se.docstatus == 1:
+					se.cancel()
+					frappe.msgprint(_("Linked Stock Entry {0} cancelled").format(se.name))
+			except Exception as e:
+				frappe.msgprint(_("Note: Linked Stock Entry {0} could not be automatically cancelled: {1}").format(self.stock_entry, str(e)))
 
 		if self.transfer_loading_journal_entry:
 			je = frappe.get_doc("Journal Entry", self.transfer_loading_journal_entry)
 			if je.docstatus == 1:
 				je.cancel()
 				frappe.msgprint(f"Journal Entry {je.name} for transfer loading charges cancelled.")
+
+		# Ensure Workflow State is updated to 'Cancelled'
+		self.db_set("workflow_state", "Cancelled")
 
 
 @frappe.whitelist()
@@ -436,3 +449,4 @@ def get_customer_warehouse_item_groups(doctype, txt, searchfield, start, page_le
 		WHERE p.customer = %s AND p.warehouse = %s AND p.docstatus = 1 AND i.item_group LIKE %s
 		LIMIT %s, %s
 	""", (customer, warehouse, f"%{txt}%", start, page_len))
+
