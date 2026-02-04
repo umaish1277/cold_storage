@@ -163,7 +163,7 @@ def generate_excel(data, customer, from_date, to_date):
                  "Received", "Dispatched", "Balance", "Days in Store"])
     
     # Detail rows
-    for item in data["items"]:
+    for item in data["line_items"]:
         rows.append([
             item.get("receipt"),
             str(item.get("receipt_date")),
