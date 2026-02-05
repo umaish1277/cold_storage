@@ -1,0 +1,122 @@
+{
+    "actions": [],
+    "autoname": "field:sensor_id",
+    "creation": "2026-02-06 01:30:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "sensor_id",
+        "sensor_name",
+        "warehouse",
+        "status",
+        "battery_percentage",
+        "last_reading",
+        "threshold_section",
+        "temperature_limit_high",
+        "temperature_limit_low",
+        "humidity_limit_high",
+        "co2_limit_high"
+    ],
+    "fields": [
+        {
+            "fieldname": "sensor_id",
+            "fieldtype": "Data",
+            "label": "Sensor ID (DevEUI)",
+            "unique": 1,
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "sensor_name",
+            "fieldtype": "Data",
+            "label": "Sensor Name",
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "warehouse",
+            "fieldtype": "Link",
+            "label": "Warehouse",
+            "options": "Warehouse",
+            "in_list_view": 1
+        },
+        {
+            "default": "Online",
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "Online\nOffline\nAlarm",
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "battery_percentage",
+            "fieldtype": "Percent",
+            "label": "Battery %"
+        },
+        {
+            "fieldname": "last_reading",
+            "fieldtype": "Datetime",
+            "label": "Last Reading",
+            "read_only": 1
+        },
+        {
+            "fieldname": "threshold_section",
+            "fieldtype": "Section Break",
+            "label": "Thresholds & Alerts"
+        },
+        {
+            "fieldname": "temperature_limit_high",
+            "fieldtype": "Float",
+            "label": "Max Temperature (\u00b0C)"
+        },
+        {
+            "fieldname": "temperature_limit_low",
+            "fieldtype": "Float",
+            "label": "Min Temperature (\u00b0C)"
+        },
+        {
+            "fieldname": "humidity_limit_high",
+            "fieldtype": "Float",
+            "label": "Max Humidity (%)"
+        },
+        {
+            "fieldname": "co2_limit_high",
+            "fieldtype": "Float",
+            "label": "Max CO2 (ppm)"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2026-02-06 01:30:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Cold Storage Environment Sensor",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}

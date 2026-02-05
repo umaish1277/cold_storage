@@ -1,0 +1,23 @@
+{
+    "aggregate_function_based_on": "co2",
+    "creation": "2026-02-06 01:50:00.000000",
+    "docstatus": 0,
+    "doctype": "Number Card",
+    "document_type": "Cold Storage Environment Reading",
+    "filters_json": "[]",
+    "function": "Sum",
+    "idx": 0,
+    "is_public": 1,
+    "is_standard": 1,
+    "label": "Current CO2 (ppm)",
+    "modified": "2026-02-06 01:50:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Current CO2",
+    "owner": "Administrator",
+    "parent_document_type": "",
+    "report_name": "",
+    "show_percentage_stats": 0,
+    "stats_time_interval": "Daily",
+    "type": "Document Transaction"
+}

@@ -1,168 +1,196 @@
 {
-    "app": "cold_storage",
-    "charts": [
-        {
-            "chart_name": "Incoming Bags",
-            "label": "Incoming Bags"
-        },
-        {
-            "chart_name": "Outgoing Bags",
-            "label": "Outgoing Bags"
-        },
-        {
-            "chart_name": "Monthly Movement Trend",
-            "label": "Monthly Movement Trend"
-        },
-        {
-            "chart_name": "Average Storage Days by Item",
-            "label": "Average Storage Days by Item"
-        },
-        {
-            "chart_name": "Inventory Aging",
-            "label": "Inventory Aging"
-        },
-        {
-            "chart_name": "Warehouse Utilization",
-            "label": "Warehouse Utilization"
-        }
-    ],
-    "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"card1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"card2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"card3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"card4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":3}},{\"id\":\"sc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Receipt\",\"col\":3}},{\"id\":\"sc_mobile\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Mobile Entry\",\"col\":3}},{\"id\":\"sc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Dispatch\",\"col\":3}},{\"id\":\"sc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Rate Card Registry\",\"col\":3}},{\"id\":\"chart3\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Monthly Movement Trend\",\"col\":12}},{\"id\":\"chart1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":6}},{\"id\":\"chart2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":6}},{\"id\":\"chart5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Inventory Aging\",\"col\":6}},{\"id\":\"8e1a8b3b-a\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Warehouse Utilization\",\"col\":6}},{\"id\":\"chart4\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Average Storage Days by Item\",\"col\":12}}]",
-    "creation": "2026-02-03 22:43:37.424177",
-    "doctype": "Workspace",
-    "icon": "box",
-    "indicator_color": "green",
-    "label": "Cold Storage",
-    "shortcuts": [
-        {
-            "label": "New Receipt",
-            "link_to": "Cold Storage Receipt",
-            "type": "DocType",
-            "url": "/app/cold_storage_receipt/new"
-        },
-        {
-            "label": "Mobile Entry",
-            "link_to": "mobile-receipt-entry",
-            "type": "Page",
-            "url": "/app/mobile-receipt-entry"
-        },
-        {
-            "label": "New Dispatch",
-            "link_to": "Cold Storage Dispatch",
-            "type": "DocType",
-            "url": "/app/cold_storage_dispatch/new"
-        },
-        {
-            "label": "Rate Card Registry",
-            "link_to": "Cold Storage Rate Card",
-            "type": "DocType",
-            "url": "/app/cold_storage_rate_card"
-        }
-    ],
-    "links": [
-        {
-            "label": "Transactions",
-            "type": "Header"
-        },
-        {
-            "label": "Receipt",
-            "link_to": "Cold Storage Receipt",
-            "link_type": "DocType",
-            "type": "Link"
-        },
-        {
-            "label": "Dispatch",
-            "link_to": "Cold Storage Dispatch",
-            "link_type": "DocType",
-            "type": "Link"
-        },
-        {
-            "label": "Rate Management",
-            "type": "Header"
-        },
-        {
-            "label": "Rate Card",
-            "link_to": "Cold Storage Rate Card",
-            "link_type": "DocType",
-            "type": "Link"
-        },
-        {
-            "label": "Season",
-            "link_to": "Cold Storage Season",
-            "link_type": "DocType",
-            "type": "Link"
-        },
-        {
-            "label": "Customer Tier",
-            "link_to": "Cold Storage Customer Tier",
-            "link_type": "DocType",
-            "type": "Link"
-        },
-        {
-            "label": "Setup & Settings",
-            "type": "Header"
-        },
-        {
-            "label": "Cold Storage Settings",
-            "link_to": "Cold Storage Settings",
-            "link_type": "DocType",
-            "type": "Link"
-        },
-        {
-            "label": "WhatsApp Settings",
-            "link_to": "Cold Storage WhatsApp Settings",
-            "link_type": "DocType",
-            "type": "Link"
-        },
-        {
-            "label": "Reports",
-            "type": "Header"
-        },
-        {
-            "label": "Customer Stock Ledger",
-            "link_to": "Customer Stock Ledger",
-            "link_type": "Report",
-            "report_ref_doctype": "Cold Storage Receipt",
-            "type": "Link"
-        }
-    ],
-    "modified": "2026-02-05 12:30:00.000000",
-    "modified_by": "Administrator",
-    "module": "Cold Storage",
-    "name": "Cold Storage",
-    "number_cards": [
-        {
-            "label": "Total Outgoing Bills",
-            "number_card_name": "Total Outgoing Bills"
-        },
-        {
-            "label": "Total Warehouses",
-            "number_card_name": "Total Warehouses"
-        },
-        {
-            "label": "Active Customers",
-            "number_card_name": "Active Customers"
-        },
-        {
-            "label": "Active Batches",
-            "number_card_name": "Active Batches"
-        }
-    ],
-    "owner": "Administrator",
-    "public": 1,
-    "roles": [
-        {
-            "role": "System Manager"
-        },
-        {
-            "role": "Stock Manager"
-        },
-        {
-            "role": "Cold Storage Accountant"
-        },
-        {
-            "role": "Cold Storage Manager"
-        }
-    ],
-    "title": "Cold Storage",
-    "type": "Workspace"
+ "app": "cold_storage",
+ "charts": [
+  {
+   "chart_name": "Incoming Bags",
+   "label": "Incoming Bags"
+  },
+  {
+   "chart_name": "Login Activity",
+   "label": "Login Activity"
+  },
+  {
+   "chart_name": "Outgoing Bags",
+   "label": "Outgoing Bags"
+  },
+  {
+   "chart_name": "Peak Season Forecast",
+   "label": "Peak Season Forecast"
+  },
+  {
+   "chart_name": "Monthly Movement Trend",
+   "label": "Monthly Movement Trend"
+  },
+  {
+   "chart_name": "Average Storage Days by Item",
+   "label": "Average Storage Days by Item"
+  },
+  {
+   "chart_name": "Inventory Aging",
+   "label": "Inventory Aging"
+  },
+  {
+   "chart_name": "Warehouse Utilization",
+   "label": "Warehouse Utilization"
+  }
+ ],
+ "content": "[{\"id\":\"WLUDg2RSL9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Cold Storage Dashboard</span>\",\"col\":12}},{\"id\":\"card1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Customers\",\"col\":3}},{\"id\":\"MQLhBxGNN2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Active Items\",\"col\":3}},{\"id\":\"card2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Batches\",\"col\":3}},{\"id\":\"card3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Warehouses\",\"col\":3}},{\"id\":\"card4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Outgoing Bills\",\"col\":6}},{\"id\":\"9FDRTBpR_p\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Incoming Payment\",\"col\":6}},{\"id\":\"chart3\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Monthly Movement Trend\",\"col\":12}},{\"id\":\"chart1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Incoming Bags\",\"col\":6}},{\"id\":\"chart2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Bags\",\"col\":6}},{\"id\":\"chart5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Inventory Aging\",\"col\":6}},{\"id\":\"8e1a8b3b-a\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Warehouse Utilization\",\"col\":6}},{\"id\":\"chart4\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Average Storage Days by Item\",\"col\":6}},{\"id\":\"u7x7zcOGcF\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Login Activity\",\"col\":6}},{\"id\":\"mozJ5gJ5Bz\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Peak Season Forecast\",\"col\":12}}]",
+ "creation": "2026-02-05 21:16:38.011347",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "box",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Cold Storage",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Receipt",
+   "link_count": 0,
+   "link_to": "Cold Storage Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Dispatch",
+   "link_count": 0,
+   "link_to": "Cold Storage Dispatch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cold Storage Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Rate Card",
+   "link_count": 0,
+   "link_to": "Cold Storage Rate Card",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Season",
+   "link_count": 0,
+   "link_to": "Cold Storage Season",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Tier",
+   "link_count": 0,
+   "link_to": "Cold Storage Customer Tier",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "Cold Storage WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Stock Ledger",
+   "link_count": 0,
+   "link_to": "Customer Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Cold Storage Receipt",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Environment Sensor",
+   "link_to": "Cold Storage Environment Sensor",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Environment Reading",
+   "link_to": "Cold Storage Environment Reading",
+   "link_type": "DocType",
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-02-06 00:36:00.692339",
+ "modified_by": "Administrator",
+ "module": "Cold Storage",
+ "name": "Cold Storage",
+ "number_cards": [
+  {
+   "label": "Total Outgoing Bills",
+   "number_card_name": "Total Outgoing Bills"
+  },
+  {
+   "label": "Total Active Items",
+   "number_card_name": "Total Active Items"
+  },
+  {
+   "label": "Total Warehouses",
+   "number_card_name": "Total Warehouses"
+  },
+  {
+   "label": "Total Incoming Payment",
+   "number_card_name": "Total Incoming Payment"
+  },
+  {
+   "label": "Active Customers",
+   "number_card_name": "Active Customers"
+  },
+  {
+   "label": "Active Batches",
+   "number_card_name": "Active Batches"
+  }
+ ],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Cold Storage Accountant"
+  },
+  {
+   "role": "Cold Storage Manager"
+  }
+ ],
+ "sequence_id": 0.0,
+ "shortcuts": [],
+ "title": "Cold Storage",
+ "type": "Workspace"
 }

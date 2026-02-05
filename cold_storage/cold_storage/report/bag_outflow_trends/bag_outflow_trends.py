@@ -19,7 +19,7 @@ def execute(filters=None):
         WHERE p.docstatus = 1 AND (p.remarks IS NULL OR p.remarks NOT LIKE 'Auto-generated Transfer%') {conditions}
     """, as_dict=True)
     
-    item_groups = sorted([d.item_group for d in distinct_types if d.item_group])
+    item_groups = sorted([d.get("item_group") for d in distinct_types if d.get("item_group")])
     
     check_nulls = frappe.db.sql(f"""
         SELECT 1 FROM `tabCold Storage Dispatch` p
@@ -57,12 +57,12 @@ def execute(filters=None):
     pivot = defaultdict(lambda: {bt: 0 for bt in item_groups})
     
     for row in raw_data:
-        bt_key = row.item_group 
+        bt_key = row.get("item_group")
         if not bt_key:
              bt_key = "Unspecified"
         
         if bt_key in item_groups:
-            pivot[str(row.dispatch_date)][bt_key] += float(row.qty or 0)
+            pivot[str(row.get("dispatch_date"))][bt_key] += float(row.get("qty") or 0)
             
     data = []
     labels = sorted(pivot.keys())

@@ -26,7 +26,7 @@ def execute(filters=None):
         WHERE p.docstatus = 1 AND p.receipt_type != 'Warehouse Transfer' AND p.receipt_type != 'Customer Transfer' {conditions}
     """, as_dict=True)
     
-    item_groups = sorted([d.item_group for d in distinct_types if d.item_group])
+    item_groups = sorted([d.get("item_group") for d in distinct_types if d.get("item_group")])
     
     # Always include 'Unspecified' if there are nulls, or if we want to show it.
     # Let's check if there are nulls.
@@ -66,12 +66,12 @@ def execute(filters=None):
     pivot = defaultdict(lambda: {bt: 0 for bt in item_groups})
     
     for row in raw_data:
-        bt_key = row.item_group 
+        bt_key = row.get("item_group")
         if not bt_key:
              bt_key = "Unspecified"
         
         if bt_key in item_groups:
-            pivot[str(row.receipt_date)][bt_key] += float(row.qty or 0)
+            pivot[str(row.get("receipt_date"))][bt_key] += float(row.get("qty") or 0)
             
     data = []
     labels = sorted(pivot.keys())

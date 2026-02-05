@@ -1,7 +1,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import date_diff
+from frappe.utils import date_diff, flt
 
 def execute(filters=None):
     if not filters: filters = {}
@@ -14,59 +14,108 @@ def execute(filters=None):
     ]
 
     # Conditions
-    conditions = "WHERE d.docstatus = 1 AND d.linked_receipt IS NOT NULL"
-    if filters.get("from_date"): conditions += f" AND d.dispatch_date >= '{filters.get('from_date')}'"
-    if filters.get("to_date"): conditions += f" AND d.dispatch_date <= '{filters.get('to_date')}'"
-
-    # Query to get durations
-    # We join dispatch items with receipt items to be precise, or just use parent dates
-    # Let's use parent dates for simplicity as long as dispatch is linked to receipt
-    raw_data = frappe.db.sql(f"""
-        SELECT 
-            di.goods_item as item,
-            DATEDIFF(d.dispatch_date, r.receipt_date) as duration,
-            di.number_of_bags as bags
-        FROM `tabCold Storage Dispatch` d
-        JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
-        JOIN `tabCold Storage Receipt` r ON r.name = d.linked_receipt
-        {conditions}
-    """, as_dict=True)
+    # Fetch Dispatch Items with parent data
+    dispatch_filters = {"docstatus": 1}
+    if filters.get("from_date"): dispatch_filters["dispatch_date"] = [">=", filters.get("from_date")]
+    if filters.get("to_date"): dispatch_filters["dispatch_date"] = ["<=", filters.get("to_date")]
+    
+    dispatches = frappe.get_all("Cold Storage Dispatch", 
+        filters=dispatch_filters, 
+        fields=["name", "dispatch_date"],
+        ignore_permissions=True
+    )
+    dispatch_map = {d.get("name"): d.get("dispatch_date") for d in dispatches}
+    
+    if not dispatches:
+        return columns, [], None, None
+        
+    items = frappe.get_all("Cold Storage Dispatch Item",
+        filters={
+            "parent": ["in", list(dispatch_map.keys())],
+            "linked_receipt": ["is", "set"]
+        },
+        fields=["goods_item", "number_of_bags", "linked_receipt", "parent"],
+        ignore_permissions=True
+    )
+    
+    # Get Receipt dates
+    receipt_names = list(set(i.get("linked_receipt") for i in items))
+    receipts = frappe.get_all("Cold Storage Receipt",
+        filters={"name": ["in", receipt_names]},
+        fields=["name", "receipt_date"],
+        ignore_permissions=True
+    )
+    receipt_map = {r.get("name"): r.get("receipt_date") for r in receipts}
+    
+    # Prepare data for aggregation
+    raw_data = []
+    for i in items:
+        # Convert to frappe._dict to safely allow dot notation just in case, 
+        # but we will use .get() to be extra safe.
+        i = frappe._dict(i)
+        
+        disp_date = dispatch_map.get(i.get("parent"))
+        rec_date = receipt_map.get(i.get("linked_receipt"))
+        
+        if disp_date and rec_date:
+            duration = date_diff(disp_date, rec_date)
+            raw_data.append(frappe._dict({
+                "item": i.get("goods_item"),
+                "duration": duration,
+                "bags": i.get("number_of_bags")
+            }))
 
     # Aggregate by Item
     item_stats = {}
     for row in raw_data:
-        it = row.item
-        dur = row.duration or 0
-        bags = row.bags or 0
-        
-        if it not in item_stats:
-            item_stats[it] = {"item": it, "total_duration": 0, "total_bags": 0, "max_days": 0}
+        try:
+            # Use .get() exclusively to avoid dot notation AttributeError
+            it = row.get("item")
+            dur = flt(row.get("duration"))
+            bags = flt(row.get("bags"))
             
-        item_stats[it]["total_duration"] += (dur * bags)
-        item_stats[it]["total_bags"] += bags
-        if dur > item_stats[it]["max_days"]:
-            item_stats[it]["max_days"] = dur
+            if not it:
+                continue
+            
+            if it not in item_stats:
+                item_stats[it] = frappe._dict({
+                    "item": it, 
+                    "total_duration": 0.0, 
+                    "total_bags": 0.0, 
+                    "max_days": 0
+                })
+                
+            item_stats[it]["total_duration"] += (dur * bags)
+            item_stats[it]["total_bags"] += bags
+            if dur > item_stats[it]["max_days"]:
+                item_stats[it]["max_days"] = dur
+        except Exception as e:
+            frappe.log_error(f"Report Aggregation Error: {str(e)}", f"Row: {row}")
+            continue
 
     data = []
-    items = []
+    chart_items = []
     avg_durations = []
 
     for it in item_stats:
         stats = item_stats[it]
-        avg = round(stats["total_duration"] / stats["total_bags"], 1) if stats["total_bags"] > 0 else 0
+        t_bags = stats.get("total_bags") or 0
+        t_dur = stats.get("total_duration") or 0
+        
+        avg = round(t_dur / t_bags, 1) if t_bags > 0 else 0
         data.append({
             "item": it,
             "avg_days": avg,
-            "max_days": stats["max_days"],
-            "total_bags": stats["total_bags"]
+            "max_days": stats.get("max_days") or 0,
+            "total_bags": t_bags
         })
-        items.append(it)
+        chart_items.append(it)
         avg_durations.append(avg)
 
     # Chart
     chart = {
         "data": {
-            "labels": items,
+            "labels": chart_items,
             "datasets": [
                 {"name": "Avg Storage Days", "values": avg_durations}
             ]
