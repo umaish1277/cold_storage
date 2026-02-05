@@ -19,7 +19,9 @@
         "items",
         "section_break_billing",
         "total_amount",
-        "remarks"
+        "remarks",
+        "section_break_auth",
+        "customer_signature"
     ],
     "fields": [
         {
@@ -148,6 +150,16 @@
             "fieldname": "remarks",
             "fieldtype": "Small Text",
             "label": "Remarks"
+        },
+        {
+            "fieldname": "section_break_auth",
+            "fieldtype": "Section Break",
+            "label": "Authorization"
+        },
+        {
+            "fieldname": "customer_signature",
+            "fieldtype": "Signature",
+            "label": "Customer Signature"
         },
         {
             "fieldname": "workflow_state",
