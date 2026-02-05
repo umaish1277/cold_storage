@@ -59,6 +59,9 @@ class ColdStorageDispatch(Document):
 
 		# Validation: Check for Future Date
 		utils.validate_future_date(self.dispatch_date, "Dispatch Date")
+
+		# Ensure service infrastructure exists early
+		self.ensure_service_infrastructure()
              
 		for row in self.items:
 			if not row.linked_receipt:
@@ -125,6 +128,26 @@ class ColdStorageDispatch(Document):
 		from frappe.utils import money_in_words
 		company_currency = frappe.get_cached_value('Company',  self.company,  'default_currency')
 		self.in_words = money_in_words(self.grand_total, company_currency)
+
+	def ensure_service_infrastructure(self):
+		# Ensure Item Group "Services" exists
+		if not frappe.db.exists("Item Group", "Services"):
+			ig = frappe.new_doc("Item Group")
+			ig.name = "Services" # Force name
+			ig.item_group_name = "Services"
+			ig.parent_item_group = "All Item Groups"
+			ig.is_group = 0
+			ig.insert(ignore_permissions=True)
+			frappe.db.commit()
+
+		# Ensure service item exists
+		if not frappe.db.exists("Item", "Cold Storage Service"):
+			item = frappe.new_doc("Item")
+			item.item_code = "Cold Storage Service"
+			item.item_group = "Services"
+			item.is_stock_item = 0
+			item.insert(ignore_permissions=True)
+			frappe.db.commit()
 
 
 
@@ -219,13 +242,6 @@ class ColdStorageDispatch(Document):
 			duration = 1
 			description_suffix = f"for Season ({days} days)"
 
-		# Ensure service item exists
-		if not frappe.db.exists("Item", "Cold Storage Service"):
-			item = frappe.new_doc("Item")
-			item.item_code = "Cold Storage Service"
-			item.item_group = "Services"
-			item.is_stock_item = 0
-			item.save()
 
 		for row in self.items:
 			rate = row.rate or 0.0

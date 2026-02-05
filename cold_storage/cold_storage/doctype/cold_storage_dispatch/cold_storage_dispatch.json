@@ -21,7 +21,8 @@
         "total_amount",
         "remarks",
         "section_break_auth",
-        "customer_signature"
+        "customer_signature",
+        "amended_from"
     ],
     "fields": [
         {
@@ -168,6 +169,14 @@
             "options": "Workflow State",
             "read_only": 1,
             "hidden": 1
+        },
+        {
+            "fieldname": "amended_from",
+            "fieldtype": "Link",
+            "label": "Amended From",
+            "no_copy": 1,
+            "options": "Cold Storage Dispatch",
+            "read_only": 1
         }
     ],
     "index_web_pages_for_search": 1,
