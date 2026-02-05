@@ -261,7 +261,8 @@ fixtures = [
         "dt": "Custom Field",
         "filters": [["name", "in", [
             "Item-allow_zero_valuation_rate",
-            "Customer-cold_storage_tier"
+            "Customer-cold_storage_tier",
+            "Warehouse-total_capacity_bags"
         ]]]
     },
     {
