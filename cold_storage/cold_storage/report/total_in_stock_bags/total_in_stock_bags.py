@@ -23,7 +23,7 @@ def execute(filters=None):
         SELECT DISTINCT item_group FROM `tabCold Storage Dispatch Item` WHERE item_group IS NOT NULL
     """, as_dict=True)
     
-    distinct_item_groups = sorted([row.item_group for row in item_groups if row.item_group])
+    distinct_item_groups = sorted([row.get("item_group") for row in item_groups if row.get("item_group")])
     if not distinct_item_groups:
         distinct_item_groups = ["Unspecified"]
 
@@ -55,12 +55,12 @@ def execute(filters=None):
     balance = {bt: 0 for bt in distinct_item_groups}
     
     for row in opening_in:
-        bt = row.item_group
-        if bt in balance: balance[bt] += (row.qty or 0)
+        bt = row.get("item_group")
+        if bt in balance: balance[bt] += (row.get("qty") or 0)
         
     for row in opening_out:
-        bt = row.item_group
-        if bt in balance: balance[bt] -= (row.qty or 0)
+        bt = row.get("item_group")
+        if bt in balance: balance[bt] -= (row.get("qty") or 0)
 
 
     # 2. Get Daily Movements (from_date to to_date)
@@ -84,16 +84,16 @@ def execute(filters=None):
     movements = {} # date -> {item_group: net_change}
     
     for row in daily_in:
-        d = str(row.date)
+        d = str(row.get("date"))
         if d not in movements: movements[d] = {bt: 0 for bt in distinct_item_groups}
-        if row.item_group in movements[d]:
-            movements[d][row.item_group] += (row.qty or 0)
+        if row.get("item_group") in movements[d]:
+            movements[d][row.get("item_group")] += (row.get("qty") or 0)
             
     for row in daily_out:
-        d = str(row.date)
+        d = str(row.get("date"))
         if d not in movements: movements[d] = {bt: 0 for bt in distinct_item_groups}
-        if row.item_group in movements[d]:
-            movements[d][row.item_group] -= (row.qty or 0)
+        if row.get("item_group") in movements[d]:
+            movements[d][row.get("item_group")] -= (row.get("qty") or 0)
 
     # 3. Generate Timeseries Data
     data = []

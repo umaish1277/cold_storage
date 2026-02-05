@@ -1,7 +1,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import date_diff
+from frappe.utils import date_diff, flt
 
 def execute(filters=None):
     if not filters: filters = {}
@@ -50,30 +50,41 @@ def execute(filters=None):
     # Prepare data for aggregation
     raw_data = []
     for i in items:
-        disp_date = dispatch_map.get(i.get("parent"))
-        rec_date = receipt_map.get(i.get("linked_receipt"))
+        # Convert to frappe._dict to safely allow dot notation if needed
+        i = frappe._dict(i)
+        
+        disp_date = dispatch_map.get(i.parent)
+        rec_date = receipt_map.get(i.linked_receipt)
+        
         if disp_date and rec_date:
             duration = date_diff(disp_date, rec_date)
-            raw_data.append({
-                "item": i.get("goods_item"),
+            raw_data.append(frappe._dict({
+                "item": i.goods_item,
                 "duration": duration,
-                "bags": i.get("number_of_bags")
-            })
+                "bags": i.number_of_bags
+            }))
 
     # Aggregate by Item
     item_stats = {}
     for row in raw_data:
-        it = row.get("item")
-        dur = row.get("duration") or 0
-        bags = row.get("bags") or 0
-        
-        if it not in item_stats:
-            item_stats[it] = {"item": it, "total_duration": 0, "total_bags": 0, "max_days": 0}
+        # row is a frappe._dict, so row.item or row.get("item") should both work
+        try:
+            it = row.item or row.get("item")
+            dur = flt(row.duration)
+            bags = flt(row.bags)
             
-        item_stats[it]["total_duration"] += (dur * bags)
-        item_stats[it]["total_bags"] += bags
-        if dur > item_stats[it]["max_days"]:
-            item_stats[it]["max_days"] = dur
+            if not it: continue
+            
+            if it not in item_stats:
+                item_stats[it] = frappe._dict({"item": it, "total_duration": 0, "total_bags": 0, "max_days": 0})
+                
+            item_stats[it]["total_duration"] += (dur * bags)
+            item_stats[it]["total_bags"] += bags
+            if dur > item_stats[it]["max_days"]:
+                item_stats[it]["max_days"] = dur
+        except Exception as e:
+            frappe.log_error(f"Report Error: {str(e)}", f"Row data: {row}")
+            continue
 
     data = []
     chart_items = []

@@ -39,8 +39,8 @@ def get_data(filters):
 		GROUP BY MONTH(d.dispatch_date)
 	""", as_dict=1)
 
-	intake_map = {d.month: flt(d.avg_bags) for d in intake_data}
-	outtake_map = {d.month: flt(d.avg_bags) for d in outtake_data}
+	intake_map = {d.get("month"): flt(d.get("avg_bags")) for d in intake_data}
+	outtake_map = {d.get("month"): flt(d.get("avg_bags")) for d in outtake_data}
 
 	# 2. Identify Active Seasons
 	active_seasons = frappe.get_all("Cold Storage Season", 

@@ -80,6 +80,9 @@ def send_late_payment_reminders():
 
 	sent_count = 0
 	for inv in overdue_invoices:
+		# Use safe access for frappe.get_all results
+		inv = frappe._dict(inv)
+		
 		# Get customer's mobile number
 		mobile_no = frappe.db.get_value("Customer", inv.customer, "mobile_no")
 		if not mobile_no:
