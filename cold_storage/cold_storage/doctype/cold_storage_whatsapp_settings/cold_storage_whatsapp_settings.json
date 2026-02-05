@@ -8,7 +8,10 @@
         "provider",
         "account_sid",
         "auth_token",
-        "sender_number"
+        "sender_number",
+        "section_break_daily_summary",
+        "daily_summary_enabled",
+        "summary_recipients"
     ],
     "fields": [
         {
@@ -38,6 +41,24 @@
             "fieldname": "sender_number",
             "fieldtype": "Data",
             "label": "Sender Number (e.g. +14155238886)"
+        },
+        {
+            "fieldname": "section_break_daily_summary",
+            "fieldtype": "Section Break",
+            "label": "Daily Summary Notifications"
+        },
+        {
+            "default": "0",
+            "fieldname": "daily_summary_enabled",
+            "fieldtype": "Check",
+            "label": "Enable Daily Summary"
+        },
+        {
+            "depends_on": "eval:doc.daily_summary_enabled",
+            "fieldname": "summary_recipients",
+            "fieldtype": "Small Text",
+            "label": "Summary Recipients (Phone numbers, one per line)",
+            "description": "Include country code, e.g., +923001234567"
         }
     ],
     "issingle": 1,

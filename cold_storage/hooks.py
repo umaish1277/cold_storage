@@ -145,23 +145,11 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"cold_storage.tasks.all"
-# 	],
-# 	"daily": [
-# 		"cold_storage.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"cold_storage.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"cold_storage.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"cold_storage.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"daily": [
+		"cold_storage.cold_storage.tasks.send_daily_summary"
+	],
+}
 
 # Testing
 # -------
