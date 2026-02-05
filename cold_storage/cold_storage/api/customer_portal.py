@@ -233,7 +233,7 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
             "total_received": "Total Received",
             "total_dispatched": "Total Dispatched",
             "current_balance": "Current Balance",
-            "stock_trends": "Stock Trends (Last 6 Months)",
+            "stock_trends": "Stock Trends (by Item Group)",
             "stock_by_batch_no": "Stock by Batch No",
             "inward": "Inward",
             "outward": "Outward",
@@ -263,7 +263,7 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
             "total_received": "کل موصول",
             "total_dispatched": "کل روانہ",
             "current_balance": "موجودہ بیلنس",
-            "stock_trends": "اسٹاک رجحانات (آخری 6 ماہ)",
+            "stock_trends": "آئٹم گروپ کے مطابق اسٹاک کے رجحانات",
             "stock_by_batch_no": "بیچ نمبر کے لحاظ سے اسٹاک",
             "inward": "اندر آنے والا",
             "outward": "باہر جانے والا",
@@ -281,7 +281,7 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
             "no_data": "کوئی ڈیٹا دستیاب نہیں",
             "no_trend_data": "کوئی رجحان ڈیٹا دستیاب نہیں",
             "footer1": "یہ کمپیوٹر سے تیار کردہ اسٹیٹمنٹ ہے۔ دستخط کی ضرورت نہیں۔",
-            "footer2": "کولڈ اسٹوریج مینجمنٹ سسٹم اور عمیش سلوشنز کی طرف سے تیار",
+            "footer2": "کولڈ اسٹوریج مینجمنٹ سسٹم جو کہ عمیش سلوشنز کی طرف سے تیار کردہ",
             "direction": "rtl"
         }
     }
@@ -315,7 +315,7 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
 
 
 def get_trend_chart_data(customer):
-    """Get last 6 months trend data for charts in a single query"""
+    """Get stock trend data grouped by Item Group"""
     from frappe.utils import flt
     
     combined_data = frappe.db.sql("""
@@ -324,23 +324,24 @@ def get_trend_chart_data(customer):
             SUM(qty_in) as inward, 
             SUM(qty_out) as outward
         FROM (
-            SELECT DATE_FORMAT(receipt_date, '%%b %%y') as label, SUM(ri.number_of_bags) as qty_in, 0 as qty_out, receipt_date as sort_date
+            SELECT ri.item_group as label, SUM(ri.number_of_bags) as qty_in, 0 as qty_out
             FROM `tabCold Storage Receipt` r
             JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
             WHERE r.customer = %s AND r.docstatus = 1
-            GROUP BY label
+            GROUP BY ri.item_group
             
             UNION ALL
             
-            SELECT DATE_FORMAT(dispatch_date, '%%b %%y') as label, 0 as qty_in, SUM(di.number_of_bags) as qty_out, dispatch_date as sort_date
+            SELECT di.item_group as label, 0 as qty_in, SUM(di.number_of_bags) as qty_out
             FROM `tabCold Storage Dispatch` d
             JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
             WHERE d.customer = %s AND d.docstatus = 1
-            GROUP BY label
+            GROUP BY di.item_group
         ) AS t
         GROUP BY label
-        ORDER BY MAX(sort_date) ASC
-        LIMIT 6
+        HAVING inward > 0 OR outward > 0
+        ORDER BY (inward + outward) DESC
+        LIMIT 8
     """, (customer, customer), as_dict=True)
     
     if not combined_data:

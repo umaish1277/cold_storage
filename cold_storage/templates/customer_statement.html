@@ -153,6 +153,8 @@
             text-align: center;
         }
 
+
+
         .badge {
             display: inline-block;
             padding: 3px 8px;
@@ -218,54 +220,60 @@
     <div style="margin-bottom: 30px;">
         <h3>📊 {{ t.stock_trends }}</h3>
         <div
-            style="display: table; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            style="display: table; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px 5px; margin-bottom: 25px; table-layout: fixed; overflow: hidden;">
             {% if trend_chart and trend_chart|length > 0 %}
             <div style="display: table-row;">
                 {% for item in trend_chart %}
                 <div
-                    style="display: table-cell; text-align: center; vertical-align: bottom; padding: 0 8px; width: {{ 100 / (trend_chart|length or 1) }}%;">
-                    <div style="display: inline-block; width: 14px; margin-right: 2px;">
-                        <div
-                            style="height: {{ item.in_pct or 2 }}px; width: 100%; background: #2ecc71; min-height: 2px;">
+                    style="display: table-cell; text-align: center; vertical-align: bottom; padding: 0 4px; border-right: 1px solid #f1f5f9;">
+                    <div style="display: block; margin: 0 auto; width: 95%; font-size: 0;">
+                        <div style="display: inline-block; width: 18px; margin-right: 4px; vertical-align: bottom;">
+                            <div
+                                style="height: {{ (item.in_pct * 2.5) | int or 5 }}px; width: 100%; background: #2ecc71; min-height: 4px; border-radius: 2px 2px 0 0;">
+                            </div>
+                        </div>
+                        <div style="display: inline-block; width: 18px; vertical-align: bottom;">
+                            <div
+                                style="height: {{ (item.out_pct * 2.5) | int or 5 }}px; width: 100%; background: #e74c3c; min-height: 4px; border-radius: 2px 2px 0 0;">
+                            </div>
                         </div>
                     </div>
-                    <div style="display: inline-block; width: 14px;">
-                        <div
-                            style="height: {{ item.out_pct or 2 }}px; width: 100%; background: #e74c3c; min-height: 2px;">
-                        </div>
-                    </div>
-                    <div style="font-size: 8px; color: #64748b; margin-top: 5px; white-space: nowrap;">{{ item.label }}
-                    </div>
+                    <div
+                        style="font-size: 20px; color: #1e293b; margin-top: 10px; font-weight: 700; line-height: 1.1; overflow-wrap: break-word;">
+                        {{ item.label }}</div>
+                    <div style="font-size: 14px; color: #10b981; font-weight: 600; margin-top: 4px;">↑{{ item.in_value
+                        }}</div>
+                    <div style="font-size: 14px; color: #ef4444; font-weight: 600;">↓{{ item.out_value }}</div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <div style="text-align: center; padding: 20px; color: #7f8c8d;">{{ t.no_trend_data }}</div>
+            <div style="text-align: center; padding: 20px; color: #94a3b8;">{{ t.no_trend_data }}</div>
             {% endif %}
-            <div style="margin-top: 10px; font-size: 10px;">
-                <span style="color: #2ecc71;">● {{ t.inward }}</span> &nbsp;
+            <div
+                style="margin-top: 20px; font-size: 25px; font-weight: 700; padding: 10px 15px; border-top: 1px solid #f1f5f9; text-align: center;">
+                <span style="color: #2ecc71;">● {{ t.inward }}</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span style="color: #e74c3c;">● {{ t.outward }}</span>
             </div>
         </div>
 
         <h3>📦 {{ t.stock_by_batch_no }}</h3>
         <div
-            style="display: table; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            style="display: table; width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px 5px; margin-bottom: 25px; table-layout: fixed; overflow: hidden;">
             {% if bag_chart and bag_chart|length > 0 %}
             <div style="display: table-row;">
                 {% for item in bag_chart %}
-                <div
-                    style="display: table-cell; text-align: center; vertical-align: bottom; padding: 0 8px; width: {{ 100 / bag_chart|length }}%;">
-                    <div style="font-size: 8px; color: {{ item.color }}; font-weight: bold; margin-bottom: 5px;">
+                <div style="display: table-cell; text-align: center; vertical-align: bottom; padding: 0 5px;">
+                    <div style="font-size: 20px; color: {{ item.color }}; font-weight: 800; margin-bottom: 10px;">
                         {{ item.value }}
                     </div>
-                    <div style="display: inline-block; width: 30px;">
+                    <div style="display: inline-block; width: 38px;">
                         <div
-                            style="height: {{ (item.pct * 1.5) | int }}px; width: 100%; background: {{ item.color }}; border-radius: 3px 3px 0 0; min-height: 2px;">
+                            style="height: {{ (item.pct * 3) | int }}px; width: 100%; background: {{ item.color }}; border-radius: 4px 4px 0 0; min-height: 4px;">
                         </div>
                     </div>
                     <div
-                        style="font-size: 9px; color: #7f8c8d; margin-top: 5px; word-break: break-all; line-height: 1;">
+                        style="font-size: 23px; color: #1e293b; margin-top: 10px; font-weight: 700; overflow-wrap: break-word; line-height: 1.2;">
                         {{ item.label }}
                     </div>
                 </div>
@@ -336,6 +344,7 @@
     <div class="footer">
         <p>{{ t.footer1 }}</p>
         <p>{{ t.footer2 }}</p>
+
     </div>
 </body>
 
