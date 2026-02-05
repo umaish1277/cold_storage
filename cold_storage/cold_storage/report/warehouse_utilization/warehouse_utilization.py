@@ -55,7 +55,7 @@ def get_data(filters):
             SELECT IFNULL(SUM(di.number_of_bags), 0)
             FROM `tabCold Storage Dispatch` d 
             JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name 
-            WHERE d.docstatus = 1 AND d.warehouse = %s
+            WHERE d.docstatus = 1 AND di.warehouse = %s
             AND (di.item_group = 'Jute Bag' OR di.item_group IS NULL OR di.item_group = '')
         """, (w.name,))[0][0] or 0
         
@@ -73,7 +73,7 @@ def get_data(filters):
             SELECT IFNULL(SUM(di.number_of_bags), 0)
             FROM `tabCold Storage Dispatch` d 
             JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name 
-            WHERE d.docstatus = 1 AND d.warehouse = %s
+            WHERE d.docstatus = 1 AND di.warehouse = %s
             AND di.item_group = 'Net Bag'
         """, (w.name,))[0][0] or 0
         

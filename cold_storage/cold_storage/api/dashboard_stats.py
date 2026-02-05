@@ -33,7 +33,7 @@ def get_warehouse_utilization(chart_name=None):
                 (SELECT IFNULL(SUM(di.number_of_bags), 0) 
                  FROM `tabCold Storage Dispatch` d 
                  JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name 
-                 WHERE d.docstatus = 1 AND d.warehouse = %s)
+                 WHERE d.docstatus = 1 AND di.warehouse = %s)
         """, (w.name, w.name))[0][0] or 0
 
         
