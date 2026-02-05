@@ -14,23 +14,51 @@ def execute(filters=None):
     ]
 
     # Conditions
-    conditions = "WHERE d.docstatus = 1 AND di.linked_receipt IS NOT NULL"
-    if filters.get("from_date"): conditions += f" AND d.dispatch_date >= '{filters.get('from_date')}'"
-    if filters.get("to_date"): conditions += f" AND d.dispatch_date <= '{filters.get('to_date')}'"
-
-    # Query to get durations
-    # We join dispatch items with receipt items to be precise, or just use parent dates
-    # Let's use parent dates for simplicity as long as dispatch is linked to receipt
-    raw_data = frappe.db.sql(f"""
-        SELECT 
-            di.goods_item as item,
-            DATEDIFF(d.dispatch_date, r.receipt_date) as duration,
-            di.number_of_bags as bags
-        FROM `tabCold Storage Dispatch` d
-        JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
-        JOIN `tabCold Storage Receipt` r ON r.name = di.linked_receipt
-        {conditions}
-    """, as_dict=True)
+    # Fetch Dispatch Items with parent data
+    dispatch_filters = {"docstatus": 1}
+    if filters.get("from_date"): dispatch_filters["dispatch_date"] = [">=", filters.get("from_date")]
+    if filters.get("to_date"): dispatch_filters["dispatch_date"] = ["<=", filters.get("to_date")]
+    
+    dispatches = frappe.get_all("Cold Storage Dispatch", 
+        filters=dispatch_filters, 
+        fields=["name", "dispatch_date"],
+        ignore_permissions=True
+    )
+    dispatch_map = {d.name: d.dispatch_date for d in dispatches}
+    
+    if not dispatches:
+        return columns, [], None, None
+        
+    items = frappe.get_all("Cold Storage Dispatch Item",
+        filters={
+            "parent": ["in", list(dispatch_map.keys())],
+            "linked_receipt": ["is", "set"]
+        },
+        fields=["goods_item", "number_of_bags", "linked_receipt", "parent"],
+        ignore_permissions=True
+    )
+    
+    # Get Receipt dates
+    receipt_names = list(set(i.linked_receipt for i in items))
+    receipts = frappe.get_all("Cold Storage Receipt",
+        filters={"name": ["in", receipt_names]},
+        fields=["name", "receipt_date"],
+        ignore_permissions=True
+    )
+    receipt_map = {r.name: r.receipt_date for r in receipts}
+    
+    # Prepare data for aggregation
+    raw_data = []
+    for i in items:
+        disp_date = dispatch_map.get(i.parent)
+        rec_date = receipt_map.get(i.linked_receipt)
+        if disp_date and rec_date:
+            duration = date_diff(disp_date, rec_date)
+            raw_data.append({
+                "item": i.goods_item,
+                "duration": duration,
+                "bags": i.number_of_bags
+            })
 
     # Aggregate by Item
     item_stats = {}
