@@ -63,9 +63,9 @@ def execute(filters=None):
     # Aggregate by Item
     item_stats = {}
     for row in raw_data:
-        it = row.item
-        dur = row.duration or 0
-        bags = row.bags or 0
+        it = row.get("item")
+        dur = row.get("duration") or 0
+        bags = row.get("bags") or 0
         
         if it not in item_stats:
             item_stats[it] = {"item": it, "total_duration": 0, "total_bags": 0, "max_days": 0}
