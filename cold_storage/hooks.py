@@ -147,7 +147,8 @@ doc_events = {
 
 scheduler_events = {
 	"daily": [
-		"cold_storage.cold_storage.tasks.send_daily_summary"
+		"cold_storage.cold_storage.tasks.send_daily_summary",
+		"cold_storage.cold_storage.tasks.send_late_payment_reminders"
 	],
 }
 

@@ -54,3 +54,46 @@ def send_daily_summary():
 		utils.send_whatsapp(number, message)
 
 	return "Summary sent to " + ", ".join(recipients)
+
+def send_late_payment_reminders():
+	"""
+	Scheduled task to send WhatsApp reminders for overdue Sales Invoices.
+	"""
+	settings = frappe.get_single("Cold Storage WhatsApp Settings")
+	if not settings.enabled or not settings.late_payment_reminders_enabled:
+		return
+
+	if not settings.late_payment_message_template:
+		return
+
+	today = nowdate()
+	
+	# Fetch overdue invoices: Submitted, Outstanding > 0, Due Date < Today
+	overdue_invoices = frappe.get_all("Sales Invoice",
+		filters={
+			"docstatus": 1,
+			"outstanding_amount": [">", 0],
+			"due_date": ["<", today]
+		},
+		fields=["name", "customer", "due_date", "outstanding_amount"]
+	)
+
+	sent_count = 0
+	for inv in overdue_invoices:
+		# Get customer's mobile number
+		mobile_no = frappe.db.get_value("Customer", inv.customer, "mobile_no")
+		if not mobile_no:
+			continue
+
+		# Prepare message
+		message = settings.late_payment_message_template.format(
+			customer_name=inv.customer,
+			invoice_number=inv.name,
+			due_date=format_date(inv.due_date),
+			outstanding_amount=inv.outstanding_amount
+		)
+
+		utils.send_whatsapp(mobile_no, message)
+		sent_count += 1
+
+	return f"Sent {sent_count} reminders"

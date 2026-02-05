@@ -11,7 +11,10 @@
         "sender_number",
         "section_break_daily_summary",
         "daily_summary_enabled",
-        "summary_recipients"
+        "summary_recipients",
+        "section_break_reminders",
+        "late_payment_reminders_enabled",
+        "late_payment_message_template"
     ],
     "fields": [
         {
@@ -59,6 +62,23 @@
             "fieldtype": "Small Text",
             "label": "Summary Recipients (Phone numbers, one per line)",
             "description": "Include country code, e.g., +923001234567"
+        },
+        {
+            "fieldname": "section_break_reminders",
+            "fieldtype": "Section Break",
+            "label": "Overdue Payment Reminders"
+        },
+        {
+            "fieldname": "late_payment_reminders_enabled",
+            "fieldtype": "Check",
+            "label": "Enable Late Payment Reminders"
+        },
+        {
+            "fieldname": "late_payment_message_template",
+            "fieldtype": "Small Text",
+            "label": "Late Payment Message Template",
+            "description": "Available variables: {customer_name}, {invoice_number}, {due_date}, {outstanding_amount}",
+            "default": "Dear {customer_name}, your payment for invoice {invoice_number} was due on {due_date}. Outstanding amount: {outstanding_amount}. Please clear your dues at the earliest."
         }
     ],
     "issingle": 1,
