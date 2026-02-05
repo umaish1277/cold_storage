@@ -24,7 +24,7 @@ def execute(filters=None):
         fields=["name", "dispatch_date"],
         ignore_permissions=True
     )
-    dispatch_map = {d.name: d.dispatch_date for d in dispatches}
+    dispatch_map = {d.get("name"): d.get("dispatch_date") for d in dispatches}
     
     if not dispatches:
         return columns, [], None, None
@@ -39,25 +39,25 @@ def execute(filters=None):
     )
     
     # Get Receipt dates
-    receipt_names = list(set(i.linked_receipt for i in items))
+    receipt_names = list(set(i.get("linked_receipt") for i in items))
     receipts = frappe.get_all("Cold Storage Receipt",
         filters={"name": ["in", receipt_names]},
         fields=["name", "receipt_date"],
         ignore_permissions=True
     )
-    receipt_map = {r.name: r.receipt_date for r in receipts}
+    receipt_map = {r.get("name"): r.get("receipt_date") for r in receipts}
     
     # Prepare data for aggregation
     raw_data = []
     for i in items:
-        disp_date = dispatch_map.get(i.parent)
-        rec_date = receipt_map.get(i.linked_receipt)
+        disp_date = dispatch_map.get(i.get("parent"))
+        rec_date = receipt_map.get(i.get("linked_receipt"))
         if disp_date and rec_date:
             duration = date_diff(disp_date, rec_date)
             raw_data.append({
-                "item": i.goods_item,
+                "item": i.get("goods_item"),
                 "duration": duration,
-                "bags": i.number_of_bags
+                "bags": i.get("number_of_bags")
             })
 
     # Aggregate by Item
@@ -76,7 +76,7 @@ def execute(filters=None):
             item_stats[it]["max_days"] = dur
 
     data = []
-    items = []
+    chart_items = []
     avg_durations = []
 
     for it in item_stats:
@@ -88,13 +88,13 @@ def execute(filters=None):
             "max_days": stats["max_days"],
             "total_bags": stats["total_bags"]
         })
-        items.append(it)
+        chart_items.append(it)
         avg_durations.append(avg)
 
     # Chart
     chart = {
         "data": {
-            "labels": items,
+            "labels": chart_items,
             "datasets": [
                 {"name": "Avg Storage Days", "values": avg_durations}
             ]
