@@ -285,6 +285,83 @@
         </div>
     </div>
 
+
+    <!-- Financial Section -->
+    <div style="margin-bottom: 30px;">
+        <h3>💰 {{ t.financial_summary }}</h3>
+
+        <div class="summary-grid" style="margin-bottom: 20px;">
+            <div class="summary-card red" style="width: 100%; display: block; border-radius: 8px;">
+                <div class="label">{{ t.total_outstanding }}</div>
+                <div class="value">{{ "{:,.2f}".format(financial.total_outstanding) }}</div>
+            </div>
+        </div>
+
+        <div style="display: table; width: 100%; border-spacing: 15px 0; margin-left: -15px; margin-right: -15px;">
+            <div style="display: table-cell; width: 50%; vertical-align: top;">
+                <h4>📄 {{ t.recent_invoices }}</h4>
+                <table style="margin-top: 5px; font-size: 10px;">
+                    <thead>
+                        <tr>
+                            <th>{{ t.date }}</th>
+                            <th>{{ t.amount }}</th>
+                            <th>{{ t.outstanding }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv in financial.recent_invoices %}
+                        <tr>
+                            <td>{{ inv.posting_date.strftime("%d:%m:%Y") if inv.posting_date and
+                                inv.posting_date.strftime else inv.posting_date }}</td>
+                            <td class="text-right">{{ "{:,.0f}".format(inv.grand_total) }}</td>
+                            <td class="text-right">
+                                {% if inv.outstanding_amount > 0 %}
+                                <span style="color: #e74c3c; font-weight: bold;">{{
+                                    "{:,.0f}".format(inv.outstanding_amount) }}</span>
+                                {% else %}
+                                <span style="color: #27ae60;">0</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not financial.recent_invoices %}
+                        <tr>
+                            <td colspan="3" class="text-center">{{ t.no_data }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: table-cell; width: 50%; vertical-align: top;">
+                <h4>💸 {{ t.recent_payments }}</h4>
+                <table style="margin-top: 5px; font-size: 10px;">
+                    <thead>
+                        <tr>
+                            <th>{{ t.date }}</th>
+                            <th class="text-right">{{ t.amount }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pay in financial.recent_payments %}
+                        <tr>
+                            <td>{{ pay.posting_date.strftime("%d:%m:%Y") if pay.posting_date and
+                                pay.posting_date.strftime else pay.posting_date }}</td>
+                            <td class="text-right" style="color: #27ae60; font-weight: bold;">{{
+                                "{:,.0f}".format(pay.amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not financial.recent_payments %}
+                        <tr>
+                            <td colspan="2" class="text-center">{{ t.no_data }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <h3>📋 {{ t.detailed_register }}</h3>
 
     <table>
