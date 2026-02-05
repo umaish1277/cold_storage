@@ -14,8 +14,10 @@ def get_customer_statement(customer=None, from_date=None, to_date=None, format="
     if lang:
         frappe.local.lang = lang
     
-    # Force reload of utils within the call to bypass caching
-    from frappe.utils import today, add_days
+    # Force clear cache for this request to ensure fresh code/data
+    frappe.clear_cache()
+    
+    frappe.logger().debug(f"Generating statement for {customer} (format: {format}, lang: {lang})")
 
     # Validate customer access
     if not customer:
@@ -28,6 +30,7 @@ def get_customer_statement(customer=None, from_date=None, to_date=None, format="
     if not can_access_customer(customer):
         frappe.throw(_("You do not have access to this customer's data"))
     
+    from frappe.utils import today, add_days
     # Default date range: last 1 year
     if not from_date:
         from_date = add_days(today(), -365)
@@ -90,10 +93,11 @@ def can_access_customer(customer):
 
 
 def get_statement_data(customer, from_date, to_date):
-    """Get detailed stock statement for a customer"""
+    """Get detailed stock statement for a customer using optimized JOINs"""
     from frappe.utils import flt, getdate, today
     
-    # Get all receipt items with dispatched quantities
+    # Get all receipt items with dispatched quantities in one go
+    # Using more robust SELECT to avoid SQL mode issues
     data = frappe.db.sql("""
         SELECT 
             r.name as receipt,
@@ -103,14 +107,12 @@ def get_statement_data(customer, from_date, to_date):
             ri.item_group,
             ri.batch_no,
             ri.number_of_bags as received_qty,
-            COALESCE((
-                SELECT SUM(di.number_of_bags)
-                FROM `tabCold Storage Dispatch` d
-                JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
-                WHERE d.docstatus = 1 
-                AND di.linked_receipt = r.name 
-                AND di.batch_no = ri.batch_no
-            ), 0) as dispatched_qty
+            (SELECT COALESCE(SUM(di.number_of_bags), 0) 
+             FROM `tabCold Storage Dispatch Item` di 
+             JOIN `tabCold Storage Dispatch` d ON d.name = di.parent
+             WHERE di.linked_receipt = r.name 
+             AND di.batch_no = ri.batch_no
+             AND d.docstatus = 1) as dispatched_qty
         FROM `tabCold Storage Receipt` r
         JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
         WHERE r.customer = %s 
@@ -120,14 +122,17 @@ def get_statement_data(customer, from_date, to_date):
     """, (customer, from_date, to_date), as_dict=True)
     
     # Calculate balances and days in store
+    total_received = 0
+    total_dispatched = 0
+    today_date = getdate(today())
+    
+    results = []
     for row in data:
         row["balance_qty"] = flt(row["received_qty"]) - flt(row["dispatched_qty"])
-        row["days_in_store"] = (getdate(today()) - getdate(row["receipt_date"])).days
-    
-    # Summary stats
-    total_received = sum(flt(r.get("received_qty", 0)) for r in data)
-    total_dispatched = sum(flt(r.get("dispatched_qty", 0)) for r in data)
-    total_balance = sum(flt(r.get("balance_qty", 0)) for r in data)
+        row["days_in_store"] = (today_date - getdate(row["receipt_date"])).days
+        total_received += flt(row["received_qty"])
+        total_dispatched += flt(row["dispatched_qty"])
+        results.append(row)
     
     return {
         "customer": customer,
@@ -137,43 +142,58 @@ def get_statement_data(customer, from_date, to_date):
         "summary": {
             "total_received": total_received,
             "total_dispatched": total_dispatched,
-            "total_balance": total_balance
+            "total_balance": total_received - total_dispatched
         },
-        "line_items": data
+        "line_items": results
     }
 
 
 def generate_excel(data, customer, from_date, to_date):
-    """Generate Excel file for statement"""
+    """Generate Excel file for statement. Uses 'line_items' key."""
     from frappe.utils.xlsxutils import build_xlsx_response
     from frappe.utils import today
     from frappe import _
     
+    if not data:
+        data = {}
+
     # Prepare data for Excel
     rows = []
     
     # Header row
     rows.append([_("Customer Stock Statement")])
     rows.append([f"{_('Customer')}: {customer}"])
-    p_from = from_date.strftime('%d:%m:%Y') if hasattr(from_date, 'strftime') else from_date
-    p_to = to_date.strftime('%d:%m:%Y') if hasattr(to_date, 'strftime') else to_date
+    
+    p_from = from_date
+    if hasattr(from_date, "strftime"):
+        p_from = from_date.strftime('%d:%m:%Y')
+    
+    p_to = to_date
+    if hasattr(to_date, "strftime"):
+        p_to = to_date.strftime('%d:%m:%Y')
+
     rows.append([f"{_('Period')}: {p_from} {_('to')} {p_to}"])
     rows.append([f"{_('Generated')}: {today()}"])
     rows.append([])  # Empty row
     
     # Summary
+    summary = data.get("summary", {})
     rows.append([_("Summary")])
-    rows.append([_("Total Received"), data["summary"]["total_received"]])
-    rows.append([_("Total Dispatched"), data["summary"]["total_dispatched"]])
-    rows.append([_("Current Balance"), data["summary"]["total_balance"]])
+    rows.append([_("Total Received"), summary.get("total_received", 0)])
+    rows.append([_("Total Dispatched"), summary.get("total_dispatched", 0)])
+    rows.append([_("Current Balance"), summary.get("total_balance", 0)])
     rows.append([])  # Empty row
     
     # Detail header
-                 "Received", "Dispatched", "Balance", "Days in Store"])
+    rows.append([_("Receipt"), _("Date"), _("Warehouse"), _("Item"), _("Item Group"), _("Batch"), 
+                 _("Received"), _("Dispatched"), _("Balance"), _("Days in Store")])
     
-    for item in data.get("line_items", []):
+    items = data.get("line_items") or data.get("items") or []
+    for item in items:
         receipt_date = item.get("receipt_date")
-        formatted_date = receipt_date.strftime("%d:%m:%Y") if receipt_date and hasattr(receipt_date, "strftime") else str(receipt_date)
+        formatted_date = str(receipt_date)
+        if receipt_date and hasattr(receipt_date, "strftime"):
+             formatted_date = receipt_date.strftime("%d:%m:%Y")
         
         rows.append([
             item.get("receipt"),
@@ -191,12 +211,11 @@ def generate_excel(data, customer, from_date, to_date):
     # Add Total row at the bottom
     rows.append([])
     rows.append([_("TOTAL"), "", "", "", "", "", 
-                 data["summary"]["total_received"], 
-                 data["summary"]["total_dispatched"], 
-                 data["summary"]["total_balance"], ""])
+                 summary.get("total_received", 0), 
+                 summary.get("total_dispatched", 0), 
+                 summary.get("total_balance", 0), ""])
     
-    # Use standard build_xlsx_response which handles both creation and response setup
-    filename = f"{_('Stock_Statement')}_{customer}_{today()}"
+    filename = f"Stock_Statement_{customer}_{today()}"
     build_xlsx_response(rows, filename)
 
 
@@ -204,7 +223,6 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
     """Generate PDF statement using Frappe's PDF generator"""
     from frappe.utils import today
     
-    # Translations
     translations = {
         "en": {
             "title": "Stock Statement",
@@ -233,7 +251,7 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
             "no_data": "No data available",
             "no_trend_data": "No trend data available",
             "footer1": "This is a computer-generated statement. No signature required.",
-            "footer2": "Generated by Cold Storage Management System By Umaish Solutions",
+            "footer2": "Generated by Cold Storage Management System Powered By Umaish Solutions",
             "direction": "ltr"
         },
         "ur": {
@@ -270,7 +288,6 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
     
     t = translations.get(lang, translations["en"])
     
-    # Generate chart data for PDF
     trend_chart = get_trend_chart_data(customer)
     bag_chart = get_bag_chart_data(customer)
     
@@ -298,99 +315,91 @@ def generate_pdf(data, customer, from_date, to_date, lang="en"):
 
 
 def get_trend_chart_data(customer):
-    """Get last 6 months trend data for charts"""
+    """Get last 6 months trend data for charts in a single query"""
     from frappe.utils import flt
     
-    incoming_data = frappe.db.sql("""
-        SELECT DATE_FORMAT(receipt_date, '%%b %%y'), SUM(ri.number_of_bags)
-        FROM `tabCold Storage Receipt` r
-        JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
-        WHERE r.customer = %s AND r.docstatus = 1
-        GROUP BY DATE_FORMAT(receipt_date, '%%Y-%%m')
-        ORDER BY receipt_date ASC
+    combined_data = frappe.db.sql("""
+        SELECT 
+            label, 
+            SUM(qty_in) as inward, 
+            SUM(qty_out) as outward
+        FROM (
+            SELECT DATE_FORMAT(receipt_date, '%%b %%y') as label, SUM(ri.number_of_bags) as qty_in, 0 as qty_out, receipt_date as sort_date
+            FROM `tabCold Storage Receipt` r
+            JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
+            WHERE r.customer = %s AND r.docstatus = 1
+            GROUP BY label
+            
+            UNION ALL
+            
+            SELECT DATE_FORMAT(dispatch_date, '%%b %%y') as label, 0 as qty_in, SUM(di.number_of_bags) as qty_out, dispatch_date as sort_date
+            FROM `tabCold Storage Dispatch` d
+            JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
+            WHERE d.customer = %s AND d.docstatus = 1
+            GROUP BY label
+        ) AS t
+        GROUP BY label
+        ORDER BY MAX(sort_date) ASC
         LIMIT 6
-    """, (customer,))
+    """, (customer, customer), as_dict=True)
     
-    outgoing_data = frappe.db.sql("""
-        SELECT DATE_FORMAT(dispatch_date, '%%b %%y'), SUM(di.number_of_bags)
-        FROM `tabCold Storage Dispatch` d
-        JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
-        WHERE d.customer = %s AND d.docstatus = 1
-        GROUP BY DATE_FORMAT(dispatch_date, '%%Y-%%m')
-        ORDER BY dispatch_date ASC
-        LIMIT 6
-    """, (customer,))
+    if not combined_data:
+        return []
+
+    max_val = max([flt(d.inward) for d in combined_data] + [flt(d.outward) for d in combined_data] + [1])
     
-    data_map = {}
-    for row in incoming_data:
-        label, qty = row
-        if label not in data_map:
-            data_map[label] = {"in": 0, "out": 0}
-        data_map[label]["in"] = flt(qty)
-        
-    for row in outgoing_data:
-        label, qty = row
-        if label not in data_map:
-            data_map[label] = {"in": 0, "out": 0}
-        data_map[label]["out"] = flt(qty)
-    
-    # Calculate max for scaling
-    max_val = 1
-    for d in data_map.values():
-        max_val = max(max_val, d["in"], d["out"])
-    
-    # Build chart data with percentages for bar heights
     chart_items = []
-    for label, vals in data_map.items():
+    for d in combined_data:
         chart_items.append({
-            "label": label,
-            "in_value": int(vals["in"]),
-            "out_value": int(vals["out"]),
-            "in_pct": int((vals["in"] / max_val) * 100) if max_val else 0,
-            "out_pct": int((vals["out"] / max_val) * 100) if max_val else 0
+            "label": d.label,
+            "in_value": int(d.inward),
+            "out_value": int(d.outward),
+            "in_pct": int((flt(d.inward) / max_val) * 100),
+            "out_pct": int((flt(d.outward) / max_val) * 100)
         })
     
     return chart_items
 
 
 def get_bag_chart_data(customer):
-    """Get stock by item group for donut chart"""
+    """Get stock by batch number for donut chart in a single query"""
     from frappe.utils import flt
     
-    in_bags = frappe.db.sql("""
-        SELECT ri.batch_no, SUM(ri.number_of_bags)
-        FROM `tabCold Storage Receipt` r
-        JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
-        WHERE r.customer = %s AND r.docstatus = 1
-        GROUP BY ri.batch_no
-    """, (customer,))
+    batch_data = frappe.db.sql("""
+        SELECT 
+            batch_no, 
+            SUM(qty_in) - SUM(qty_out) as balance
+        FROM (
+            SELECT ri.batch_no, SUM(ri.number_of_bags) as qty_in, 0 as qty_out
+            FROM `tabCold Storage Receipt` r
+            JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name
+            WHERE r.customer = %s AND r.docstatus = 1
+            GROUP BY ri.batch_no
+            
+            UNION ALL
+            
+            SELECT di.batch_no, 0 as qty_in, SUM(di.number_of_bags) as qty_out
+            FROM `tabCold Storage Dispatch` d
+            JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
+            WHERE d.customer = %s AND d.docstatus = 1
+            GROUP BY di.batch_no
+        ) AS t
+        GROUP BY batch_no
+        HAVING balance > 0
+    """, (customer, customer), as_dict=True)
     
-    out_bags = frappe.db.sql("""
-        SELECT di.batch_no, SUM(di.number_of_bags)
-        FROM `tabCold Storage Dispatch` d
-        JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
-        WHERE d.customer = %s AND d.docstatus = 1
-        GROUP BY di.batch_no
-    """, (customer,))
+    if not batch_data:
+        return []
     
-    bag_balance = {}
-    for row in in_bags:
-        bag_balance[row[0]] = flt(row[1])
-        
-    for row in out_bags:
-        bag_balance[row[0]] = bag_balance.get(row[0], 0) - flt(row[1])
-    
-    # Filter out zero or negative and calculate totals
-    valid_bags = {k: v for k, v in bag_balance.items() if v > 0}
-    total = sum(valid_bags.values()) or 1
-    
+    total = sum([flt(d.balance) for d in batch_data]) or 1
     colors = ['#3498db', '#9b59b6', '#f1c40f', '#e67e22', '#1abc9c', '#e74c3c']
+    
     chart_items = []
-    for i, (label, value) in enumerate(valid_bags.items()):
+    for i, d in enumerate(batch_data):
         chart_items.append({
-            "label": label,
-            "value": int(value),
-            "pct": int((value / total) * 100),
+            "label": d.batch_no,
+            "value": int(d.balance),
+            "pct": int((flt(d.balance) / total) * 100),
             "color": colors[i % len(colors)]
         })
     
