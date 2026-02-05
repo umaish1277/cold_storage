@@ -1,0 +1,37 @@
+{
+    "cards": [
+        {
+            "card": "Current Temperature"
+        },
+        {
+            "card": "Current Humidity"
+        },
+        {
+            "card": "Current CO2"
+        }
+    ],
+    "charts": [
+        {
+            "chart": "Temperature Trend",
+            "width": "Full"
+        },
+        {
+            "chart": "Humidity Trend",
+            "width": "Half"
+        },
+        {
+            "chart": "CO2 Trend",
+            "width": "Half"
+        }
+    ],
+    "creation": "2026-02-06 01:55:00.000000",
+    "dashboard_name": "Environment Monitoring",
+    "docstatus": 0,
+    "doctype": "Dashboard",
+    "is_standard": 1,
+    "modified": "2026-02-06 01:55:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Environment Monitoring",
+    "owner": "Administrator"
+}

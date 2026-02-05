@@ -126,6 +126,20 @@
    "onboard": 0,
    "report_ref_doctype": "Cold Storage Receipt",
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Environment Sensor",
+   "link_to": "Cold Storage Environment Sensor",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Environment Reading",
+   "link_to": "Cold Storage Environment Reading",
+   "link_type": "DocType",
+   "type": "Link"
   }
  ],
  "modified": "2026-02-06 00:36:00.692339",
