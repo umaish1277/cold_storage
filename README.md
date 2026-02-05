@@ -9,12 +9,24 @@ A comprehensive Cold Storage Management application built on the Frappe Framewor
 *   **Cold Storage Dispatch**: Manage outgoing stock linked to specific receipts. Ensures you cannot dispatch more than the received quantity (Batch-level validation).
 *   **QR Code Tracking**: Print Receipts with embedded QR codes for quick scanning and retrieval.
 
-### 2. Automated Billing & Invoicing
+### 2. Rate Card Management
+*   **Seasons**: Define time-bound business seasons (e.g., Summer 2026) for differentiated pricing.
+*   **Customer Tiers**: Categorize customers (e.g., VIP, Gold, Standard) to offer tiered storage rates.
+*   **Prioritized Rates**: Define specific rate cards for combinations of Item Group, Season, and Tier. The system automatically fetches the most specific rate with a fallback to global settings.
+
+### 3. Automated Billing & Invoicing
 *   **Flexible Billing Types**: Support for **Daily**, **Monthly**, and **Seasonal** billing cycles.
-*   **Smart Rate Fetching**: Automatically calculates Handling, Loading, and Storage charges based on **Item Group**.
+*   **Smart Rate Fetching**: Automatically calculates Handling, Loading, and Storage charges based on **Item Group**, **Customer Tier**, and **Active Season**.
 *   **ERPNext Integration**: Automatically creates and links an ERPNext Sales Invoice upon submission of a Dispatch.
 
-### 3. Mobile Entry System
+### 4. Customer Portal & Financial Transparency
+*   **Stock Statements**: Customers can download a PDF/XLSX stock statement.
+*   **Financial Summary**: Includes Total Outstanding, Recent Invoices, and Payment History directly in the PDF.
+*   **Stock Visualization**: Interactive charts for inventory trends and batch-wise distribution.
+*   **Urdu Support**: Full Right-to-Left (RTL) support and high-quality Urdu typography for all portal reports.
+
+### 5. Mobile Entry System
+... (rest of the content)
 *   **Simplified UI**: A dedicated page for fast, mobile-friendly receipt entry.
 *   **Smart Defaults**: Automatically pulls the Default Company from settings and filters warehouses accordingly.
 *   **Pro Driver Tracking**: Driver name and phone fields with a searchable country code selector (Defaults to Pakistan +92).
