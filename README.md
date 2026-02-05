@@ -26,18 +26,17 @@ A comprehensive Cold Storage Management application built on the Frappe Framewor
 *   **Urdu Support**: Full Right-to-Left (RTL) support and high-quality Urdu typography for all portal reports.
 
 ### 5. Mobile Entry System
-... (rest of the content)
 *   **Simplified UI**: A dedicated page for fast, mobile-friendly receipt entry.
 *   **Smart Defaults**: Automatically pulls the Default Company from settings and filters warehouses accordingly.
 *   **Pro Driver Tracking**: Driver name and phone fields with a searchable country code selector (Defaults to Pakistan +92).
 *   **Fault Tolerance**: Preserves all form data if a submission fails, allowing for quick correction and retry.
 
-### 4. Advanced Reporting & Audit
+### 6. Advanced Reporting & Audit
 *   **Audit Trail Report**: A detailed log of **who changed what and when**, tracking field-level changes (Old vs. New values) across core documents.
 *   **Warehouse Heatmaps**: Visual reports for warehouse utilization and occupancy trends.
 *   **Customer Stock Ledger**: Real-time visibility into customer-wise and batch-wise stock levels.
 
-### 5. Notifications & Approvals
+### 7. Notifications & Approvals
 *   **Approval System**: Automated manager notifications for arrivals and dispatches requiring approval.
 *   **Smart Persistence**: Popup notifications stay dismissed across logins and automatically suppress themselves on relevant list views.
 *   **WhatsApp Integration**: Instant customer alerts for "Goods Received" and "Goods Dispatched" via Twilio.
