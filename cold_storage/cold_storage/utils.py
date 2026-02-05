@@ -221,11 +221,19 @@ def send_via_twilio(settings, to_number, message):
 
 @frappe.whitelist()
 def get_total_warehouses_count(filters=None):
-	default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
-	if not default_company:
+	if filters and isinstance(filters, str):
+		import json
+		filters = json.loads(filters)
+	
+	company = (filters or {}).get("company")
+	if not company:
+		company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+	
+	if not company:
 		return 0
+		
 	return frappe.db.count("Warehouse", {
-		"company": default_company,
+		"company": company,
 		"disabled": 0,
 		"is_group": 0
 	})
