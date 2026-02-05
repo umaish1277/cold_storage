@@ -42,23 +42,71 @@ def validate_future_date(date_val, label="Date"):
 	if date_val and getdate(date_val) > getdate(nowdate()):
 		frappe.throw(f"{label} cannot be in the future")
 
-def get_bag_rate(item_group, billing_type, goods_item=None):
-	# Fetch all rates in one go to minimize DB calls if called in loop?
-	# Usually settings is a singleton, so frappe.get_single caches it.
-	settings = frappe.get_single("Cold Storage Settings")
+def get_bag_rates(item_group, billing_type, goods_item=None, customer=None, doc_date=None):
+	"""
+	Lookup rates based on Priority:
+	1. Rate Cards (Most specific match by Season/Tier/Date)
+	2. Fallback to global Cold Storage Settings
+	Returns: {"handling": rate, "loading": loading_rate}
+	"""
+	from frappe.utils import getdate, nowdate
+	if not doc_date:
+		doc_date = nowdate()
 	
+	doc_date = getdate(doc_date)
+	
+	# Get Customer Tier
+	customer_tier = None
+	if customer:
+		customer_tier = frappe.db.get_value("Customer", customer, "cold_storage_tier")
+	
+	# Find applicable Rate Cards
+	rate_cards = frappe.get_all("Cold Storage Rate Card", 
+		filters={
+			"is_active": 1,
+			"docstatus": ["<", 2]
+		},
+		fields=["name", "priority", "season", "customer_tier", "valid_from", "valid_to"],
+		order_by="priority desc"
+	)
+	
+	for card in rate_cards:
+		if card.season:
+			season_dates = frappe.db.get_value("Cold Storage Season", card.season, ["from_date", "to_date"], as_dict=1)
+			if season_dates and not (getdate(season_dates.from_date) <= doc_date <= getdate(season_dates.to_date)):
+				continue
+		
+		if card.customer_tier and card.customer_tier != customer_tier:
+			continue
+			
+		if card.valid_from and getdate(card.valid_from) > doc_date:
+			continue
+		if card.valid_to and getdate(card.valid_to) < doc_date:
+			continue
+			
+		card_doc = frappe.get_doc("Cold Storage Rate Card", card.name)
+		rates = find_rates_in_table(card_doc.rates, item_group, billing_type, goods_item)
+		if rates:
+			return rates
+			
+	settings = frappe.get_single("Cold Storage Settings")
+	rates = find_rates_in_table(settings.bag_type_rates, item_group, billing_type, goods_item)
+	
+	return rates if rates else {"handling": 0.0, "loading": 0.0}
+
+def find_rates_in_table(rates_table, item_group, billing_type, goods_item=None):
 	# Priority 1: Specific Match
-	for row in settings.bag_type_rates:
+	for row in rates_table:
 		if row.billing_type == billing_type and row.item_group == item_group:
 			if row.goods_item and row.goods_item == goods_item:
-				return flt(row.rate)
+				return {"handling": flt(row.rate), "loading": flt(row.loading_rate)}
 				 
-	# Priority 2: Generic Match (No Goods Item)
-	for row in settings.bag_type_rates:
+	# Priority 2: Generic Match
+	for row in rates_table:
 		if row.billing_type == billing_type and row.item_group == item_group and not row.goods_item:
-			return flt(row.rate)
+			return {"handling": flt(row.rate), "loading": flt(row.loading_rate)}
 			
-	return 0.0
+	return None
 
 def get_batch_balance(linked_receipt, batch_no, current_dispatch=None):
 	if not linked_receipt or not batch_no:

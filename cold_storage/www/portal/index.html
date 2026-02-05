@@ -1,7 +1,9 @@
 {% extends "templates/web.html" %}
 
 {% block style %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap"
+    rel="stylesheet">
 <style>
     /* Full-width overrides - must be inline for highest priority */
     html,
@@ -9,6 +11,14 @@
         width: 100% !important;
         max-width: 100% !important;
         overflow-x: hidden;
+
+        direction: {
+                {
+                lang_dir
+            }
+        }
+
+        ;
     }
 
     .main-section,
@@ -48,9 +58,20 @@
         max-width: 100%;
         padding: 2rem 3rem;
         margin: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: #f4f6f9;
-        min-height: 100vh;
+
+        font-family: 'Inter',
+        {
+        % if lang=='ur' %
+    }
+
+    'Noto Nastaliq Urdu',
+    {
+    % endif %
+    }
+
+    sans-serif;
+    background-color: #f4f6f9;
+    min-height: 100vh;
     }
 
         {
@@ -61,23 +82,37 @@
 
 
 {% block page_content %}
-<div class="portal-container">
+<div class="portal-container" dir="{{ lang_dir }}">
+    <!-- Language Toggle -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem; gap: 10px;">
+        <a href="?lang=en{% if customer %}&customer={{ customer | urlencode }}{% endif %}"
+            class="btn btn-sm {% if lang == 'en' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+            style="font-size: 12px; border-radius: 20px; padding: 4px 12px;">
+            🇺🇸 {{ _("English") }}
+        </a>
+        <a href="?lang=ur{% if customer %}&customer={{ customer | urlencode }}{% endif %}"
+            class="btn btn-sm {% if lang == 'ur' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+            style="font-size: 12px; border-radius: 20px; padding: 4px 12px; font-family: 'Noto Nastaliq Urdu', serif;">
+            🇵🇰 {{ _("Urdu") }}
+        </a>
+    </div>
 
     {% if is_manager %}
     <!-- Manager Customer Selector -->
     <div
         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
         <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            <span style="color: white; font-weight: 600; font-size: 14px;">👔 Manager View</span>
+            <span style="color: white; font-weight: 600; font-size: 14px;">👔 {{ _("Manager View") }}</span>
             <select id="customerSelect" onchange="selectCustomer(this.value)"
                 style="padding: 8px 15px; border-radius: 8px; border: none; font-size: 14px; min-width: 250px; cursor: pointer; background: white;">
-                <option value="">-- Select Customer --</option>
+                <option value="">-- {{ _("Select Customer") }} --</option>
                 {% for c in all_customers %}
                 <option value="{{ c }}" {% if c==customer %}selected{% endif %}>{{ c }}</option>
                 {% endfor %}
             </select>
             {% if customer %}
-            <span style="color: rgba(255,255,255,0.8); font-size: 13px;">Viewing: <strong style="color: white;">{{
+            <span style="color: rgba(255,255,255,0.8); font-size: 13px;">{{ _("Viewing") }}: <strong
+                    style="color: white;">{{
                     customer }}</strong></span>
             {% endif %}
         </div>
@@ -97,17 +132,17 @@
 
 
     <div class="welcome-header">
-        <h1>Welcome, {{ customer }}</h1>
-        <p>Here is your stock overview at a glance.</p>
+        <h1>{{ _("Welcome") }}, {{ customer }}</h1>
+        <p>{{ _("Here is your stock overview at a glance.") }}</p>
         <div class="download-buttons"
             style="margin-top: 1rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="/api/method/cold_storage.cold_storage.api.customer_portal.get_customer_statement?format=xlsx&customer={{ customer | urlencode }}"
+            <a href="/api/method/cold_storage.cold_storage.api.customer_portal.get_customer_statement?format=xlsx&customer={{ customer | urlencode }}&lang={{ lang }}"
                 class="btn btn-primary">
-                📥 Download Excel
+                📥 {{ _("Download Excel") }}
             </a>
             <div class="dropdown" style="position: relative; display: inline-block;">
                 <button class="btn btn-secondary" onclick="togglePdfDropdown()" style="padding: 8px 16px;">
-                    📄 Download PDF ▾
+                    📄 {{ _("Download PDF") }} ▾
                 </button>
                 <div id="pdfDropdown" class="dropdown-content"
                     style="display: none; position: absolute; background: white; min-width: 180px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 8px; z-index: 100; margin-top: 5px;">
@@ -139,15 +174,16 @@
     <!-- Stats Grid -->
     <div class="dashboard-grid" style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
         <div class="stat-card" style="flex: 1; min-width: 200px;">
-            <h3>Current Stock</h3>
-            <div class="value">{{ total_stored }} <span style="font-size: 1rem; color: #7f8c8d;">Bags</span></div>
+            <h3>{{ _("Current Stock") }}</h3>
+            <div class="value">{{ total_stored }} <span style="font-size: 1rem; color: #7f8c8d;">{{ _("Bags") }}</span>
+            </div>
         </div>
         <div class="stat-card" style="flex: 1; min-width: 200px; border-left-color: #3498db;">
-            <h3>Total Inward</h3>
+            <h3>{{ _("Total Inward") }}</h3>
             <div class="value">{{ total_inward }}</div>
         </div>
         <div class="stat-card" style="flex: 1; min-width: 200px; border-left-color: #e74c3c;">
-            <h3>Total Outward</h3>
+            <h3>{{ _("Total Outward") }}</h3>
             <div class="value">{{ total_outward }}</div>
         </div>
     </div>
@@ -157,13 +193,13 @@
     <div class="row">
         <div class="col-md-8 mb-4">
             <div class="card shadow-sm h-100" style="border-radius: 12px; border: none; padding: 1.5rem;">
-                <h2 class="section-title">📊 Stock Trends (Last 6 Months)</h2>
+                <h2 class="section-title">📊 {{ _("Stock Trends (Last 6 Months)") }}</h2>
                 <div id="stock-chart"></div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm h-100" style="border-radius: 12px; border: none; padding: 1.5rem;">
-                <h2 class="section-title">📦 Stock by Batch No</h2>
+                <h2 class="section-title">📦 {{ _("Stock by Batch No") }}</h2>
                 <div id="bag-chart"></div>
             </div>
         </div>
@@ -212,7 +248,7 @@
                 }
             });
         } else {
-            document.getElementById('stock-chart').innerHTML = '<p style="text-align:center;color:#7f8c8d;padding:2rem;">No trend data available</p>';
+            document.getElementById('stock-chart').innerHTML = '<p style="text-align:center;color:#7f8c8d;padding:2rem;">{{ _("No trend data available") }}</p>';
         }
 
         // Bag Chart Data
@@ -231,7 +267,7 @@
                 colors: ['#3498db']
             });
         } else {
-            document.getElementById('bag-chart').innerHTML = '<p style="text-align:center;color:#7f8c8d;padding:2rem;">No bag data available</p>';
+            document.getElementById('bag-chart').innerHTML = '<p style="text-align:center;color:#7f8c8d;padding:2rem;">{{ _("No data available") }}</p>';
         }
             } catch (e) {
             console.error('Chart rendering error:', e);
@@ -243,7 +279,7 @@
     <div class="row">
         <!-- Recent Receipts -->
         <div class="col-md-6 mb-4">
-            <h2 class="section-title">📥 Recent Inward</h2>
+            <h2 class="section-title">📥 {{ _("Recent Inward") }}</h2>
             <div class="activity-feed">
                 {% if recent_receipts %}
                 {% for row in recent_receipts %}
@@ -254,37 +290,38 @@
                             }}</div>
                     </div>
                     <div class="text-right">
-                        <span class="d-block font-weight-bold">{{ row.total_bags }} Bags</span>
-                        <span class="badge badge-success">Received</span>
+                        <span class="d-block font-weight-bold">{{ row.total_bags }} {{ _("Bags") }}</span>
+                        <span class="badge badge-success">{{ _("Received") }}</span>
                     </div>
                 </div>
                 {% endfor %}
                 {% else %}
-                <div class="empty-state">No recent receipts found.</div>
+                <div class="empty-state">{{ _("No recent receipts found.") }}</div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Recent Dispatches -->
         <div class="col-md-6 mb-4">
-            <h2 class="section-title">📤 Recent Outward</h2>
+            <h2 class="section-title">📤 {{ _("Recent Outward") }}</h2>
             <div class="activity-feed">
                 {% if recent_dispatches %}
                 {% for row in recent_dispatches %}
                 <div class="activity-item">
                     <div class="activity-info">
                         <h4>{{ row.name }}</h4>
-                        <div class="activity-meta">{{ row.dispatch_date.strftime("%d:%m:%Y") }} &bull; Linked: {{
+                        <div class="activity-meta">{{ row.dispatch_date.strftime("%d:%m:%Y") }} &bull; {{ _("Linked")
+                            }}: {{
                             row.receipt }}</div>
                     </div>
                     <div class="text-right">
-                        <span class="d-block font-weight-bold">{{ row.total_amount }} (Bill)</span>
-                        <span class="badge badge-warning">Dispatched</span>
+                        <span class="d-block font-weight-bold">{{ row.total_amount }} ({{ _("Bill") }})</span>
+                        <span class="badge badge-warning">{{ _("Dispatched") }}</span>
                     </div>
                 </div>
                 {% endfor %}
                 {% else %}
-                <div class="empty-state">No recent dispatches found.</div>
+                <div class="empty-state">{{ _("No recent dispatches found.") }}</div>
                 {% endif %}
             </div>
         </div>

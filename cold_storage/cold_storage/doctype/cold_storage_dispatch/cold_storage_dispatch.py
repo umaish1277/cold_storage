@@ -5,8 +5,8 @@ from frappe.utils import flt
 from cold_storage.cold_storage import utils
 
 @frappe.whitelist()
-def get_bag_rate(item_group, billing_type, goods_item=None):
-	return utils.get_bag_rate(item_group, billing_type, goods_item)
+def get_bag_rates(item_group, billing_type, goods_item=None, customer=None, doc_date=None):
+	return utils.get_bag_rates(item_group, billing_type, goods_item, customer, doc_date)
 
 @frappe.whitelist()
 def get_batch_balance(linked_receipt, batch_no, current_dispatch=None):
@@ -80,50 +80,27 @@ class ColdStorageDispatch(Document):
 		self.calculate_billing()
         
 	def calculate_billing(self):
-		settings = frappe.get_single("Cold Storage Settings")
-		
-		# Create a map of Item Group -> Rates
-		# Keys:
-		# (Item, ItemGroup, BillingType) -> Specific
-		# (None, ItemGroup, BillingType) -> Generic
-		rate_map = {}
-		if settings.bag_type_rates:
-			for row in settings.bag_type_rates:
-				# Use None for empty goods_item
-				item_key = row.goods_item if row.goods_item else None
-				key = (item_key, row.item_group, row.billing_type)
-				
-				rate_map[key] = {
-					"handling": flt(row.rate),
-					"loading": flt(row.loading_rate)
-				}
-		
 		total_handling = 0
 		total_loading = 0
 		
 		billing_type = self.billing_type
 		
 		for item in self.items:
-			# Fetch Rates Priority:
-			# 1. Specific Match (Item + ItemGroup + Billing)
-			# 2. Generic Match (ItemGroup + Billing)
-			
-			found_rates = None
-			
-			# 1. Specific
-			if (item.goods_item, item.item_group, billing_type) in rate_map:
-				found_rates = rate_map[(item.goods_item, item.item_group, billing_type)]
-			
-			# 2. Generic (if not found specific)
-			if not found_rates and (None, item.item_group, billing_type) in rate_map:
-				found_rates = rate_map[(None, item.item_group, billing_type)]
+			# Fetch Rates using the new prioritized lookup
+			found_rates = utils.get_bag_rates(
+				item.item_group, 
+				billing_type, 
+				item.goods_item, 
+				self.customer, 
+				self.dispatch_date
+			)
 			
 			# Fallback or Defaults
 			if not item.rate:
-				item.rate = found_rates["handling"] if found_rates else 0.0
+				item.rate = found_rates.get("handling", 0.0)
 			
 			if not item.loading_rate:
-				item.loading_rate = found_rates["loading"] if found_rates else 0.0
+				item.loading_rate = found_rates.get("loading", 0.0)
 			
 			# Calculate item amounts
 			item.amount = flt(item.rate) * flt(item.number_of_bags)
@@ -137,7 +114,6 @@ class ColdStorageDispatch(Document):
 		
 		# GST API
 		if self.gst_applicable:
-			# GST applies to both? Usually yes on services.
 			taxable_amount = flt(self.total_amount) + flt(self.total_loading_amount)
 			self.total_gst_amount = taxable_amount * (flt(self.gst_rate) / 100)
 		else:

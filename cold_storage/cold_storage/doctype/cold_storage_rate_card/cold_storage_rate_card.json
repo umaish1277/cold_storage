@@ -1,0 +1,130 @@
+{
+    "actions": [],
+    "creation": "2026-02-05 12:18:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "rate_card_name",
+        "is_active",
+        "priority",
+        "selection_criteria_section",
+        "season",
+        "customer_tier",
+        "column_break_rates",
+        "valid_from",
+        "valid_to",
+        "rates_section",
+        "rates"
+    ],
+    "fields": [
+        {
+            "fieldname": "rate_card_name",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Rate Card Name",
+            "reqd": 1,
+            "unique": 1
+        },
+        {
+            "default": "1",
+            "fieldname": "is_active",
+            "fieldtype": "Check",
+            "in_list_view": 1,
+            "label": "Is Active"
+        },
+        {
+            "default": "0",
+            "fieldname": "priority",
+            "fieldtype": "Int",
+            "label": "Priority",
+            "description": "Higher priority cards are selected first."
+        },
+        {
+            "fieldname": "selection_criteria_section",
+            "fieldtype": "Section Break",
+            "label": "Selection Criteria"
+        },
+        {
+            "fieldname": "season",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Season",
+            "options": "Cold Storage Season"
+        },
+        {
+            "fieldname": "customer_tier",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Customer Tier",
+            "options": "Cold Storage Customer Tier"
+        },
+        {
+            "fieldname": "column_break_rates",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "valid_from",
+            "fieldtype": "Date",
+            "label": "Valid From"
+        },
+        {
+            "fieldname": "valid_to",
+            "fieldtype": "Date",
+            "label": "Valid To"
+        },
+        {
+            "fieldname": "rates_section",
+            "fieldtype": "Section Break",
+            "label": "Rates"
+        },
+        {
+            "fieldname": "rates",
+            "fieldtype": "Table",
+            "label": "Rates",
+            "options": "Bag Type Rate",
+            "reqd": 1
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2026-02-05 12:18:00.000000",
+    "modified_by": "Administrator",
+    "module": "Cold Storage",
+    "name": "Cold Storage Rate Card",
+    "naming_rule": "By fieldname",
+    "autoname": "field:rate_card_name",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Cold Storage Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "read": 1,
+            "role": "Cold Storage Accountant"
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}

@@ -259,7 +259,10 @@ override_doctype_class = {
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [["name", "in", ["Item-allow_zero_valuation_rate"]]]
+        "filters": [["name", "in", [
+            "Item-allow_zero_valuation_rate",
+            "Customer-cold_storage_tier"
+        ]]]
     },
     {
         "dt": "Property Setter",

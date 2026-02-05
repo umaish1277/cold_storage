@@ -37,17 +37,21 @@ frappe.ui.form.on('Cold Storage Dispatch Item', {
         var row = locals[cdt][cdn];
         if (row.item_group) {
             frappe.call({
-                method: 'cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_bag_rate',
+                method: 'cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_bag_rates',
                 args: {
                     item_group: row.item_group,
                     billing_type: frm.doc.billing_type,
-                    goods_item: row.goods_item
+                    goods_item: row.goods_item,
+                    customer: frm.doc.customer,
+                    doc_date: frm.doc.dispatch_date
                 },
                 callback: function (r) {
                     if (r.message) {
-                        frappe.model.set_value(cdt, cdn, 'rate', r.message);
+                        frappe.model.set_value(cdt, cdn, 'rate', r.message.handling || 0);
+                        frappe.model.set_value(cdt, cdn, 'loading_rate', r.message.loading || 0);
                     } else {
                         frappe.model.set_value(cdt, cdn, 'rate', 0);
+                        frappe.model.set_value(cdt, cdn, 'loading_rate', 0);
                     }
                 }
             });
@@ -249,14 +253,19 @@ frappe.ui.form.on('Cold Storage Dispatch', {
         $.each(frm.doc.items || [], function (i, row) {
             if (row.item_group) {
                 frappe.call({
-                    method: 'cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_bag_rate',
+                    method: 'cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_bag_rates',
                     args: {
                         item_group: row.item_group,
                         billing_type: frm.doc.billing_type,
-                        goods_item: row.goods_item
+                        goods_item: row.goods_item,
+                        customer: frm.doc.customer,
+                        doc_date: frm.doc.dispatch_date
                     },
                     callback: function (r) {
-                        frappe.model.set_value(row.doctype, row.name, 'rate', r.message || 0);
+                        if (r.message) {
+                            frappe.model.set_value(row.doctype, row.name, 'rate', r.message.handling || 0);
+                            frappe.model.set_value(row.doctype, row.name, 'loading_rate', r.message.loading || 0);
+                        }
                     }
                 });
             }
