@@ -50,40 +50,47 @@ def execute(filters=None):
     # Prepare data for aggregation
     raw_data = []
     for i in items:
-        # Convert to frappe._dict to safely allow dot notation if needed
+        # Convert to frappe._dict to safely allow dot notation just in case, 
+        # but we will use .get() to be extra safe.
         i = frappe._dict(i)
         
-        disp_date = dispatch_map.get(i.parent)
-        rec_date = receipt_map.get(i.linked_receipt)
+        disp_date = dispatch_map.get(i.get("parent"))
+        rec_date = receipt_map.get(i.get("linked_receipt"))
         
         if disp_date and rec_date:
             duration = date_diff(disp_date, rec_date)
             raw_data.append(frappe._dict({
-                "item": i.goods_item,
+                "item": i.get("goods_item"),
                 "duration": duration,
-                "bags": i.number_of_bags
+                "bags": i.get("number_of_bags")
             }))
 
     # Aggregate by Item
     item_stats = {}
     for row in raw_data:
-        # row is a frappe._dict, so row.item or row.get("item") should both work
         try:
-            it = row.item or row.get("item")
-            dur = flt(row.duration)
-            bags = flt(row.bags)
+            # Use .get() exclusively to avoid dot notation AttributeError
+            it = row.get("item")
+            dur = flt(row.get("duration"))
+            bags = flt(row.get("bags"))
             
-            if not it: continue
+            if not it:
+                continue
             
             if it not in item_stats:
-                item_stats[it] = frappe._dict({"item": it, "total_duration": 0, "total_bags": 0, "max_days": 0})
+                item_stats[it] = frappe._dict({
+                    "item": it, 
+                    "total_duration": 0.0, 
+                    "total_bags": 0.0, 
+                    "max_days": 0
+                })
                 
             item_stats[it]["total_duration"] += (dur * bags)
             item_stats[it]["total_bags"] += bags
             if dur > item_stats[it]["max_days"]:
                 item_stats[it]["max_days"] = dur
         except Exception as e:
-            frappe.log_error(f"Report Error: {str(e)}", f"Row data: {row}")
+            frappe.log_error(f"Report Aggregation Error: {str(e)}", f"Row: {row}")
             continue
 
     data = []
@@ -92,12 +99,15 @@ def execute(filters=None):
 
     for it in item_stats:
         stats = item_stats[it]
-        avg = round(stats["total_duration"] / stats["total_bags"], 1) if stats["total_bags"] > 0 else 0
+        t_bags = stats.get("total_bags") or 0
+        t_dur = stats.get("total_duration") or 0
+        
+        avg = round(t_dur / t_bags, 1) if t_bags > 0 else 0
         data.append({
             "item": it,
             "avg_days": avg,
-            "max_days": stats["max_days"],
-            "total_bags": stats["total_bags"]
+            "max_days": stats.get("max_days") or 0,
+            "total_bags": t_bags
         })
         chart_items.append(it)
         avg_durations.append(avg)
