@@ -43,43 +43,65 @@ def get_data(filters):
         if capacity <= 0:
             continue
         
-        jute_in = frappe.db.sql("""
-            SELECT IFNULL(SUM(ri.number_of_bags), 0)
-            FROM `tabCold Storage Receipt` r 
-            JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name 
-            WHERE r.docstatus = 1 AND r.warehouse = %s 
-            AND (ri.item_group = 'Jute Bag' OR ri.item_group IS NULL OR ri.item_group = '')
-        """, (w.name,))[0][0] or 0
+        # Calculate Jute Bags In
+        # We need to filter by Receipt's warehouse because Receipt Item doesn't have it
+        receipts = frappe.get_all("Cold Storage Receipt", 
+            filters={"docstatus": 1, "warehouse": w.name}, 
+            pluck="name", 
+            ignore_permissions=True
+        )
         
-        # DEBUG: Verifying code execution path
-        frappe.logger().debug(f"Executing Warehouse Utilization for {w.name}")
-        sql_query = """
-            SELECT IFNULL(SUM(di.number_of_bags), 0)
-            FROM `tabCold Storage Dispatch` dispatch_parent 
-            JOIN `tabCold Storage Dispatch Item` di ON di.parent = dispatch_parent.name 
-            WHERE dispatch_parent.docstatus = 1 AND di.warehouse = %s
-            AND (di.item_group = 'Jute Bag' OR di.item_group IS NULL OR di.item_group = '')
-        """
-        # frappe.throw(sql_query % f"'{w.name}'") # Un-comment to see the query in UI
-        jute_out = frappe.db.sql(sql_query, (w.name,))[0][0] or 0
+        jute_in = 0
+        if receipts:
+            jute_in_items = frappe.get_all("Cold Storage Receipt Item",
+                filters={
+                    "parent": ["in", receipts],
+                    "item_group": ["in", ["Jute Bag", None, ""]]
+                },
+                fields=["number_of_bags"],
+                ignore_permissions=True
+            )
+            jute_in = sum(flt(item.number_of_bags) for item in jute_in_items)
+        
+        # Calculate Jute Bags Out
+        # Dispatch Item has warehouse directly
+        jute_out_items = frappe.get_all("Cold Storage Dispatch Item",
+            filters={
+                "warehouse": w.name,
+                "docstatus": 1,
+                "item_group": ["in", ["Jute Bag", None, ""]]
+            },
+            fields=["number_of_bags"],
+            ignore_permissions=True
+        )
+        jute_out = sum(flt(item.number_of_bags) for item in jute_out_items)
         
         jute_bags = jute_in - jute_out
         
-        net_in = frappe.db.sql("""
-            SELECT IFNULL(SUM(ri.number_of_bags), 0)
-            FROM `tabCold Storage Receipt` r 
-            JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name 
-            WHERE r.docstatus = 1 AND r.warehouse = %s 
-            AND ri.item_group = 'Net Bag'
-        """, (w.name,))[0][0] or 0
+        # Calculate Net Bags In
+        net_in = 0
+        if receipts:
+            net_in_items = frappe.get_all("Cold Storage Receipt Item",
+                filters={
+                    "parent": ["in", receipts],
+                    "item_group": "Net Bag"
+                },
+                fields=["number_of_bags"],
+                ignore_permissions=True
+            )
+            net_in = sum(flt(item.number_of_bags) for item in net_in_items)
         
-        net_out = frappe.db.sql("""
-            SELECT IFNULL(SUM(di.number_of_bags), 0)
-            FROM `tabCold Storage Dispatch` dispatch_parent 
-            JOIN `tabCold Storage Dispatch Item` di ON di.parent = dispatch_parent.name 
-            WHERE dispatch_parent.docstatus = 1 AND di.warehouse = %s
-            AND di.item_group = 'Net Bag'
-        """, (w.name,))[0][0] or 0
+        # Calculate Net Bags Out
+        net_out_items = frappe.get_all("Cold Storage Dispatch Item",
+            filters={
+                "warehouse": w.name,
+                "docstatus": 1,
+                "item_group": "Net Bag"
+            },
+            fields=["number_of_bags"],
+            ignore_permissions=True
+        )
+        net_out = sum(flt(item.number_of_bags) for item in net_out_items)
         
         net_bags = net_in - net_out
         

@@ -40,18 +40,29 @@ def get(
 			continue
 			
 		# Calculate current stock (Bags)
-		# Using a direct SQL query for efficiency
-		current_bags = frappe.db.sql("""
-			SELECT 
-				(SELECT IFNULL(SUM(ri.number_of_bags), 0) 
-				 FROM `tabCold Storage Receipt` r 
-				 JOIN `tabCold Storage Receipt Item` ri ON ri.parent = r.name 
-				 WHERE r.docstatus = 1 AND r.warehouse = %s) - 
-				(SELECT IFNULL(SUM(di.number_of_bags), 0) 
-				 FROM `tabCold Storage Dispatch` d 
-				 JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name 
-				 WHERE d.docstatus = 1 AND di.warehouse = %s)
-		""", (w.name, w.name))[0][0] or 0
+		receipts = frappe.get_all("Cold Storage Receipt", 
+			filters={"docstatus": 1, "warehouse": w.name}, 
+			pluck="name", 
+			ignore_permissions=True
+		)
+		
+		in_bags = 0
+		if receipts:
+			in_items = frappe.get_all("Cold Storage Receipt Item",
+				filters={"parent": ["in", receipts]},
+				fields=["number_of_bags"],
+				ignore_permissions=True
+			)
+			in_bags = sum(flt(item.number_of_bags) for item in in_items)
+			
+		out_items = frappe.get_all("Cold Storage Dispatch Item",
+			filters={"docstatus": 1, "warehouse": w.name},
+			fields=["number_of_bags"],
+			ignore_permissions=True
+		)
+		out_bags = sum(flt(item.number_of_bags) for item in out_items)
+		
+		current_bags = in_bags - out_bags
 
 		
 		utilization = (flt(current_bags) / capacity) * 100
