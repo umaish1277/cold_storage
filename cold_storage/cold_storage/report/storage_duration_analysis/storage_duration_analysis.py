@@ -14,7 +14,7 @@ def execute(filters=None):
     ]
 
     # Conditions
-    conditions = "WHERE d.docstatus = 1 AND d.linked_receipt IS NOT NULL"
+    conditions = "WHERE d.docstatus = 1 AND di.linked_receipt IS NOT NULL"
     if filters.get("from_date"): conditions += f" AND d.dispatch_date >= '{filters.get('from_date')}'"
     if filters.get("to_date"): conditions += f" AND d.dispatch_date <= '{filters.get('to_date')}'"
 
@@ -28,7 +28,7 @@ def execute(filters=None):
             di.number_of_bags as bags
         FROM `tabCold Storage Dispatch` d
         JOIN `tabCold Storage Dispatch Item` di ON di.parent = d.name
-        JOIN `tabCold Storage Receipt` r ON r.name = d.linked_receipt
+        JOIN `tabCold Storage Receipt` r ON r.name = di.linked_receipt
         {conditions}
     """, as_dict=True)
 
