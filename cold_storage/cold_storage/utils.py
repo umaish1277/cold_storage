@@ -264,3 +264,35 @@ def get_total_outgoing_bills(filters=None):
 	""", (default_company, year_start, year_end))
 	
 	return flt(result[0][0]) if result else 0.0
+
+from frappe import _
+
+def validate_company(doc, fieldname="company"):
+	if not doc.get(fieldname):
+		return
+	
+	if "System Manager" in frappe.get_roles(frappe.session.user) or frappe.session.user == "Administrator":
+		return
+
+	# Check if company is allowed for user
+	allowed_companies = frappe.get_all("User Permission", filters={
+		"user": frappe.session.user,
+		"allow": "Company"
+	}, pluck="for_value")
+
+	if allowed_companies and doc.get(fieldname) not in allowed_companies:
+		frappe.throw(_("No permission for Company {0}").format(doc.get(fieldname)))
+
+def validate_consistent_company(doc, linked_doctype, fieldname, label=None):
+	"""
+	Validates that a linked document belongs to the same company as the parent document.
+	"""
+	if not doc.get("company") or not doc.get(fieldname):
+		return
+		
+	linked_company = frappe.db.get_value(linked_doctype, doc.get(fieldname), "company")
+	if linked_company and linked_company != doc.get("company"):
+		if not label: label = fieldname.replace("_", " ").title()
+		frappe.throw(_("{0} {1} does not belong to Company {2}").format(
+			_(label), doc.get(fieldname), doc.get("company")
+		))

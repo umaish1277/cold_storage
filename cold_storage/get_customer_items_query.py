@@ -8,12 +8,17 @@ def get_customer_batches(doctype, txt, searchfield, start, page_len, filters):
 	goods_item = filters.get("goods_item")
 	warehouse = filters.get("warehouse")
 	linked_receipt = filters.get("linked_receipt")
+	company = filters.get("company")
 	
 	if not customer:
 		return []
 
 	conditions = ["p.customer = %(customer)s", "p.docstatus = 1"]
 	values = {"customer": customer, "txt": f"%{txt}%"}
+	
+	if company:
+		conditions.append("p.company = %(company)s")
+		values["company"] = company
 	
 	if linked_receipt:
 		conditions.append("p.name = %(linked_receipt)s")
@@ -48,12 +53,17 @@ def get_customer_items(doctype, txt, searchfield, start, page_len, filters):
 	customer = filters.get("customer")
 	warehouse = filters.get("warehouse")
 	linked_receipt = filters.get("linked_receipt")
+	company = filters.get("company")
 	
 	if not customer:
 		return []
 
 	conditions = ["p.customer = %(customer)s", "p.docstatus = 1"]
 	values = {"customer": customer, "txt": f"%{txt}%"}
+	
+	if company:
+		conditions.append("p.company = %(company)s")
+		values["company"] = company
 	
 	if linked_receipt:
 		conditions.append("p.name = %(linked_receipt)s")
@@ -81,12 +91,17 @@ def get_customer_item_groups(doctype, txt, searchfield, start, page_len, filters
 	goods_item = filters.get("goods_item")
 	warehouse = filters.get("warehouse")
 	linked_receipt = filters.get("linked_receipt")
+	company = filters.get("company")
 	
 	if not customer:
 		return []
 
 	conditions = ["p.customer = %(customer)s", "p.docstatus = 1"]
 	values = {"customer": customer, "txt": f"%{txt}%"}
+	
+	if company:
+		conditions.append("p.company = %(company)s")
+		values["company"] = company
 	
 	if linked_receipt:
 		conditions.append("p.name = %(linked_receipt)s")
@@ -105,25 +120,34 @@ def get_customer_item_groups(doctype, txt, searchfield, start, page_len, filters
 	where_clause = " AND ".join(conditions)
 
 	return frappe.db.sql(f"""
-		SELECT DISTINCT c.item_group
+		SELECT DISTINCT i.item_group
 		FROM `tabCold Storage Receipt` p
-		JOIN `tabCold Storage Receipt Item` c ON c.parent = p.name
+		JOIN `tabCold Storage Receipt Item` i ON i.parent = p.name
 		WHERE {where_clause}
 		LIMIT %(start)s, %(page_len)s
 	""", {**values, "start": start, "page_len": page_len})
 
 @frappe.whitelist()
 def get_customer_warehouses(doctype, txt, searchfield, start, page_len, filters):
-	customer = filters.get("customer")
+	company = filters.get("company")
 	if not customer:
 		return []
+
+	conditions = ["customer = %(customer)s", "docstatus = 1", "warehouse LIKE %(txt)s"]
+	values = {"customer": customer, "txt": f"%{txt}%", "start": start, "page_len": page_len}
+	
+	if company:
+		conditions.append("company = %(company)s")
+		values["company"] = company
+		
+	where_clause = " AND ".join(conditions)
 
 	return frappe.db.sql(f"""
 		SELECT DISTINCT warehouse
 		FROM `tabCold Storage Receipt`
-		WHERE customer = %(customer)s AND docstatus = 1 AND warehouse LIKE %(txt)s
+		WHERE {where_clause}
 		LIMIT %(start)s, %(page_len)s
-	""", {"customer": customer, "txt": f"%{txt}%", "start": start, "page_len": page_len})
+	""", values)
 
 @frappe.whitelist()
 def get_receipt_warehouses(doctype, txt, searchfield, start, page_len, filters):

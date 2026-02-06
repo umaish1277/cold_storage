@@ -5,29 +5,45 @@ from frappe.model.document import Document
 
 class ColdStorageReceipt(Document):
 	def onload(self):
-		default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		if not self.company:
-			self.company = default_company
-		self.set_onload("default_company", default_company)
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		self.set_onload("default_company", frappe.db.get_single_value("Cold Storage Settings", "default_company"))
 
 	def set_missing_values(self):
 		if not self.company:
 			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 
 	def validate(self):
-		# Enforce default company from settings
-		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		from cold_storage.cold_storage import utils
 		
 		if not self.company:
-			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		
+		if not self.company:
+			frappe.throw(_("Company is mandatory. Please set it in the document or as 'Default Company' in Cold Storage Settings."))
 
-		from cold_storage.cold_storage import utils
+		# Multi-Company Validation
+		utils.validate_company(self)
+		utils.validate_consistent_company(self, "Customer", "customer")
+		utils.validate_consistent_company(self, "Warehouse", "warehouse")
+		
+		# For Transfer Logic
+		if self.from_customer:
+			utils.validate_consistent_company(self, "Customer", "from_customer", "From Customer")
+		if self.from_warehouse:
+			utils.validate_consistent_company(self, "Warehouse", "from_warehouse", "From Warehouse")
+
+
 		self.total_bags = sum([flt(item.number_of_bags) for item in self.items])
 		
 		# Validation: Check for positive number of bags
 		for item in self.items:
 			if item.number_of_bags <= 0:
 				frappe.throw(f"Row {item.idx}: Number of Bags must be greater than 0")
+			
+			# Item-level company validation
+			utils.validate_consistent_company(item, "Item", "goods_item", "Item")
+			utils.validate_consistent_company(item, "Item Group", "item_group", "Item Group")
 
 		# Validation: Check for Future Date
 		utils.validate_future_date(self.receipt_date, "Receipt Date")
@@ -101,8 +117,8 @@ class ColdStorageReceipt(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def before_save(self):
-		# Enforce company again just in case
-		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 
 		# Generate/Update QR Code
 		if self.name:

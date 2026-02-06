@@ -175,5 +175,57 @@
         "translatable": 0,
         "unique": 0,
         "width": null
+    },
+    {
+        "dt": "Customer",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "insert_after": "customer_name",
+        "label": "Company",
+        "name": "Customer-company",
+        "options": "Company",
+        "reqd": 1,
+        "in_list_view": 1,
+        "in_standard_filter": 1,
+        "doctype": "Custom Field"
+    },
+    {
+        "dt": "Customer Group",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "insert_after": "customer_group_name",
+        "label": "Company",
+        "name": "Customer_Group-company",
+        "options": "Company",
+        "reqd": 1,
+        "in_list_view": 1,
+        "in_standard_filter": 1,
+        "doctype": "Custom Field"
+    },
+    {
+        "dt": "Item",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "insert_after": "item_name",
+        "label": "Company",
+        "name": "Item-company",
+        "options": "Company",
+        "reqd": 1,
+        "in_list_view": 1,
+        "in_standard_filter": 1,
+        "doctype": "Custom Field"
+    },
+    {
+        "dt": "Item Group",
+        "fieldname": "company",
+        "fieldtype": "Link",
+        "insert_after": "item_group_name",
+        "label": "Company",
+        "name": "Item_Group-company",
+        "options": "Company",
+        "reqd": 1,
+        "in_list_view": 1,
+        "in_standard_filter": 1,
+        "doctype": "Custom Field"
     }
 ]

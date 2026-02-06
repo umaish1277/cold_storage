@@ -104,17 +104,12 @@ frappe.ui.form.on('Cold Storage Receipt Item', {
 
 frappe.ui.form.on('Cold Storage Receipt', {
     onload: function (frm) {
-        // Enforce read-only company
-        frm.set_df_property("company", "read_only", 1);
-
         if (frm.is_new()) {
             let default_company = (frm.doc.__onload && frm.doc.__onload.default_company) ? frm.doc.__onload.default_company : null;
 
             let set_comp = function (val) {
                 if (val) {
-                    frm.set_df_property("company", "read_only", 0);
                     frm.set_value("company", val);
-                    frm.set_df_property("company", "read_only", 1);
                 }
             };
 
@@ -168,9 +163,7 @@ frappe.ui.form.on('Cold Storage Receipt', {
 
             let set_comp = function (val) {
                 if (val && frm.doc.company !== val) {
-                    frm.set_df_property("company", "read_only", 0);
                     frm.set_value("company", val);
-                    frm.set_df_property("company", "read_only", 1);
                 } else if (frm.doc.company === val) {
                     frm.trigger("company");
                 }
@@ -207,6 +200,7 @@ frappe.ui.form.on('Cold Storage Receipt', {
                     filters: {
                         "customer": doc.from_customer,
                         "warehouse": doc.warehouse,
+                        "company": doc.company,
                         "docstatus": 1
                     }
                 };
@@ -224,11 +218,12 @@ frappe.ui.form.on('Cold Storage Receipt', {
                         query: "cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_customer_batches",
                         filters: {
                             customer: doc.from_customer,
-                            receipt: doc.source_receipt
+                            receipt: doc.source_receipt,
+                            company: doc.company
                         }
                     };
                 } else {
-                    return { filters: { "customer": doc.from_customer } };
+                    return { filters: { "customer": doc.from_customer, "company": doc.company } };
                 }
             } else if (doc.receipt_type == "Warehouse Transfer") {
                 if (doc.from_warehouse && doc.customer) {
@@ -238,16 +233,18 @@ frappe.ui.form.on('Cold Storage Receipt', {
                             customer: doc.customer,
                             warehouse: doc.from_warehouse,
                             goods_item: row.goods_item,
-                            item_group: row.item_group
+                            item_group: row.item_group,
+                            company: doc.company
                         }
                     };
                 } else {
-                    return { filters: { "customer": doc.customer } };
+                    return { filters: { "customer": doc.customer, "company": doc.company } };
                 }
             } else {
                 return {
                     filters: {
-                        "customer": doc.customer
+                        "customer": doc.customer,
+                        "company": doc.company
                     }
                 };
             }
@@ -259,7 +256,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                 return {
                     query: "cold_storage.cold_storage.doctype.cold_storage_receipt.cold_storage_receipt.get_receipt_items",
                     filters: {
-                        receipt: doc.source_receipt
+                        receipt: doc.source_receipt,
+                        company: doc.company
                     }
                 };
             } else if (doc.receipt_type == "Warehouse Transfer" && doc.customer && doc.from_warehouse) {
@@ -267,7 +265,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                     query: "cold_storage.cold_storage.doctype.cold_storage_receipt.cold_storage_receipt.get_customer_warehouse_items",
                     filters: {
                         customer: doc.customer,
-                        warehouse: doc.from_warehouse
+                        warehouse: doc.from_warehouse,
+                        company: doc.company
                     }
                 };
             }
@@ -279,7 +278,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                 return {
                     query: "cold_storage.cold_storage.doctype.cold_storage_receipt.cold_storage_receipt.get_receipt_item_groups",
                     filters: {
-                        receipt: doc.source_receipt
+                        receipt: doc.source_receipt,
+                        company: doc.company
                     }
                 };
             } else if (doc.receipt_type == "Warehouse Transfer" && doc.customer && doc.from_warehouse) {
@@ -287,7 +287,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                     query: "cold_storage.cold_storage.doctype.cold_storage_receipt.cold_storage_receipt.get_customer_warehouse_item_groups",
                     filters: {
                         customer: doc.customer,
-                        warehouse: doc.from_warehouse
+                        warehouse: doc.from_warehouse,
+                        company: doc.company
                     }
                 };
             }
@@ -299,7 +300,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                 return {
                     query: "cold_storage.cold_storage.doctype.cold_storage_receipt.cold_storage_receipt.get_customer_warehouses",
                     filters: {
-                        customer: doc.from_customer
+                        customer: doc.from_customer,
+                        company: doc.company
                     }
                 };
             }
@@ -311,7 +313,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                 return {
                     query: "cold_storage.cold_storage.doctype.cold_storage_receipt.cold_storage_receipt.get_customer_warehouses",
                     filters: {
-                        customer: doc.customer
+                        customer: doc.customer,
+                        company: doc.company
                     }
                 };
             }

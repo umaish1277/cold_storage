@@ -101,17 +101,12 @@ frappe.ui.form.on('Cold Storage Dispatch Item', {
 
 frappe.ui.form.on('Cold Storage Dispatch', {
     onload: function (frm) {
-        // Enforce read-only company
-        frm.set_df_property("company", "read_only", 1);
-
         if (frm.is_new()) {
             let default_company = (frm.doc.__onload && frm.doc.__onload.default_company) ? frm.doc.__onload.default_company : null;
 
             let set_comp = function (val) {
                 if (val) {
-                    frm.set_df_property("company", "read_only", 0);
                     frm.set_value("company", val);
-                    frm.set_df_property("company", "read_only", 1);
                 }
             };
 
@@ -158,9 +153,7 @@ frappe.ui.form.on('Cold Storage Dispatch', {
 
             let set_comp = function (val) {
                 if (val && frm.doc.company !== val) {
-                    frm.set_df_property("company", "read_only", 0);
                     frm.set_value("company", val);
-                    frm.set_df_property("company", "read_only", 1);
                 } else if (frm.doc.company === val) {
                     frm.trigger("company");
                 }
@@ -180,6 +173,7 @@ frappe.ui.form.on('Cold Storage Dispatch', {
             return {
                 filters: {
                     "customer": doc.customer,
+                    "company": doc.company,
                     "docstatus": 1
                 }
             };
@@ -193,14 +187,16 @@ frappe.ui.form.on('Cold Storage Dispatch', {
                 return {
                     query: "cold_storage.get_customer_items_query.get_receipt_warehouses",
                     filters: {
-                        "linked_receipt": row.linked_receipt
+                        "linked_receipt": row.linked_receipt,
+                        "company": doc.company
                     }
                 };
             }
             return {
                 query: "cold_storage.get_customer_items_query.get_customer_warehouses",
                 filters: {
-                    "customer": doc.customer
+                    "customer": doc.customer,
+                    "company": doc.company
                 }
             };
         });
@@ -215,7 +211,8 @@ frappe.ui.form.on('Cold Storage Dispatch', {
                     "item_group": row.item_group,
                     "goods_item": row.goods_item,
                     "warehouse": row.warehouse,
-                    "linked_receipt": row.linked_receipt
+                    "linked_receipt": row.linked_receipt,
+                    "company": doc.company
                 }
             };
         });
@@ -228,7 +225,8 @@ frappe.ui.form.on('Cold Storage Dispatch', {
                 filters: {
                     "customer": doc.customer,
                     "warehouse": row.warehouse,
-                    "linked_receipt": row.linked_receipt
+                    "linked_receipt": row.linked_receipt,
+                    "company": doc.company
                 }
             };
         });
@@ -242,7 +240,8 @@ frappe.ui.form.on('Cold Storage Dispatch', {
                     "customer": doc.customer,
                     "goods_item": row.goods_item,
                     "warehouse": row.warehouse,
-                    "linked_receipt": row.linked_receipt
+                    "linked_receipt": row.linked_receipt,
+                    "company": doc.company
                 }
             };
         });
