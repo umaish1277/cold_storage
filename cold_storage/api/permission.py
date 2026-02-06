@@ -18,3 +18,12 @@ def get_query_condition(user):
 
 	companies_str = ", ".join([frappe.db.escape(c) for c in companies])
 	return f"company in ({companies_str})"
+
+def has_app_permission():
+	allowed_roles = [
+		"System Manager",
+		"Stock Manager",
+		"Cold Storage Accountant",
+		"Cold Storage Manager"
+	]
+	return frappe.session.user == "Administrator" or any(role in allowed_roles for role in frappe.get_roles())
