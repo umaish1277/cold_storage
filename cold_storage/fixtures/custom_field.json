@@ -227,5 +227,37 @@
         "in_list_view": 1,
         "in_standard_filter": 1,
         "doctype": "Custom Field"
+    },
+    {
+        "dt": "Customer",
+        "fieldname": "latitude",
+        "fieldtype": "Float",
+        "insert_after": "primary_address",
+        "label": "Latitude",
+        "name": "Customer-latitude",
+        "read_only": 1,
+        "fetch_from": "customer_primary_address.latitude",
+        "doctype": "Custom Field"
+    },
+    {
+        "dt": "Customer",
+        "fieldname": "longitude",
+        "fieldtype": "Float",
+        "insert_after": "latitude",
+        "label": "Longitude",
+        "name": "Customer-longitude",
+        "read_only": 1,
+        "fetch_from": "customer_primary_address.longitude",
+        "doctype": "Custom Field"
+    },
+    {
+        "dt": "Customer",
+        "fieldname": "geolocation",
+        "fieldtype": "Geolocation",
+        "insert_after": "longitude",
+        "label": "Geolocation",
+        "name": "Customer-geolocation",
+        "read_only": 1,
+        "doctype": "Custom Field"
     }
 ]
