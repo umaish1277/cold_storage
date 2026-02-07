@@ -117,6 +117,11 @@ frappe.ui.form.on('Cold Storage Dispatch', {
                     set_comp(value);
                 });
             }
+
+            // Clear old links if this is an amendment to prevent link validation errors
+            if (frm.doc.amended_from) {
+                frm.set_value("stock_entry", "");
+            }
         }
     },
 

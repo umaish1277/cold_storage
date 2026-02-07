@@ -13,6 +13,16 @@ class ColdStorageReceipt(Document):
 		if not self.company:
 			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 
+	def _validate_links(self):
+		# Clear old links if this is an amendment to prevent link validation errors
+		# This must happen before the core Document._validate_links() logic
+		if self.amended_from:
+			self.stock_entry = None
+			if hasattr(self, "transfer_loading_journal_entry"):
+				self.transfer_loading_journal_entry = None
+		
+		super()._validate_links()
+
 	def validate(self):
 		from cold_storage.cold_storage import utils
 		
@@ -105,6 +115,12 @@ class ColdStorageReceipt(Document):
 	def autoname(self):
 		if not self.company:
 			frappe.throw("Company is mandatory for naming")
+		
+		# Clear old links if this is an amendment to prevent link validation errors
+		if self.amended_from:
+			self.stock_entry = None
+			if hasattr(self, "transfer_loading_journal_entry"):
+				self.transfer_loading_journal_entry = None
 		
 		abbr = frappe.db.get_value("Company", self.company, "abbr")
 		if not abbr:

@@ -33,6 +33,12 @@ class ColdStorageDispatch(Document):
 			if customer_company:
 				self.company = customer_company
 
+	def _validate_links(self):
+		# Clear old links if this is an amendment to prevent link validation errors
+		if self.amended_from:
+			self.stock_entry = None
+		super()._validate_links()
+
 	def autoname(self):
 		if not self.company:
 			frappe.throw("Company is mandatory for naming")

@@ -120,6 +120,12 @@ frappe.ui.form.on('Cold Storage Receipt', {
                     set_comp(value);
                 });
             }
+
+            // Clear old links if this is an amendment to prevent link validation errors
+            if (frm.doc.amended_from) {
+                frm.set_value("stock_entry", "");
+                frm.set_value("transfer_loading_journal_entry", "");
+            }
         }
 
         // Inject Custom CSS to resize QR Code image in form view
