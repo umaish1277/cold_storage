@@ -1,18 +1,31 @@
 {
-    "name": "Bag Movement",
-    "doctype": "Dashboard Chart",
-    "chart_name": "Bag Movement",
-    "chart_type": "Report",
-    "report_name": "Bag Activity Trends",
-    "use_report_chart": 1,
-    "roles": [
-        {
-            "role": "Cold Storage Manager"
-        },
-        {
-            "role": "System Manager"
-        }
-    ],
-    "type": "Bar",
-    "width": "Full"
+ "chart_name": "Bag Movement",
+ "chart_type": "Report",
+ "creation": "2026-02-07 20:21:38.197617",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "[]",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2026-02-07 22:05:25.266599",
+ "modified_by": "Administrator",
+ "module": "Cold Storage",
+ "name": "Bag Movement",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Bag Activity Trends",
+ "roles": [
+  {
+   "role": "Cold Storage Manager"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "show_values_over_chart": 1,
+ "timeseries": 0,
+ "type": "Bar",
+ "use_report_chart": 1,
+ "y_axis": []
 }
