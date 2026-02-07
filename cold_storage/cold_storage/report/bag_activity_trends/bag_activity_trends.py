@@ -14,8 +14,9 @@ def execute(filters=None):
     
     # 1. Fetch Receipts (Inflow)
     conditions_in = ""
-    if filters.get("from_date"): conditions_in += f" AND receipt_date >= '{filters.get('from_date')}'"
-    if filters.get("to_date"): conditions_in += f" AND receipt_date <= '{filters.get('to_date')}'"
+    if filters.get("from_date"): conditions_in += f" AND p.receipt_date >= '{filters.get('from_date')}'"
+    if filters.get("to_date"): conditions_in += f" AND p.receipt_date <= '{filters.get('to_date')}'"
+    if filters.get("item"): conditions_in += f" AND c.goods_item = '{filters.get('item')}'"
 
     receipts = frappe.db.sql(f"""
         SELECT p.receipt_date as date, SUM(c.number_of_bags) as qty
@@ -27,13 +28,9 @@ def execute(filters=None):
 
     # 2. Fetch Dispatches (Outflow)
     conditions_out = ""
-    if filters.get("from_date"): conditions_out += f" AND dispatch_date >= '{filters.get('from_date')}'"
-    if filters.get("to_date"): conditions_out += f" AND dispatch_date <= '{filters.get('to_date')}'"
-    
-    # Dispatch uses 'total_packages' or we sum items? Let's check dispatch tables.
-    # Assuming 'Cold Storage Dispatch' has date field 'dispatch_date' 
-    # and items with 'qty' or 'number_of_bags'. 
-    # Let's verify Dispatch fields in a moment, but assuming standard structure based on Receipt.
+    if filters.get("from_date"): conditions_out += f" AND p.dispatch_date >= '{filters.get('from_date')}'"
+    if filters.get("to_date"): conditions_out += f" AND p.dispatch_date <= '{filters.get('to_date')}'"
+    if filters.get("item"): conditions_out += f" AND c.goods_item = '{filters.get('item')}'"
     
     dispatches = frappe.db.sql(f"""
         SELECT p.dispatch_date as date, SUM(c.number_of_bags) as qty
