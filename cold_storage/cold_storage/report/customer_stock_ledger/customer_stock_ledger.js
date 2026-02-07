@@ -20,20 +20,6 @@ frappe.query_reports["Customer Stock Ledger"] = {
             "reqd": 0
         },
         {
-            "fieldname": "batch_no",
-            "label": __("Batch No"),
-            "fieldtype": "Link",
-            "options": "Batch",
-            "get_query": function () {
-                var customer = frappe.query_report.get_filter_value("customer");
-                return {
-                    query: "cold_storage.get_customer_items_query.get_customer_batches",
-                    filters: { customer: customer }
-                };
-            },
-            "reqd": 0
-        },
-        {
             "fieldname": "item_code",
             "label": __("Item"),
             "fieldtype": "Link",
@@ -42,6 +28,20 @@ frappe.query_reports["Customer Stock Ledger"] = {
                 var customer = frappe.query_report.get_filter_value("customer");
                 return {
                     query: "cold_storage.get_customer_items_query.get_customer_items",
+                    filters: { customer: customer }
+                };
+            },
+            "reqd": 0
+        },
+        {
+            "fieldname": "batch_no",
+            "label": __("Batch No"),
+            "fieldtype": "Link",
+            "options": "Batch",
+            "get_query": function () {
+                var customer = frappe.query_report.get_filter_value("customer");
+                return {
+                    query: "cold_storage.get_customer_items_query.get_customer_batches",
                     filters: { customer: customer }
                 };
             },
