@@ -294,5 +294,8 @@ fixtures = [
     {
         "dt": "Property Setter",
         "filters": [["name", "in", ["Stock Entry Detail-allow_zero_valuation_rate-default"]]]
-    }
+    },
+    "Workflow",
+    "Workflow State",
+    "Workflow Action Master"
 ]
