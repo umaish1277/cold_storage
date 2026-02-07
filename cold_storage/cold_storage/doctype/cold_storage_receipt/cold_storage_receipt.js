@@ -235,7 +235,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                     filters: {
                         customer: doc.from_customer,
                         linked_receipt: doc.source_receipt,
-                        company: doc.company
+                        company: doc.company,
+                        goods_item: row.goods_item
                     }
                 };
             } else if (doc.receipt_type == "Warehouse Transfer") {
@@ -253,7 +254,8 @@ frappe.ui.form.on('Cold Storage Receipt', {
                 return {
                     filters: {
                         customer: doc.customer,
-                        company: doc.company
+                        company: doc.company,
+                        item: row.goods_item
                     }
                 };
             }
