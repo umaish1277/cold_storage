@@ -84,18 +84,22 @@ class ColdStorageReceipt(Document):
 					if item.number_of_bags > batch_avl:
 						frappe.throw(f"Row {item.idx}: Insufficient balance for Batch {item.batch_no}. Available: {batch_avl}, Requested: {item.number_of_bags}")
 
-		# Link Batch to Customer
-		if self.customer:
+		# Link Batch to Customer and Company
+		if self.customer or self.company:
 			for item in self.items:
 				if item.batch_no:
 					if frappe.db.exists("Batch", item.batch_no):
 						batch = frappe.get_doc("Batch", item.batch_no)
-						if not batch.customer:
+						modified = False
+						if self.customer and batch.customer != self.customer:
 							batch.customer = self.customer
-							batch.db_set("customer", self.customer)
-						elif batch.customer != self.customer:
-							# Optional: Warn if batch belongs to another customer?
-							pass
+							modified = True
+						if self.company and batch.company != self.company:
+							batch.company = self.company
+							modified = True
+						
+						if modified:
+							batch.save(ignore_permissions=True)
 
 
 	def autoname(self):

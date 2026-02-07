@@ -286,7 +286,9 @@ fixtures = [
             "Customer-company",
             "Customer_Group-company",
             "Item-company",
-            "Item_Group-company"
+            "Item_Group-company",
+            "Batch-company",
+            "Batch-customer"
         ]]]
     },
     {

@@ -213,38 +213,30 @@ frappe.ui.form.on('Cold Storage Receipt', {
         frm.set_query("batch_no", "items", function (doc, cdt, cdn) {
             var row = locals[cdt][cdn];
             if (doc.receipt_type == "Customer Transfer") {
-                if (doc.source_receipt) {
-                    return {
-                        query: "cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_customer_batches",
-                        filters: {
-                            customer: doc.from_customer,
-                            receipt: doc.source_receipt,
-                            company: doc.company
-                        }
-                    };
-                } else {
-                    return { filters: { "customer": doc.from_customer, "company": doc.company } };
-                }
+                return {
+                    query: "cold_storage.get_customer_items_query.get_customer_batches",
+                    filters: {
+                        customer: doc.from_customer,
+                        linked_receipt: doc.source_receipt,
+                        company: doc.company
+                    }
+                };
             } else if (doc.receipt_type == "Warehouse Transfer") {
-                if (doc.from_warehouse && doc.customer) {
-                    return {
-                        query: "cold_storage.cold_storage.doctype.cold_storage_dispatch.cold_storage_dispatch.get_customer_batches",
-                        filters: {
-                            customer: doc.customer,
-                            warehouse: doc.from_warehouse,
-                            goods_item: row.goods_item,
-                            item_group: row.item_group,
-                            company: doc.company
-                        }
-                    };
-                } else {
-                    return { filters: { "customer": doc.customer, "company": doc.company } };
-                }
+                return {
+                    query: "cold_storage.get_customer_items_query.get_customer_batches",
+                    filters: {
+                        customer: doc.customer,
+                        warehouse: doc.from_warehouse,
+                        goods_item: row.goods_item,
+                        item_group: row.item_group,
+                        company: doc.company
+                    }
+                };
             } else {
                 return {
                     filters: {
-                        "customer": doc.customer,
-                        "company": doc.company
+                        customer: doc.customer,
+                        company: doc.company
                     }
                 };
             }
