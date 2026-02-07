@@ -164,7 +164,7 @@ class ColdStorageReceipt(Document):
 			img.save(buffered, format="PNG")
 			img_str = buffered.getvalue()
 			
-			filename = f"QR-{self.name}.png"
+			filename = f"QR-{self.name}-{frappe.generate_hash(length=10)}.png"
 			
 			# Delete old file to ensure refresh
 			if self.qr_code:
