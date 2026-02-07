@@ -302,6 +302,12 @@ frappe.ui.form.on('Cold Storage Receipt', {
                         company: doc.company
                     }
                 };
+            } else {
+                return {
+                    filters: {
+                        company: doc.company
+                    }
+                };
             }
         });
 
