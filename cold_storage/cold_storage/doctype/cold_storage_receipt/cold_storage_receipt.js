@@ -1,5 +1,16 @@
 
 frappe.ui.form.on('Cold Storage Receipt Item', {
+    goods_item: function (frm, cdt, cdn) {
+        var row = locals[cdt][cdn];
+        if (row.goods_item) {
+            frappe.db.get_value('Item', row.goods_item, 'item_group', function (value) {
+                if (value && value.item_group) {
+                    frappe.model.set_value(cdt, cdn, 'item_group', value.item_group);
+                }
+            });
+        }
+    },
+
     number_of_bags: function (frm, cdt, cdn) {
         var row = locals[cdt][cdn];
         if (row.number_of_bags <= 0) {
