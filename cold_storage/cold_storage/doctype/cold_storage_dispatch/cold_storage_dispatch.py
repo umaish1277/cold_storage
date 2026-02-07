@@ -19,14 +19,25 @@ def get_total_batch_balance(customer, warehouse, batch_no):
 
 class ColdStorageDispatch(Document):
 	def onload(self):
-		default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		if not self.company:
-			self.company = default_company
-		self.set_onload("default_company", default_company)
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		self.set_onload("default_company", frappe.db.get_single_value("Cold Storage Settings", "default_company"))
 
 	def set_missing_values(self):
 		if not self.company:
 			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		
+		# Prioritize customer's company if set
+		if self.customer:
+			customer_company = frappe.db.get_value("Customer", self.customer, "company")
+			if customer_company:
+				self.company = customer_company
+
+	def _validate_links(self):
+		# Clear old links if this is an amendment to prevent link validation errors
+		if self.amended_from:
+			self.stock_entry = None
+		super()._validate_links()
 
 	def autoname(self):
 		if not self.company:
@@ -51,11 +62,15 @@ class ColdStorageDispatch(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def validate(self):
-		# Enforce default company from settings
-		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		
 		if not self.company:
-			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
+			frappe.throw(_("Company is mandatory. Please set it in the document or as 'Default Company' in Cold Storage Settings."))
+
+		# Multi-Company Validation
+		utils.validate_company(self)
+		utils.validate_consistent_company(self, "Customer", "customer")
 
 		# Validation: Check for Future Date
 		utils.validate_future_date(self.dispatch_date, "Dispatch Date")
@@ -72,6 +87,12 @@ class ColdStorageDispatch(Document):
 			
 			if row.number_of_bags <= 0:
 				frappe.throw(f"Row {row.idx}: Number of Bags must be greater than 0")
+
+			# Multi-Company Validation for items
+			utils.validate_consistent_company(row, "Cold Storage Receipt", "linked_receipt", "Linked Receipt")
+			utils.validate_consistent_company(row, "Warehouse", "warehouse", "Warehouse")
+			utils.validate_consistent_company(row, "Item", "goods_item", "Item")
+			utils.validate_consistent_company(row, "Item Group", "item_group", "Item Group")
 
 			# 1. Check if Batch exists in Receipt
 			# Optimized: Using shared balance logic

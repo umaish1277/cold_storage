@@ -5,29 +5,55 @@ from frappe.model.document import Document
 
 class ColdStorageReceipt(Document):
 	def onload(self):
-		default_company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 		if not self.company:
-			self.company = default_company
-		self.set_onload("default_company", default_company)
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		self.set_onload("default_company", frappe.db.get_single_value("Cold Storage Settings", "default_company"))
 
 	def set_missing_values(self):
 		if not self.company:
 			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 
+	def _validate_links(self):
+		# Clear old links if this is an amendment to prevent link validation errors
+		# This must happen before the core Document._validate_links() logic
+		if self.amended_from:
+			self.stock_entry = None
+			if hasattr(self, "transfer_loading_journal_entry"):
+				self.transfer_loading_journal_entry = None
+		
+		super()._validate_links()
+
 	def validate(self):
-		# Enforce default company from settings
-		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		from cold_storage.cold_storage import utils
 		
 		if not self.company:
-			frappe.throw("Company is mandatory. Please set 'Default Company' in Cold Storage Settings.")
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		
+		if not self.company:
+			frappe.throw(_("Company is mandatory. Please set it in the document or as 'Default Company' in Cold Storage Settings."))
 
-		from cold_storage.cold_storage import utils
+		# Multi-Company Validation
+		utils.validate_company(self)
+		utils.validate_consistent_company(self, "Customer", "customer")
+		utils.validate_consistent_company(self, "Warehouse", "warehouse")
+		
+		# For Transfer Logic
+		if self.from_customer:
+			utils.validate_consistent_company(self, "Customer", "from_customer", "From Customer")
+		if self.from_warehouse:
+			utils.validate_consistent_company(self, "Warehouse", "from_warehouse", "From Warehouse")
+
+
 		self.total_bags = sum([flt(item.number_of_bags) for item in self.items])
 		
 		# Validation: Check for positive number of bags
 		for item in self.items:
 			if item.number_of_bags <= 0:
 				frappe.throw(f"Row {item.idx}: Number of Bags must be greater than 0")
+			
+			# Item-level company validation
+			utils.validate_consistent_company(item, "Item", "goods_item", "Item")
+			utils.validate_consistent_company(item, "Item Group", "item_group", "Item Group")
 
 		# Validation: Check for Future Date
 		utils.validate_future_date(self.receipt_date, "Receipt Date")
@@ -68,23 +94,33 @@ class ColdStorageReceipt(Document):
 					if item.number_of_bags > batch_avl:
 						frappe.throw(f"Row {item.idx}: Insufficient balance for Batch {item.batch_no}. Available: {batch_avl}, Requested: {item.number_of_bags}")
 
-		# Link Batch to Customer
-		if self.customer:
+		# Link Batch to Customer and Company
+		if self.customer or self.company:
 			for item in self.items:
 				if item.batch_no:
 					if frappe.db.exists("Batch", item.batch_no):
 						batch = frappe.get_doc("Batch", item.batch_no)
-						if not batch.customer:
+						modified = False
+						if self.customer and batch.customer != self.customer:
 							batch.customer = self.customer
-							batch.db_set("customer", self.customer)
-						elif batch.customer != self.customer:
-							# Optional: Warn if batch belongs to another customer?
-							pass
+							modified = True
+						if self.company and batch.company != self.company:
+							batch.company = self.company
+							modified = True
+						
+						if modified:
+							batch.save(ignore_permissions=True)
 
 
 	def autoname(self):
 		if not self.company:
 			frappe.throw("Company is mandatory for naming")
+		
+		# Clear old links if this is an amendment to prevent link validation errors
+		if self.amended_from:
+			self.stock_entry = None
+			if hasattr(self, "transfer_loading_journal_entry"):
+				self.transfer_loading_journal_entry = None
 		
 		abbr = frappe.db.get_value("Company", self.company, "abbr")
 		if not abbr:
@@ -101,8 +137,8 @@ class ColdStorageReceipt(Document):
 		self.name = make_autoname(f"{series}.####")
 
 	def before_save(self):
-		# Enforce company again just in case
-		self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
+		if not self.company:
+			self.company = frappe.db.get_single_value("Cold Storage Settings", "default_company")
 
 		# Generate/Update QR Code
 		if self.name:
@@ -128,7 +164,7 @@ class ColdStorageReceipt(Document):
 			img.save(buffered, format="PNG")
 			img_str = buffered.getvalue()
 			
-			filename = f"QR-{self.name}.png"
+			filename = f"QR-{self.name}-{frappe.generate_hash(length=10)}.png"
 			
 			# Delete old file to ensure refresh
 			if self.qr_code:
