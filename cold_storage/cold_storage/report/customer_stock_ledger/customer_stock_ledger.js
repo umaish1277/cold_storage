@@ -38,6 +38,13 @@ frappe.query_reports["Customer Stock Ledger"] = {
             "label": __("Item"),
             "fieldtype": "Link",
             "options": "Item",
+            "get_query": function () {
+                var customer = frappe.query_report.get_filter_value("customer");
+                return {
+                    query: "cold_storage.get_customer_items_query.get_customer_items",
+                    filters: { customer: customer }
+                };
+            },
             "reqd": 0
         },
         {
