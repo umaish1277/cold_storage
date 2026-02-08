@@ -14,13 +14,6 @@ frappe.query_reports["Bag Activity Trends"] = {
             "fieldtype": "Date",
             "default": frappe.datetime.get_today(),
             "reqd": 1
-        },
-        {
-            "fieldname": "item",
-            "label": __("Item"),
-            "fieldtype": "Link",
-            "options": "Item",
-            "reqd": 0
         }
     ]
 };
