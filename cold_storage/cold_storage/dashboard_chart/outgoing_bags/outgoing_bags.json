@@ -1,33 +1,27 @@
 {
- "chart_name": "Outgoing Bags",
- "chart_type": "Report",
- "creation": "2026-02-07 20:21:38.213002",
- "docstatus": 0,
- "doctype": "Dashboard Chart",
- "filters_json": "{\"from_date\":\"2026-01-07\",\"to_date\":\"2026-02-07\"}",
- "idx": 0,
- "is_public": 1,
- "is_standard": 1,
- "modified": "2026-02-07 22:19:29.771040",
- "modified_by": "Administrator",
- "module": "Cold Storage",
- "name": "Outgoing Bags",
- "number_of_groups": 0,
- "owner": "Administrator",
- "report_name": "Bag Outflow Trends",
- "roles": [
-  {
-   "role": "System Manager"
-  },
-  {
-   "role": "Cold Storage Manager"
-  }
- ],
- "show_values_over_chart": 1,
- "time_interval": "Daily",
- "timeseries": 0,
- "timespan": "Last Year",
- "type": "Bar",
- "use_report_chart": 1,
- "y_axis": []
+    "chart_name": "Outgoing Bags",
+    "chart_type": "Report",
+    "doctype": "Dashboard Chart",
+    "filters_json": "{\"from_date\": \"2025-01-01\", \"to_date\": \"2026-12-31\"}",
+    "idx": 0,
+    "is_public": 1,
+    "roles": [
+        {
+            "role": "System Manager"
+        },
+        {
+            "role": "Cold Storage Manager"
+        }
+    ],
+    "is_standard": 1,
+    "module": "Cold Storage",
+    "name": "Outgoing Bags",
+    "report_name": "Bag Outflow Trends",
+    "show_values_over_chart": 0,
+    "time_interval": "Daily",
+    "timeseries": 0,
+    "timespan": "Last Year",
+    "type": "Bar",
+    "use_report_chart": 1,
+    "y_axis": []
 }

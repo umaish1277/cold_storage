@@ -120,21 +120,13 @@ app_include_js = "/assets/cold_storage/js/cold_storage_notifications.js"
 # -----------
 # Permissions evaluated in scripted ways
 
-permission_query_conditions = {
-	"Customer": "cold_storage.api.permission.get_query_condition",
-	"Customer Group": "cold_storage.api.permission.get_query_condition",
-	"Item": "cold_storage.api.permission.get_query_condition",
-	"Item Group": "cold_storage.api.permission.get_query_condition",
-	"Warehouse": "cold_storage.api.permission.get_query_condition",
-	"Batch": "cold_storage.api.permission.get_query_condition",
-	"Stock Entry": "cold_storage.api.permission.get_query_condition",
-	"Sales Invoice": "cold_storage.api.permission.get_query_condition",
-	"Payment Entry": "cold_storage.api.permission.get_query_condition",
-	"Journal Entry": "cold_storage.api.permission.get_query_condition",
-	"GL Entry": "cold_storage.api.permission.get_query_condition",
-	"Cold Storage Receipt": "cold_storage.api.permission.get_query_condition",
-	"Cold Storage Dispatch": "cold_storage.api.permission.get_query_condition",
-}
+# permission_query_conditions = {
+# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
+# }
+#
+# has_permission = {
+# 	"Event": "frappe.desk.doctype.event.event.has_permission",
+# }
 
 # Document Events
 # ---------------
@@ -142,33 +134,10 @@ permission_query_conditions = {
 
 doc_events = {
     "Cold Storage Receipt": {
-        "after_insert": "cold_storage.workflow.auto_request_approval",
-        "validate": "cold_storage.cold_storage.utils.validate_company"
+        "after_insert": "cold_storage.workflow.auto_request_approval"
     },
     "Cold Storage Dispatch": {
-        "after_insert": "cold_storage.workflow.auto_request_approval",
-        "validate": "cold_storage.cold_storage.utils.validate_company"
-    },
-    "Customer": {
-        "validate": "cold_storage.cold_storage.utils.validate_company"
-    },
-    "Item": {
-        "validate": "cold_storage.cold_storage.utils.validate_company"
-    },
-    "Warehouse": {
-        "validate": "cold_storage.cold_storage.utils.validate_company"
-    },
-    "Stock Entry": {
-        "validate": "cold_storage.cold_storage.utils.validate_company"
-    },
-    "Sales Invoice": {
-        "validate": "cold_storage.cold_storage.utils.validate_company"
-    },
-    "Payment Entry": {
-        "validate": "cold_storage.cold_storage.utils.validate_company"
-    },
-    "Journal Entry": {
-        "validate": "cold_storage.cold_storage.utils.validate_company"
+        "after_insert": "cold_storage.workflow.auto_request_approval"
     }
 }
 
@@ -282,20 +251,11 @@ fixtures = [
         "filters": [["name", "in", [
             "Item-allow_zero_valuation_rate",
             "Customer-cold_storage_tier",
-            "Warehouse-total_capacity_bags",
-            "Customer-company",
-            "Customer_Group-company",
-            "Item-company",
-            "Item_Group-company",
-            "Batch-company",
-            "Batch-customer"
+            "Warehouse-total_capacity_bags"
         ]]]
     },
     {
         "dt": "Property Setter",
         "filters": [["name", "in", ["Stock Entry Detail-allow_zero_valuation_rate-default"]]]
-    },
-    "Workflow",
-    "Workflow State",
-    "Workflow Action Master"
+    }
 ]

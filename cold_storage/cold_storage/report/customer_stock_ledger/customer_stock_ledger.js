@@ -20,31 +20,16 @@ frappe.query_reports["Customer Stock Ledger"] = {
             "reqd": 0
         },
         {
+            "fieldname": "batch_no",
+            "label": __("Batch No"),
+            "fieldtype": "Data",
+            "reqd": 0
+        },
+        {
             "fieldname": "item_code",
             "label": __("Item"),
             "fieldtype": "Link",
             "options": "Item",
-            "get_query": function () {
-                var customer = frappe.query_report.get_filter_value("customer");
-                return {
-                    query: "cold_storage.get_customer_items_query.get_customer_items",
-                    filters: { customer: customer }
-                };
-            },
-            "reqd": 0
-        },
-        {
-            "fieldname": "batch_no",
-            "label": __("Batch No"),
-            "fieldtype": "Link",
-            "options": "Batch",
-            "get_query": function () {
-                var customer = frappe.query_report.get_filter_value("customer");
-                return {
-                    query: "cold_storage.get_customer_items_query.get_customer_batches",
-                    filters: { customer: customer }
-                };
-            },
             "reqd": 0
         },
         {
@@ -52,13 +37,6 @@ frappe.query_reports["Customer Stock Ledger"] = {
             "label": __("Warehouse"),
             "fieldtype": "Link",
             "options": "Warehouse",
-            "get_query": function () {
-                var customer = frappe.query_report.get_filter_value("customer");
-                return {
-                    query: "cold_storage.get_customer_items_query.get_customer_warehouses",
-                    filters: { customer: customer }
-                };
-            },
             "reqd": 0
         },
         {

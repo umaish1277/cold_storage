@@ -1,7 +1,7 @@
 {
     "based_on": "receipt_date",
     "chart_name": "Incoming Bags",
-    "chart_type": "Sum",
+    "chart_type": "Count",
     "creation": "2024-05-24 12:00:00",
     "docstatus": 0,
     "doctype": "Dashboard Chart",
@@ -11,14 +11,13 @@
     "idx": 0,
     "is_public": 1,
     "is_standard": 1,
-    "last_synced_on": "2026-02-07 13:06:59.236918",
-    "modified": "2026-02-07 13:07:40.002357",
+    "last_synced_on": "2026-01-31 01:24:09.754001",
+    "modified": "2026-01-31 01:24:26.906110",
     "modified_by": "Administrator",
     "module": "Cold Storage",
     "name": "Incoming Bags",
     "number_of_groups": 0,
     "owner": "Administrator",
-    "report_name": "Bag Inflow Trends",
     "roles": [
         {
             "role": "System Manager"
@@ -28,11 +27,12 @@
         }
     ],
     "show_values_over_chart": 0,
-    "time_interval": "Weekly",
+    "time_interval": "Daily",
     "timeseries": 1,
     "timespan": "Last Year",
     "type": "Bar",
+    "report_name": "Bag Inflow Trends",
     "use_report_chart": 1,
-    "value_based_on": "total_bags",
+    "value_based_on": "receipt_date",
     "y_axis": []
 }
